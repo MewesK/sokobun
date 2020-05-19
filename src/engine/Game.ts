@@ -40,7 +40,7 @@ export default class Game {
         this.resourceLoader = new ResourceLoader();
         this.resourceLoader.load([sprites, tiles]).then(() => {
             // Prepare graphics
-            this.spriteMap = new TileMap(this.resourceLoader.get(sprites), 4, 4);
+            this.spriteMap = new TileMap(this.resourceLoader.get(sprites), 4, 6);
             this.tileMap = new TileMap(this.resourceLoader.get(tiles), 14, 22);
 
             // Prepare sprites
@@ -52,17 +52,17 @@ export default class Game {
                     right: [this.spriteMap.get(1, 0)]
                 }, 1),
                 walk: new Action({
-                    up: [this.spriteMap.get(2, 1), this.spriteMap.get(2, 0)],
-                    down: [this.spriteMap.get(3, 1), this.spriteMap.get(3, 0)],
-                    left: [this.spriteMap.get(0, 1), this.spriteMap.get(0, 0)],
-                    right: [this.spriteMap.get(1, 1), this.spriteMap.get(1, 0)],
-                }, 0.4),
+                    up: [this.spriteMap.get(2, 1), this.spriteMap.get(2, 0), this.spriteMap.get(2, 2), this.spriteMap.get(2, 0)],
+                    down: [this.spriteMap.get(3, 1), this.spriteMap.get(3, 0), this.spriteMap.get(3, 2), this.spriteMap.get(3, 0)],
+                    left: [this.spriteMap.get(0, 1), this.spriteMap.get(0, 0), this.spriteMap.get(0, 2), this.spriteMap.get(0, 0)],
+                    right: [this.spriteMap.get(1, 1), this.spriteMap.get(1, 0), this.spriteMap.get(1, 2), this.spriteMap.get(1, 0)],
+                }, 0.6),
                 push: new Action({
-                    up: [this.spriteMap.get(2, 3), this.spriteMap.get(2, 2)],
-                    down: [this.spriteMap.get(3, 3), this.spriteMap.get(3, 2)],
-                    left: [this.spriteMap.get(0, 3), this.spriteMap.get(0, 2)],
-                    right: [this.spriteMap.get(1, 3), this.spriteMap.get(1, 2)],
-                }, 0.4)
+                    up: [this.spriteMap.get(2, 3), this.spriteMap.get(2, 2), this.spriteMap.get(2, 4), this.spriteMap.get(2, 2)],
+                    down: [this.spriteMap.get(3, 3), this.spriteMap.get(3, 2), this.spriteMap.get(3, 4), this.spriteMap.get(3, 2)],
+                    left: [this.spriteMap.get(0, 3), this.spriteMap.get(0, 2), this.spriteMap.get(0, 4), this.spriteMap.get(0, 2)],
+                    right: [this.spriteMap.get(1, 3), this.spriteMap.get(1, 2), this.spriteMap.get(1, 4), this.spriteMap.get(1, 2)],
+                }, 0.6)
             });
             this.bunnie.setAction('stand');
             this.bunnie.setDirection('down');
@@ -152,7 +152,7 @@ export default class Game {
             }
         }
 
-        // Clear
+        // Clear canvas
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         // Draw sprite
