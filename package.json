@@ -1,0 +1,37 @@
+{
+  "name": "webpack-typescript-babel",
+  "version": "1.0.0",
+  "description": "A sample setup using Webpack and Babel to build TypeScript code, and using TypeScript for type-checking.",
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "npm run type-check -- --watch",
+    "build:types": "tsc --emitDeclarationOnly",
+    "build:js": "webpack --mode=production",
+    "build": "npm run build:types && npm run build:js",
+    "watch": "webpack --watch",
+    "serve": "webpack-dev-server"
+  },
+  "main": "dist/bundle.js",
+  "types": "dist/types/index.d.ts",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-proposal-object-rest-spread": "^7.9.0",
+    "@babel/preset-env": "^7.9.0",
+    "@babel/preset-typescript": "^7.9.0",
+    "babel-loader": "^8.1.0",
+    "css-loader": "^3.5.3",
+    "file-loader": "^6.0.0",
+    "fork-ts-checker-webpack-plugin": "^4.1.2",
+    "html-webpack-plugin": "^4.3.0",
+    "style-loader": "^1.2.1",
+    "typescript": "^3.8.3",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "resolutions": {
+    "terser": "3.14.1"
+  }
+}
