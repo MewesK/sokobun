@@ -2,7 +2,7 @@ import Game from './engine/Game';
 
 import './css/main.css';
 
-const canvas = <HTMLCanvasElement>document.createElement('canvas');
+const canvas = <HTMLCanvasElement>document.getElementById('game');
 
 // Instantiate game
 new Game(
@@ -10,5 +10,3 @@ new Game(
     512,
     448
 );
-
-document.body.appendChild(canvas);

@@ -2,6 +2,11 @@ body {
     background-color: white;
 }
 
+h1 {
+    display: block;
+    margin: 0 auto;
+}
+
 canvas {
     background-color: lightpink;
     display: block;

@@ -42,7 +42,8 @@ module.exports = {
   plugins: [
     new ForkTsCheckerWebpackPlugin(),
     new HtmlWebpackPlugin({
-      title: 'SokoBun'
+      title: 'SokoBun',
+      template: './public/index.html'
     }),
     new MiniCssExtractPlugin()
   ],
