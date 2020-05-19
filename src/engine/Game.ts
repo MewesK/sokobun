@@ -56,13 +56,13 @@ export default class Game {
                     down: [this.spriteMap.get(3, 1), this.spriteMap.get(3, 0)],
                     left: [this.spriteMap.get(0, 1), this.spriteMap.get(0, 0)],
                     right: [this.spriteMap.get(1, 1), this.spriteMap.get(1, 0)],
-                }, 0.5),
+                }, 0.4),
                 push: new Action({
                     up: [this.spriteMap.get(2, 3), this.spriteMap.get(2, 2)],
                     down: [this.spriteMap.get(3, 3), this.spriteMap.get(3, 2)],
                     left: [this.spriteMap.get(0, 3), this.spriteMap.get(0, 2)],
                     right: [this.spriteMap.get(1, 3), this.spriteMap.get(1, 2)],
-                }, 0.5)
+                }, 0.4)
             });
             this.bunnie.setAction('stand');
             this.bunnie.setDirection('down');
