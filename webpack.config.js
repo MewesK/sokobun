@@ -41,7 +41,7 @@ module.exports = {
   plugins: [
     new ForkTsCheckerWebpackPlugin(),
     new HtmlWebpackPlugin({
-      title: 'SokoBuun'
+      title: 'SokoBun'
     })
   ],
 

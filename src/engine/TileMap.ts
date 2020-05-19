@@ -1,5 +1,5 @@
-import {Resource} from "./Resource";
-import {Tile} from "./Tile";
+import {Resource} from './Resource';
+import {Tile} from './Tile';
 
 export  class TileMap {
     tileTable: Array<Array<Tile>>

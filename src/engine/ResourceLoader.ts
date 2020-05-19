@@ -17,11 +17,12 @@ export class ResourceLoader {
             srcList.forEach((src) => {
                 // Create and load image
                 const image = new Image();
-                image.onload = () => {
+                image.addEventListener('load', () => {
                     if (--counter === 0) {
+                        console.log('Resources finished loading...');
                         resolve();
                     }
-                };
+                }, false);
                 image.src = src;
 
                 // Create resource

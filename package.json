@@ -1,6 +1,6 @@
 {
-  "name": "webpack-typescript-babel",
-  "version": "1.0.0",
+  "name": "sokobun",
+  "version": "0.0.2",
   "description": "A sample setup using Webpack and Babel to build TypeScript code, and using TypeScript for type-checking.",
   "scripts": {
     "type-check": "tsc --noEmit",
@@ -9,7 +9,8 @@
     "build:js": "webpack --mode=production",
     "build": "npm run build:types && npm run build:js",
     "watch": "webpack --watch",
-    "serve": "webpack-dev-server"
+    "serve": "webpack-dev-server",
+    "deploy": "npm run build && gh-pages -d dist"
   },
   "main": "dist/bundle.js",
   "types": "dist/types/index.d.ts",
@@ -24,6 +25,7 @@
     "css-loader": "^3.5.3",
     "file-loader": "^6.0.0",
     "fork-ts-checker-webpack-plugin": "^4.1.2",
+    "gh-pages": "^2.2.0",
     "html-webpack-plugin": "^4.3.0",
     "style-loader": "^1.2.1",
     "typescript": "^3.8.3",

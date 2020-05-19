@@ -25,6 +25,10 @@ export class Sprite {
     }
 
     setAction = (name: string): void => {
+        if (this.action === name) {
+            return;
+        }
+
         if (this.actionList[name] === undefined) {
             throw new Error('Invalid direction');
         }
@@ -34,6 +38,10 @@ export class Sprite {
     };
 
     setDirection = (name: string): void => {
+        if (this.direction === name) {
+            return;
+        }
+
         if (this.actionList[this.action].directionList[name] === undefined) {
             throw new Error('Invalid direction');
         }

@@ -1,4 +1,4 @@
-# SokoBuun
+# SokoBun
 
 A Sokoban clone featuring buunnie!
 
