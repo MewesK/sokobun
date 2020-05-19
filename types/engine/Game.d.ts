@@ -9,7 +9,7 @@ export default class Game {
     tileMap: TileMap;
     lastTime: number;
     gameTime: number;
-    buunnie: Sprite;
+    bunnie: Sprite;
     constructor(canvas: HTMLCanvasElement, width: number, height: number);
     loop: () => void;
 }
