@@ -1,0 +1,9 @@
+body {
+    background-color: white;
+}
+
+canvas {
+    background-color: lightpink;
+    display: block;
+    margin: 0 auto;
+}
