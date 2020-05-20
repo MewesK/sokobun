@@ -1,8 +1,11 @@
 import sprites from '../images/sprites.png';
 import tiles from '../images/tiles.png';
+import level1 from '../levels/1.txt';
 import ResourceLoader from './ResourceLoader';
 import TileMap from './TileMap';
 import Bunnie from './Bunnie';
+import Level from './Level';
+import {Direction} from './Sprite';
 
 export default class Game {
     resourceLoader: ResourceLoader;
@@ -13,6 +16,7 @@ export default class Game {
     spriteMap!: TileMap;
     tileMap!: TileMap;
     bunnie!: Bunnie;
+    level!: Level;
 
     lastTime: number = 0;
     gameTime: number = 0;
@@ -42,13 +46,16 @@ export default class Game {
 
         // Prepare resources
         this.resourceLoader = new ResourceLoader();
-        this.resourceLoader.load([sprites, tiles]).then(() => {
+        this.resourceLoader.load([sprites, tiles, level1]).then(() => {
             // Prepare graphics
             this.spriteMap = new TileMap(this.resourceLoader.get(sprites), 4, 6);
             this.tileMap = new TileMap(this.resourceLoader.get(tiles), 14, 22);
 
             // Prepare sprites
             this.bunnie = new Bunnie(this.spriteMap);
+
+            // Prepare levels
+            this.level = new Level(this.resourceLoader.get(level1), this.tileMap);
 
             // Start game loop
             console.log('Starting game loop...');
@@ -63,25 +70,25 @@ export default class Game {
             case 'ArrowDown':
                 this.pressedKeyList[event.code] = true;
                 this.bunnie.setAction('walk');
-                this.bunnie.setDirection('down');
+                this.bunnie.setDirection(Direction.Down);
                 break;
             case 'KeyW':
             case 'ArrowUp':
                 this.pressedKeyList[event.code] = true;
                 this.bunnie.setAction('walk');
-                this.bunnie.setDirection('up');
+                this.bunnie.setDirection(Direction.Up);
                 break;
             case 'KeyA':
             case 'ArrowLeft':
                 this.pressedKeyList[event.code] = true;
                 this.bunnie.setAction('walk');
-                this.bunnie.setDirection('left');
+                this.bunnie.setDirection(Direction.Left);
                 break;
             case 'KeyD':
             case 'ArrowRight':
                 this.pressedKeyList[event.code] = true;
                 this.bunnie.setAction('walk');
-                this.bunnie.setDirection('right');
+                this.bunnie.setDirection(Direction.Right);
                 break;
         }
     }
@@ -105,6 +112,9 @@ export default class Game {
 
         // Clear canvas
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Draw level
+        this.level.draw(this.context);
 
         // Draw sprite
         this.bunnie.draw(this.context);

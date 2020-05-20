@@ -1,5 +1,25 @@
 import Tile from './Tile';
-import Action from './Action';
+
+export enum Direction {
+    Up ,
+    Down,
+    Left,
+    Right,
+}
+
+export class Action {
+    directionList: Record<Direction, Array<Tile>>;
+    duration: number;
+
+    constructor(directionList: Record<Direction, Array<Tile>>, duration: number) {
+        if (Object.keys(directionList).length === 0) {
+            throw new Error('There must be at least one direction.');
+        }
+
+        this.directionList = directionList;
+        this.duration = duration;
+    }
+}
 
 export default class Sprite {
     actionList: Record<string, Action>;
@@ -7,20 +27,20 @@ export default class Sprite {
     x: number;
     y: number;
     action: string;
-    direction: string;
+    direction: Direction;
     timer: number;
 
-    constructor(actionList: Record<string, Action>) {
+    constructor(actionList: Record<string, Action>, action: string, direction: Direction) {
         if (Object.keys(actionList).length === 0) {
             throw new Error('There must be at least one action.');
         }
 
         this.actionList = actionList;
+        this.action = action;
+        this.direction = direction;
 
         this.x = 0;
         this.y = 0;
-        this.action = Object.keys(this.actionList)[0];
-        this.direction = Object.keys(this.actionList[this.action].directionList)[0];
         this.timer = 0;
     }
 
@@ -30,24 +50,20 @@ export default class Sprite {
         }
 
         if (this.actionList[name] === undefined) {
-            throw new Error('Invalid direction');
+            throw new Error('Invalid action');
         }
 
         this.timer = 0;
         this.action = name;
     };
 
-    setDirection = (name: string): void => {
-        if (this.direction === name) {
+    setDirection = (direction: Direction): void => {
+        if (this.direction === direction) {
             return;
         }
 
-        if (this.actionList[this.action].directionList[name] === undefined) {
-            throw new Error('Invalid direction');
-        }
-
         this.timer = 0;
-        this.direction = name;
+        this.direction = direction;
     };
 
     update = (dt: number) => {
@@ -68,7 +84,7 @@ export default class Sprite {
         const tile = this.getTile();
 
         context.drawImage(
-            tile.resource.image,
+            tile.resource.resource,
             tile.x,
             tile.y,
             tile.width,
@@ -87,25 +103,25 @@ export default class Sprite {
         if (this.action === 'walk') {
             let x, y;
             switch (this.direction) {
-                case 'down':
+                case Direction.Down:
                     y = this.y + Math.round(dt * speed)
                     if (y + tile.height * 2 <= context.canvas.height) {
                         this.y = y;
                     }
                     break;
-                case 'up':
+                case Direction.Up:
                     y = this.y - Math.round(dt * speed)
                     if (y >= 0) {
                         this.y = y;
                     }
                     break;
-                case 'left':
+                case Direction.Left:
                     x = this.x - Math.round(dt * speed)
                     if (x >= 0) {
                         this.x = x;
                     }
                     break;
-                case 'right':
+                case Direction.Right:
                     x = this.x + Math.round(dt * speed)
                     if (x + tile.width * 2 <= context.canvas.width) {
                         this.x = x;

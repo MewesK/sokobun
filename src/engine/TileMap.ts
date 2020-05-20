@@ -5,8 +5,8 @@ export default class TileMap {
     tileTable: Array<Array<Tile>>
 
     constructor(resource: Resource, rows: number, columns: number) {
-        const width = resource.image.width / columns;
-        const height = resource.image.height / rows;
+        const width = resource.resource.width / columns;
+        const height = resource.resource.height / rows;
 
         // Calculate individual tiles
         this.tileTable = [];

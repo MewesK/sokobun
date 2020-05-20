@@ -8,25 +8,41 @@ export default class ResourceLoader {
     }
 
     /**
-     * Load an array of image URLs.
+     * Load an array of resource URLs.
      * @param srcList
      */
     load = (srcList: Array<string>): Promise<void> => {
         return new Promise((resolve) => {
             let counter = srcList.length;
-            srcList.forEach((src) => {
-                // Create and load image
-                const image = new Image();
-                image.addEventListener('load', () => {
-                    if (--counter === 0) {
-                        console.log('Resources finished loading...');
-                        resolve();
-                    }
-                }, false);
-                image.src = src;
 
-                // Create resource
-                this.cache.push(new Resource(src, image));
+            const decreaseCounter = () => {
+                if (--counter === 0) {
+                    console.log('Resources finished loading...');
+                    resolve();
+                }
+            };
+
+            // Create and load resources
+            srcList.forEach((src) => {
+                // Image resource handling
+                if (src.match(/^.*\.png$/)) {
+                    const image = new Image();
+                    image.addEventListener('load', () => {
+                        this.cache.push(new Resource(src, image));
+                        decreaseCounter();
+                    }, false);
+                    image.src = src;
+                }
+
+                // Other resource handling
+                else {
+                    fetch(src).then(response => {
+                        response.text().then(value => {
+                            this.cache.push(new Resource(src, value));
+                            decreaseCounter();
+                        })
+                    });
+                }
             });
         });
     }

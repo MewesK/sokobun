@@ -1,9 +1,9 @@
 export default class Resource {
     src: string;
-    image: HTMLImageElement;
+    resource: any;
 
-    constructor(src: string, image: HTMLImageElement) {
+    constructor(src: string, resource: any) {
         this.src = src;
-        this.image = image;
+        this.resource = resource;
     }
 }
