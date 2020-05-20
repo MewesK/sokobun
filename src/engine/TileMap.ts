@@ -1,7 +1,7 @@
-import {Resource} from './Resource';
-import {Tile} from './Tile';
+import Resource from './Resource';
+import Tile from './Tile';
 
-export  class TileMap {
+export default class TileMap {
     tileTable: Array<Array<Tile>>
 
     constructor(resource: Resource, rows: number, columns: number) {

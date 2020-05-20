@@ -1,6 +1,6 @@
-import {Resource} from "./Resource";
+import Resource from "./Resource";
 
-export class Tile {
+export default class Tile {
     resource: Resource;
     x: number;
     y: number;

@@ -1,7 +1,7 @@
-import {Tile} from './Tile';
-import {Action} from './Action';
+import Tile from './Tile';
+import Action from './Action';
 
-export class Sprite {
+export default class Sprite {
     actionList: Record<string, Action>;
 
     x: number;
@@ -62,5 +62,56 @@ export class Sprite {
         const direction = action.directionList[this.direction];
         const index = Math.floor(this.timer / (action.duration / direction.length));
         return direction[index];
+    }
+
+    draw = (context: CanvasRenderingContext2D) => {
+        const tile = this.getTile();
+
+        context.drawImage(
+            tile.resource.image,
+            tile.x,
+            tile.y,
+            tile.width,
+            tile.height,
+            this.x,
+            this.y,
+            tile.width * 2,
+            tile.height * 2
+        );
+    }
+
+    move = (dt: number, context: CanvasRenderingContext2D) => {
+        const speed = 150;
+        const tile = this.getTile();
+
+        if (this.action === 'walk') {
+            let x, y;
+            switch (this.direction) {
+                case 'down':
+                    y = this.y + Math.round(dt * speed)
+                    if (y + tile.height * 2 <= context.canvas.height) {
+                        this.y = y;
+                    }
+                    break;
+                case 'up':
+                    y = this.y - Math.round(dt * speed)
+                    if (y >= 0) {
+                        this.y = y;
+                    }
+                    break;
+                case 'left':
+                    x = this.x - Math.round(dt * speed)
+                    if (x >= 0) {
+                        this.x = x;
+                    }
+                    break;
+                case 'right':
+                    x = this.x + Math.round(dt * speed)
+                    if (x + tile.width * 2 <= context.canvas.width) {
+                        this.x = x;
+                    }
+                    break;
+            }
+        }
     }
 }

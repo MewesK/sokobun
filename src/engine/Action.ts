@@ -1,6 +1,6 @@
-import {Tile} from './Tile';
+import Tile from './Tile';
 
-export class Action {
+export default class Action {
     directionList: Record<string, Array<Tile>>;
     duration: number;
 

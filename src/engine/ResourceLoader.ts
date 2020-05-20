@@ -1,6 +1,6 @@
-import {Resource} from "./Resource";
+import Resource from "./Resource";
 
-export class ResourceLoader {
+export default class ResourceLoader {
     cache: Array<Resource>;
 
     constructor() {
