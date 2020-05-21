@@ -1,14 +1,16 @@
 import sprites from '../images/sprites.png';
 import tiles from '../images/tiles.png';
 import level1 from '../levels/1.txt';
-import ResourceLoader from './ResourceLoader';
+import ResourceLoader from './resource/ResourceLoader';
 import TileMap from './TileMap';
 import Bunnie from './Bunnie';
-import Level from './Level';
+import Level from './level/Level';
 import {Direction} from './Sprite';
+import LevelLoader from './level/LevelLoader';
 
 export default class Game {
-    resourceLoader: ResourceLoader;
+    resourceLoader: ResourceLoader = new ResourceLoader();
+    levelLoader: LevelLoader = new LevelLoader();
 
     canvas: HTMLCanvasElement;
     context: CanvasRenderingContext2D;
@@ -45,7 +47,6 @@ export default class Game {
         document.addEventListener('keyup', this.keyUp);
 
         // Prepare resources
-        this.resourceLoader = new ResourceLoader();
         this.resourceLoader.load([sprites, tiles, level1]).then(() => {
             // Prepare graphics
             this.spriteMap = new TileMap(this.resourceLoader.get(sprites), 4, 6);
@@ -55,12 +56,14 @@ export default class Game {
             this.bunnie = new Bunnie(this.spriteMap);
 
             // Prepare levels
-            this.level = new Level(this.resourceLoader.get(level1), this.tileMap);
+            this.levelLoader.load([this.resourceLoader.get(level1)], this.tileMap).then(() => {
+                this.level = this.levelLoader.get(level1);
 
-            // Start game loop
-            console.log('Starting game loop...');
-            this.lastTime = Date.now();
-            this.loop();
+                // Start game loop
+                console.log('Starting game loop...');
+                this.lastTime = Date.now();
+                this.loop();
+            });
         });
     }
 

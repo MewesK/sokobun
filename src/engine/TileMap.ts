@@ -1,4 +1,4 @@
-import Resource from './Resource';
+import Resource from './resource/Resource';
 import Tile from './Tile';
 
 export default class TileMap {

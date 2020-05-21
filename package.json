@@ -1,7 +1,13 @@
 {
-  "name": "sokobun",
-  "version": "0.0.2",
-  "description": "A sample setup using Webpack and Babel to build TypeScript code, and using TypeScript for type-checking.",
+  "name": "@mewesk/sokobun",
+  "version": "0.0.5",
+  "description": "A cute Sokoban clone featuring rabbits!",
+  "license": "MIT",
+  "author": "MewesK (https://github.com/MewesK)",
+  "contributors": [
+    "Buch (https://opengameart.org/users/buch)"
+  ],
+  "repository": "github:MewesK/sokobun",
   "scripts": {
     "type-check": "tsc --noEmit",
     "type-check:watch": "npm run type-check -- --watch",
@@ -14,12 +20,14 @@
   },
   "main": "dist/bundle.js",
   "types": "dist/types/index.d.ts",
-  "license": "MIT",
+  "dependencies": {
+    "core-js": "^3.6.5"
+  },
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-proposal-object-rest-spread": "^7.9.0",
-    "@babel/preset-env": "^7.9.0",
+    "@babel/preset-env": "^7.9.6",
     "@babel/preset-typescript": "^7.9.0",
     "babel-loader": "^8.1.0",
     "clean-webpack-plugin": "^3.0.0",

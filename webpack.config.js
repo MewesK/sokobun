@@ -58,7 +58,8 @@ module.exports = {
     new ForkTsCheckerWebpackPlugin(),
     new HtmlWebpackPlugin({
       title: 'SokoBun',
-      template: './public/index.html'
+      template: './public/index.html',
+      favicon: './public/favicon.png'
     }),
     new MiniCssExtractPlugin({
       filename: '[name].[contenthash].css'

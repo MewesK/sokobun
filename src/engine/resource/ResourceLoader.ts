@@ -1,24 +1,20 @@
-import Resource from "./Resource";
+import Resource from './Resource';
 
 export default class ResourceLoader {
-    cache: Array<Resource>;
-
-    constructor() {
-        this.cache = [];
-    }
+    cache: Array<Resource> = [];
 
     /**
      * Load an array of resource URLs.
      * @param srcList
      */
-    load = (srcList: Array<string>): Promise<void> => {
+    load = (srcList: Array<string>): Promise<Array<Resource>> => {
         return new Promise((resolve) => {
             let counter = srcList.length;
 
             const decreaseCounter = () => {
                 if (--counter === 0) {
                     console.log('Resources finished loading...');
-                    resolve();
+                    resolve(this.cache);
                 }
             };
 
