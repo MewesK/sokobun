@@ -119,6 +119,7 @@ export default class LevelLoader {
 
     /**
      * This function flood fills the floor based on the position of the player.
+     * Based on http://www.williammalone.com/articles/html5-canvas-javascript-paint-bucket-tool/
      *
      * @param level
      */
@@ -126,29 +127,29 @@ export default class LevelLoader {
         let levelWidth = level.levelMap[0].length;
         let levelHeight = level.levelMap.length;
 
-        let cellStack: Array<Array<number>> = [level.playerPosition];
-        while(cellStack.length) {
-            let newCell = cellStack.pop()!;
-            let columnIndex = newCell[0];
-            let rowIndex = newCell[1];
+        let positionStack: Array<Array<number>> = [level.playerPosition];
+        while(positionStack.length) {
+            let position = positionStack.pop()!;
+            let columnIndex = position[0];
+            let rowIndex = position[1];
 
             // Travel up
             while(rowIndex >= 0 && level.levelMap[rowIndex][columnIndex] === LevelTile.Void) {
                 rowIndex--;
             }
+            rowIndex++;
 
             // Travel down
-            rowIndex++;
             let reachLeft = false;
             let reachRight = false;
             while(rowIndex < levelHeight - 1 && level.levelMap[rowIndex][columnIndex] === LevelTile.Void) {
                 level.levelMap[rowIndex][columnIndex] = LevelTile.Floor;
 
-                // Check right
+                // Reach right
                 if(columnIndex > 0) {
                     if(level.levelMap[rowIndex][columnIndex - 1] === LevelTile.Void) {
                         if(!reachLeft) {
-                            cellStack.push([columnIndex - 1, rowIndex]);
+                            positionStack.push([columnIndex - 1, rowIndex]);
                             reachLeft = true;
                         }
                     } else if(reachLeft) {
@@ -156,11 +157,11 @@ export default class LevelLoader {
                     }
                 }
 
-                // Check left
+                // Reach left
                 if(columnIndex < levelWidth - 1) {
                     if(level.levelMap[rowIndex][columnIndex + 1] === LevelTile.Void) {
                         if(!reachRight) {
-                            cellStack.push([columnIndex + 1, rowIndex]);
+                            positionStack.push([columnIndex + 1, rowIndex]);
                             reachRight = true;
                         }
                     } else if(reachRight) {
