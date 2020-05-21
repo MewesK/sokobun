@@ -36,6 +36,12 @@ export default class LevelLoader {
         return result;
     }
 
+    /**
+     * This function parses the level file and creates an two dimensional array.
+     *
+     * @param resource
+     * @param level
+     */
     private parse = (resource: Resource, level: Level): Level => {
         let columnIndex = 0;
         let rowIndex = 0;
@@ -84,6 +90,11 @@ export default class LevelLoader {
         return level;
     }
 
+    /**
+     * This function makes sure that all rows have the same length.
+     *
+     * @param level
+     */
     private fillRows = (level: Level): Level => {
         // Find max row length
         let maxRowLength = 0;
@@ -106,6 +117,11 @@ export default class LevelLoader {
         return level;
     }
 
+    /**
+     * This function flood fills the floor based on the position of the player.
+     *
+     * @param level
+     */
     private floodFillFloor = (level: Level): Level => {
         let levelWidth = level.levelMap[0].length;
         let levelHeight = level.levelMap.length;
@@ -171,6 +187,11 @@ export default class LevelLoader {
         return level;
     }
 
+    /**
+     * This function replaces all walls with void.
+     *
+     * @param level
+     */
     private removeWalls = (level: Level): Level => {
         level.levelMap.forEach(row => {
             row.forEach((cell, columnIndex) => {
@@ -183,6 +204,11 @@ export default class LevelLoader {
         return level;
     }
 
+    /**
+     * This function removes all empty rows at the top and bottom of the level.
+     *
+     * @param level
+     */
     // @ts-ignore
     private removeEmptyRows = (level: Level): Level => {
         // TODO: Adjust player/box/destination positions
