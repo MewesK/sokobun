@@ -1,6 +1,7 @@
 import Resource from '../resource/Resource';
-import TileMap from '../tile/TileMap';
 import Level, {TileStyle} from './Level';
+import Tile from '../tile/Tile';
+import WorldTileMap from '../tile/WorldTileMap';
 
 enum TileType {
     Undefined,
@@ -13,26 +14,43 @@ enum TileType {
 export default class LevelLoader {
     cache: Array<Level> = [];
 
-    load = (resourceList: Array<Resource>, tileMap: TileMap): Promise<Array<Level>> => {
+    /**
+     * Loads the given levels using the the given world tile map.
+     *
+     * @param resourceList
+     * @param worldTileMap
+     */
+    load = (resourceList: Array<Resource>, worldTileMap: WorldTileMap): Promise<Array<Level>> => {
         return new Promise((resolve) => {
             resourceList.forEach((resource) => {
                 console.debug(`Loading level ${resource.src}...`);
 
-                const level = new Level(resource.src, tileMap);
                 const tileTypeMap: Array<Array<TileType>> = [[]];
 
-                this.parse(resource, level, tileTypeMap);
+                const playerPosition: [number, number] = [0, 0];
+                const boxPositionList: Array<[number, number]> = [];
+                const destinationPositionList: Array<[number, number]> = [];
+
+                this.parse(resource, tileTypeMap, playerPosition, boxPositionList, destinationPositionList);
                 this.fillRows(tileTypeMap);
-                this.floodFillFloor(level, tileTypeMap);
+                this.floodFillFloor(tileTypeMap, playerPosition, boxPositionList, destinationPositionList);
                 this.removeWalls(tileTypeMap);
                 this.floodFillVoid(tileTypeMap);
                 this.floodFillPonds(tileTypeMap);
                 // TODO: Remove empty rows
                 // TODO: Remove empty columns
                 // TODO: Add pillar effect
-                this.convertToTiles(level, tileTypeMap);
 
-                this.cache.push(level);
+                this.cache.push(
+                    new Level(
+                        resource.src,
+                        worldTileMap,
+                        this.convertToTiles(worldTileMap, tileTypeMap),
+                        playerPosition,
+                        boxPositionList,
+                        destinationPositionList
+                    )
+                );
             });
 
             console.log('Levels finished loading...');
@@ -59,11 +77,20 @@ export default class LevelLoader {
      * @param resource
      * @param level
      * @param tileTypeMap
+     * @param playerPosition
+     * @param boxPositionList
+     * @param destinationPositionList
      */
-    private parse = (resource: Resource, level: Level, tileTypeMap: Array<Array<TileType>>): void => {
+    private parse = (
+        resource: Resource,
+        tileTypeMap: Array<Array<TileType>>,
+        playerPosition: [number, number],
+        boxPositionList: Array<[number, number]>,
+        destinationPositionList: Array<[number, number]>
+    ): void => {
         let columnIndex = 0;
         let rowIndex = 0;
-        let playerPosition: [number, number]|undefined = undefined;
+        let tempPlayerPosition: [number, number]|undefined = undefined;
 
         [...resource.data].forEach(character => {
             switch (character) {
@@ -78,43 +105,44 @@ export default class LevelLoader {
                     tileTypeMap[rowIndex][columnIndex++] = TileType.Undefined;
                     break;
                 case '@':
-                    if (playerPosition !== undefined) {
+                    if (tempPlayerPosition !== undefined) {
                         throw new Error('Invalid level (multiple player)');
                     }
 
                     console.debug(`Player found at [${columnIndex}, ${rowIndex}]`)
 
-                    playerPosition = [columnIndex, rowIndex];
+                    tempPlayerPosition = [columnIndex, rowIndex];
                     tileTypeMap[rowIndex][columnIndex++] = TileType.Undefined;
                     break;
                 case '$':
                     console.debug(`Box found at [${columnIndex}, ${rowIndex}]`)
 
-                    level.boxPositionList.push([columnIndex, rowIndex]);
+                    boxPositionList.push([columnIndex, rowIndex]);
                     tileTypeMap[rowIndex][columnIndex++] = TileType.Undefined;
                     break;
                 case '.':
                     console.debug(`Destination found at [${columnIndex}, ${rowIndex}]`)
 
-                    level.destinationPositionList.push([columnIndex, rowIndex]);
+                    destinationPositionList.push([columnIndex, rowIndex]);
                     tileTypeMap[rowIndex][columnIndex++] = TileType.Undefined;
                     break;
             }
         });
 
         // Error checks
-        if (playerPosition === undefined) {
+        if (tempPlayerPosition === undefined) {
             throw new Error('Invalid level (no player)');
         } else {
-            level.playerPosition = playerPosition;
+            playerPosition[0] = tempPlayerPosition[0];
+            playerPosition[1] = tempPlayerPosition[1];
         }
-        if (level.boxPositionList.length === 0) {
+        if (boxPositionList.length === 0) {
             throw new Error('Invalid level (no boxes)');
         }
-        if (level.destinationPositionList.length === 0) {
+        if (destinationPositionList.length === 0) {
             throw new Error('Invalid level (no destinations)');
         }
-        if (level.boxPositionList.length !== level.destinationPositionList.length) {
+        if (boxPositionList.length !== destinationPositionList.length) {
             throw new Error('Invalid level (box and destination count is not equal)');
         }
     }
@@ -149,24 +177,31 @@ export default class LevelLoader {
     /**
      * Flood fills the floor based on the position of the player.
      *
-     * @param level
      * @param tileTypeMap
+     * @param playerPosition
+     * @param boxPositionList
+     * @param destinationPositionList
      */
-    private floodFillFloor = (level: Level, tileTypeMap: Array<Array<TileType>>): void => {
+    private floodFillFloor = (
+        tileTypeMap: Array<Array<TileType>>,
+        playerPosition: [number, number],
+        boxPositionList: Array<[number, number]>,
+        destinationPositionList: Array<[number, number]>
+    ): void => {
         this.floodFill(
-            level.playerPosition[0],
-            level.playerPosition[1],
+            playerPosition[0],
+            playerPosition[1],
             TileType.Floor,
             tileTypeMap
         );
 
         // Error checks
-        level.boxPositionList.forEach(boxPosition => {
+        boxPositionList.forEach(boxPosition => {
             if (tileTypeMap[boxPosition[1]][boxPosition[0]] !== TileType.Floor) {
                 throw new Error('Invalid level (box position not on floor)');
             }
         });
-        level.destinationPositionList.forEach(destinationPosition => {
+        destinationPositionList.forEach(destinationPosition => {
             if (tileTypeMap[destinationPosition[1]][destinationPosition[0]] !== TileType.Floor) {
                 throw new Error('Invalid level (destination position not on floor)');
             }
@@ -254,10 +289,10 @@ export default class LevelLoader {
     /**
      * Converts tile types into tiles.
      *
-     * @param level
+     * @param worldTileMap
      * @param tileTypeMap
      */
-    private convertToTiles = (level: Level, tileTypeMap: Array<Array<TileType>>): void => {
+    private convertToTiles = (worldTileMap: WorldTileMap, tileTypeMap: Array<Array<TileType>>): Array<Array<Tile>> => {
         /**
          * Returns a single bit of the pattern for the given coordinates.
          *
@@ -297,28 +332,32 @@ export default class LevelLoader {
             return pattern;
         };
 
+        const levelMap: Array<Array<Tile>> = [];
+
         for (let rowIndex = 0; rowIndex < tileTypeMap.length; rowIndex++) {
-            level.levelMap[rowIndex] = [];
+            levelMap[rowIndex] = [];
             for (let columnIndex = 0; columnIndex < tileTypeMap[0].length; columnIndex++) {
                 switch (tileTypeMap[rowIndex][columnIndex]) {
                     case TileType.Floor:
-                        level.levelMap[rowIndex][columnIndex] = level.getTileByPattern(
+                        levelMap[rowIndex][columnIndex] = worldTileMap.getTileByPattern(
                             getPatternAt(columnIndex, rowIndex, TileType.Floor),
                             TileStyle.Grass
                         );
                         break;
                     case TileType.Water:
-                        level.levelMap[rowIndex][columnIndex] = level.getTileByPattern(
+                        levelMap[rowIndex][columnIndex] = worldTileMap.getTileByPattern(
                             getPatternAt(columnIndex, rowIndex, TileType.Water),
                             TileStyle.Water
                         );
                         break;
                     case TileType.Void:
-                        level.levelMap[rowIndex][columnIndex] = level.tileMap.get(8, 21);
+                        levelMap[rowIndex][columnIndex] = worldTileMap.get(8, 21);
                         break;
                 }
             }
         }
+
+        return levelMap;
     }
 
     /**

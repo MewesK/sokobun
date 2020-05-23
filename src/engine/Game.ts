@@ -7,6 +7,7 @@ import Bunnie from './Bunnie';
 import Level from './level/Level';
 import {Direction} from './Sprite';
 import LevelLoader from './level/LevelLoader';
+import WorldTileMap from './tile/WorldTileMap';
 
 export default class Game {
     resourceLoader: ResourceLoader = new ResourceLoader();
@@ -15,13 +16,10 @@ export default class Game {
     canvas: HTMLCanvasElement;
     context: CanvasRenderingContext2D;
 
-    levelCanvas: HTMLCanvasElement;
-    levelContext!: CanvasRenderingContext2D;
-
     zoom = 2;
 
     spriteMap!: TileMap;
-    tileMap!: TileMap;
+    worldTileMap!: WorldTileMap;
     bunnie!: Bunnie;
     level!: Level;
 
@@ -37,9 +35,8 @@ export default class Game {
 
         // Prepare canvas
         this.canvas = canvas;
-        this.levelCanvas = document.createElement('canvas');
-
-        this.setCanvasSize(width, height);
+        this.canvas.width = width * zoom;
+        this.canvas.height = height * zoom;
 
         // Prepare context
         const context = this.canvas.getContext('2d');
@@ -47,12 +44,6 @@ export default class Game {
             throw new Error('2D context not supported');
         }
         this.context = context;
-
-        const levelContext = this.levelCanvas.getContext('2d');
-        if (levelContext === null) {
-            throw new Error('2D context not supported');
-        }
-        this.levelContext = levelContext;
 
         // Register event listener
         document.addEventListener('keydown', this.keyDown);
@@ -62,27 +53,22 @@ export default class Game {
         this.resourceLoader.load([sprites, tiles, level1]).then(() => {
             // Prepare graphics
             this.spriteMap = new TileMap(this.resourceLoader.get(sprites), 4, 6);
-            this.tileMap = new TileMap(this.resourceLoader.get(tiles), 14, 22);
+            this.worldTileMap = new WorldTileMap(this.resourceLoader.get(tiles), 14, 22);
 
             // Prepare sprites
             this.bunnie = new Bunnie(this.spriteMap);
 
             // Prepare levels
-            this.levelLoader.load([this.resourceLoader.get(level1)], this.tileMap).then(() => {
+            this.levelLoader.load([this.resourceLoader.get(level1)], this.worldTileMap).then(() => {
                 this.level = this.levelLoader.get(level1);
 
-                this.setCanvasSize(
-                    this.level.levelMap[0].length * this.level.getTile(0, 0).width,
-                    this.level.levelMap.length * this.level.getTile(0, 0).height
-                );
-
-                this.bunnie.x = this.level.playerPosition[0] * this.level.getTile(0, 0).width;
-                this.bunnie.y = this.level.playerPosition[1] * this.level.getTile(0, 0).height;
-
+                this.canvas.width = this.level.levelMap[0].length * this.level.getTile(0, 0).width * zoom;
+                this.canvas.height = this.level.levelMap.length * this.level.getTile(0, 0).height * zoom;
                 console.log(`Setting canvas size to [${this.canvas.width}x${this.canvas.height}] for level ${this.level.src}...`);
 
-                // Draw level to buffer
-                this.level.draw(this.levelContext, this.zoom);
+                // Set player position
+                this.bunnie.x = this.level.playerPosition[0] * this.level.getTile(0, 0).width;
+                this.bunnie.y = this.level.playerPosition[1] * this.level.getTile(0, 0).height;
 
                 // Start game loop
                 console.log('Starting game loop...');
@@ -91,11 +77,6 @@ export default class Game {
             });
         });
     }
-
-    setCanvasSize = (width: number, height: number): void => {
-        this.canvas.width = this.levelCanvas.width = width * this.zoom;
-        this.canvas.height = this.levelCanvas.height = height * this.zoom;
-    };
 
     keyDown = (event: KeyboardEvent): void => {
         switch (event.code) {
@@ -144,8 +125,7 @@ export default class Game {
         this.bunnie.move(dt, this.context);
 
         // Draw level
-        this.context.imageSmoothingEnabled = false;
-        this.context.drawImage(this.levelCanvas, 0, 0);
+        this.level.draw(this.context, this.zoom);
 
         // Draw sprite
         this.bunnie.draw(this.context, this.zoom);
