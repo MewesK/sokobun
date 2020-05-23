@@ -15,6 +15,9 @@ export default class Game {
     canvas: HTMLCanvasElement;
     context: CanvasRenderingContext2D;
 
+    levelCanvas: HTMLCanvasElement;
+    levelContext!: CanvasRenderingContext2D;
+
     zoom = 2;
 
     spriteMap!: TileMap;
@@ -27,14 +30,16 @@ export default class Game {
 
     pressedKeyList: Record<string, boolean> = {};
 
-    constructor(canvas: HTMLCanvasElement, width: number, height: number) {
+    constructor(canvas: HTMLCanvasElement, width: number = 256, height: number = 224, zoom: number = 1) {
         console.log('Initializing game...');
+
+        this.zoom = zoom;
 
         // Prepare canvas
         this.canvas = canvas;
+        this.levelCanvas = document.createElement('canvas');
 
-        this.canvas.width = width;
-        this.canvas.height = height;
+        this.setCanvasSize(width, height);
 
         // Prepare context
         const context = this.canvas.getContext('2d');
@@ -42,7 +47,12 @@ export default class Game {
             throw new Error('2D context not supported');
         }
         this.context = context;
-        this.context.imageSmoothingEnabled = false;
+
+        const levelContext = this.levelCanvas.getContext('2d');
+        if (levelContext === null) {
+            throw new Error('2D context not supported');
+        }
+        this.levelContext = levelContext;
 
         // Register event listener
         document.addEventListener('keydown', this.keyDown);
@@ -61,13 +71,18 @@ export default class Game {
             this.levelLoader.load([this.resourceLoader.get(level1)], this.tileMap).then(() => {
                 this.level = this.levelLoader.get(level1);
 
-                this.canvas.width = this.level.levelMap[0].length * this.level.getTile(0, 0).width * this.zoom;
-                this.canvas.height = this.level.levelMap.length * this.level.getTile(0, 0).height * this.zoom;
+                this.setCanvasSize(
+                    this.level.levelMap[0].length * this.level.getTile(0, 0).width,
+                    this.level.levelMap.length * this.level.getTile(0, 0).height
+                );
 
                 this.bunnie.x = this.level.playerPosition[0] * this.level.getTile(0, 0).width;
                 this.bunnie.y = this.level.playerPosition[1] * this.level.getTile(0, 0).height;
 
                 console.log(`Setting canvas size to [${this.canvas.width}x${this.canvas.height}] for level ${this.level.src}...`);
+
+                // Draw level to buffer
+                this.level.draw(this.levelContext, this.zoom);
 
                 // Start game loop
                 console.log('Starting game loop...');
@@ -77,7 +92,12 @@ export default class Game {
         });
     }
 
-    keyDown = (event: KeyboardEvent) => {
+    setCanvasSize = (width: number, height: number): void => {
+        this.canvas.width = this.levelCanvas.width = width * this.zoom;
+        this.canvas.height = this.levelCanvas.height = height * this.zoom;
+    };
+
+    keyDown = (event: KeyboardEvent): void => {
         switch (event.code) {
             case 'KeyS':
             case 'ArrowDown':
@@ -106,7 +126,7 @@ export default class Game {
         }
     }
 
-    keyUp = (event: KeyboardEvent) => {
+    keyUp = (event: KeyboardEvent): void => {
         this.pressedKeyList[event.code] = false;
 
         // Set action to stand if no key is pressed anymore
@@ -115,7 +135,7 @@ export default class Game {
         }
     }
 
-    loop = () => {
+    loop = (): void => {
         let now = Date.now();
         let dt = (now - this.lastTime) / 1000.0;
         this.gameTime += dt;
@@ -123,11 +143,9 @@ export default class Game {
         // Move sprite
         this.bunnie.move(dt, this.context);
 
-        // Clear canvas
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
         // Draw level
-        this.level.draw(this.context, this.zoom);
+        this.context.imageSmoothingEnabled = false;
+        this.context.drawImage(this.levelCanvas, 0, 0);
 
         // Draw sprite
         this.bunnie.draw(this.context, this.zoom);

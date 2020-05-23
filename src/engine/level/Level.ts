@@ -9,6 +9,7 @@ export enum TileStyle {
 }
 
 export default class Level {
+    static backgroundColor = '#252230';
     static rowsPerTileStyle = 8
     static columnsPerTileStyle = 8
     static tilePatternList:Record<number, number> = {
@@ -296,6 +297,10 @@ export default class Level {
      * @param zoom
      */
     draw = (context: CanvasRenderingContext2D, zoom: number): void => {
+        context.imageSmoothingEnabled = false;
+        context.fillStyle = Level.backgroundColor;
+        context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+
         for (let rowIndex = 0; rowIndex < this.levelMap.length; rowIndex++) {
             for (let columnIndex = 0; columnIndex < this.levelMap[0].length; columnIndex++) {
                 const tile = this.getTile(rowIndex, columnIndex);

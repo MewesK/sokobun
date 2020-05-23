@@ -70,7 +70,7 @@ export default class Bunnie extends Sprite {
      */
     draw = (context: CanvasRenderingContext2D, zoom: number): void => {
         const tile = this.getTile();
-
+        context.imageSmoothingEnabled = false;
         context.drawImage(
             tile.resource.data,
             tile.x,
@@ -78,7 +78,7 @@ export default class Bunnie extends Sprite {
             tile.width,
             tile.height,
             this.x * zoom,
-            this.y * zoom - (tile.height / (3 - zoom)),
+            (this.y - Math.round(tile.height / 2)) * zoom,
             tile.width * zoom,
             tile.height * zoom
         );

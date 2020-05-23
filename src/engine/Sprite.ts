@@ -22,7 +22,7 @@ export class Action {
 }
 
 export default class Sprite {
-    static speed = 80;
+    static speed = 40;
 
     actionList: Record<string, Action>;
 
@@ -108,7 +108,7 @@ export default class Sprite {
      */
     draw = (context: CanvasRenderingContext2D, zoom: number): void => {
         const tile = this.getTile();
-
+        context.imageSmoothingEnabled = false;
         context.drawImage(
             tile.resource.data,
             tile.x,
