@@ -321,14 +321,14 @@ export default class LevelLoader {
          */
         const getPatternAt = (columnIndex: number, rowIndex: number, tileType: TileType): string => {
             let pattern = '';
-            pattern += getTileTypeAt(rowIndex - 1, columnIndex - 1, tileType);
-            pattern += getTileTypeAt(rowIndex - 1, columnIndex, tileType);
-            pattern += getTileTypeAt(rowIndex - 1, columnIndex + 1, tileType);
-            pattern += getTileTypeAt(rowIndex, columnIndex - 1, tileType);
-            pattern += getTileTypeAt(rowIndex, columnIndex + 1, tileType);
-            pattern += getTileTypeAt(rowIndex + 1, columnIndex - 1, tileType);
-            pattern += getTileTypeAt(rowIndex + 1, columnIndex, tileType);
-            pattern += getTileTypeAt(rowIndex + 1, columnIndex + 1, tileType);
+            pattern += getTileTypeAt(columnIndex - 1,rowIndex - 1,  tileType);
+            pattern += getTileTypeAt(columnIndex,rowIndex - 1,  tileType);
+            pattern += getTileTypeAt(columnIndex + 1,rowIndex - 1,  tileType);
+            pattern += getTileTypeAt(columnIndex - 1,rowIndex,  tileType);
+            pattern += getTileTypeAt(columnIndex + 1,rowIndex,  tileType);
+            pattern += getTileTypeAt(columnIndex - 1,rowIndex + 1,  tileType);
+            pattern += getTileTypeAt(columnIndex, rowIndex + 1, tileType);
+            pattern += getTileTypeAt(columnIndex + 1,rowIndex + 1,  tileType);
             return pattern;
         };
 
