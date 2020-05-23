@@ -110,7 +110,7 @@ export default class Sprite {
         const tile = this.getTile();
 
         context.drawImage(
-            tile.resource.resource,
+            tile.resource.data,
             tile.x,
             tile.y,
             tile.width,

@@ -65,7 +65,7 @@ export default class LevelLoader {
         let rowIndex = 0;
         let playerPosition: [number, number]|undefined = undefined;
 
-        [...resource.resource].forEach(character => {
+        [...resource.data].forEach(character => {
             switch (character) {
                 case '\n':
                     columnIndex = 0;

@@ -4,7 +4,7 @@ export default class ResourceLoader {
     cache: Array<Resource> = [];
 
     /**
-     * Load an array of resource URLs.
+     * Load an array of data URLs.
      * @param srcList
      */
     load = (srcList: Array<string>): Promise<Array<Resource>> => {
@@ -20,7 +20,7 @@ export default class ResourceLoader {
 
             // Create and load resources
             srcList.forEach((src) => {
-                // Image resource handling
+                // Image data handling
                 if (src.match(/^.*\.png$/)) {
                     const image = new Image();
                     image.addEventListener('load', () => {
@@ -30,7 +30,7 @@ export default class ResourceLoader {
                     image.src = src;
                 }
 
-                // Other resource handling
+                // Other data handling
                 else {
                     fetch(src).then(response => {
                         response.text().then(value => {

@@ -1,9 +1,9 @@
 export default class Resource {
     src: string;
-    resource: any;
+    data: any;
 
     constructor(src: string, resource: any) {
         this.src = src;
-        this.resource = resource;
+        this.data = resource;
     }
 }

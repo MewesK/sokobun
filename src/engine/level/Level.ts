@@ -301,7 +301,7 @@ export default class Level {
                 const tile = this.getTile(rowIndex, columnIndex);
 
                 context.drawImage(
-                    tile.resource.resource,
+                    tile.resource.data,
                     tile.x,
                     tile.y,
                     tile.width,
