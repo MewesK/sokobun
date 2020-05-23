@@ -1,7 +1,7 @@
 import Sprite, {Action, Direction} from './Sprite';
-import TileMap from './TileMap';
+import TileMap from './tile/TileMap';
 
-export default class Bunnie extends Sprite{
+export default class Bunnie extends Sprite {
     constructor(spriteMap: TileMap) {
         super({
             stand: new Action({
@@ -60,5 +60,27 @@ export default class Bunnie extends Sprite{
                 ],
             }, 0.6)
         }, 'stand', Direction.Down);
+    }
+
+    /**
+     * Draws the sprite with the given context.
+     *
+     * @param context
+     * @param zoom
+     */
+    draw = (context: CanvasRenderingContext2D, zoom: number): void => {
+        const tile = this.getTile();
+
+        context.drawImage(
+            tile.resource.resource,
+            tile.x,
+            tile.y,
+            tile.width,
+            tile.height,
+            this.x * zoom,
+            this.y * zoom - (tile.height / (3 - zoom)),
+            tile.width * zoom,
+            tile.height * zoom
+        );
     }
 }

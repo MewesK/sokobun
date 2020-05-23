@@ -1,4 +1,4 @@
-import Resource from "./resource/Resource";
+import Resource from "../resource/Resource";
 
 export default class Tile {
     resource: Resource;

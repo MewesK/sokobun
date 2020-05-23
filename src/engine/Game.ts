@@ -2,7 +2,7 @@ import sprites from '../images/sprites.png';
 import tiles from '../images/tiles.png';
 import level1 from '../levels/1.txt';
 import ResourceLoader from './resource/ResourceLoader';
-import TileMap from './TileMap';
+import TileMap from './tile/TileMap';
 import Bunnie from './Bunnie';
 import Level from './level/Level';
 import {Direction} from './Sprite';
@@ -14,6 +14,8 @@ export default class Game {
 
     canvas: HTMLCanvasElement;
     context: CanvasRenderingContext2D;
+
+    zoom = 2;
 
     spriteMap!: TileMap;
     tileMap!: TileMap;
@@ -58,6 +60,14 @@ export default class Game {
             // Prepare levels
             this.levelLoader.load([this.resourceLoader.get(level1)], this.tileMap).then(() => {
                 this.level = this.levelLoader.get(level1);
+
+                this.canvas.width = this.level.levelMap[0].length * this.level.getTile(0, 0).width * this.zoom;
+                this.canvas.height = this.level.levelMap.length * this.level.getTile(0, 0).height * this.zoom;
+
+                this.bunnie.x = this.level.playerPosition[0] * this.level.getTile(0, 0).width;
+                this.bunnie.y = this.level.playerPosition[1] * this.level.getTile(0, 0).height;
+
+                console.log(`Setting canvas size to [${this.canvas.width}x${this.canvas.height}] for level ${this.level.src}...`);
 
                 // Start game loop
                 console.log('Starting game loop...');
@@ -117,10 +127,10 @@ export default class Game {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         // Draw level
-        this.level.draw(this.context);
+        this.level.draw(this.context, this.zoom);
 
         // Draw sprite
-        this.bunnie.draw(this.context);
+        this.bunnie.draw(this.context, this.zoom);
 
         // Update sprite
         this.bunnie.update(dt);

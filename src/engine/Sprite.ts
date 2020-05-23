@@ -1,4 +1,4 @@
-import Tile from './Tile';
+import Tile from './tile/Tile';
 
 export enum Direction {
     Up ,
@@ -22,6 +22,8 @@ export class Action {
 }
 
 export default class Sprite {
+    static speed = 80;
+
     actionList: Record<string, Action>;
 
     x: number;
@@ -44,6 +46,11 @@ export default class Sprite {
         this.timer = 0;
     }
 
+    /**
+     * Sets the action.
+     *
+     * @param name
+     */
     setAction = (name: string): void => {
         if (this.action === name) {
             return;
@@ -57,6 +64,11 @@ export default class Sprite {
         this.action = name;
     };
 
+    /**
+     * Sets the direction.
+     *
+     * @param direction
+     */
     setDirection = (direction: Direction): void => {
         if (this.direction === direction) {
             return;
@@ -66,13 +78,21 @@ export default class Sprite {
         this.direction = direction;
     };
 
-    update = (dt: number) => {
+    /**
+     * Updates the internal sprite timer.
+     *
+     * @param dt
+     */
+    update = (dt: number): void => {
         this.timer += dt;
         if (this.timer >= this.actionList[this.action].duration) {
             this.timer = 0;
         }
     }
 
+    /**
+     * Returns the tile to draw.
+     */
     getTile = (): Tile => {
         const action = this.actionList[this.action];
         const direction = action.directionList[this.direction];
@@ -80,7 +100,13 @@ export default class Sprite {
         return direction[index];
     }
 
-    draw = (context: CanvasRenderingContext2D) => {
+    /**
+     * Draws the sprite with the given context.
+     *
+     * @param context
+     * @param zoom
+     */
+    draw = (context: CanvasRenderingContext2D, zoom: number): void => {
         const tile = this.getTile();
 
         context.drawImage(
@@ -89,41 +115,46 @@ export default class Sprite {
             tile.y,
             tile.width,
             tile.height,
-            this.x,
-            this.y,
-            tile.width * 2,
-            tile.height * 2
+            this.x * zoom,
+            this.y * zoom,
+            tile.width * zoom,
+            tile.height * zoom
         );
     }
 
-    move = (dt: number, context: CanvasRenderingContext2D) => {
-        const speed = 150;
+    /**
+     * Sets the internal X and Y coordinates based on the current direction.
+     *
+     * @param dt
+     * @param context
+     */
+    move = (dt: number, context: CanvasRenderingContext2D):void => {
         const tile = this.getTile();
 
         if (this.action === 'walk') {
             let x, y;
             switch (this.direction) {
                 case Direction.Down:
-                    y = this.y + Math.round(dt * speed)
-                    if (y + tile.height * 2 <= context.canvas.height) {
+                    y = this.y + Math.round(dt * Sprite.speed)
+                    if (y + tile.height <= context.canvas.height) {
                         this.y = y;
                     }
                     break;
                 case Direction.Up:
-                    y = this.y - Math.round(dt * speed)
+                    y = this.y - Math.round(dt * Sprite.speed)
                     if (y >= 0) {
                         this.y = y;
                     }
                     break;
                 case Direction.Left:
-                    x = this.x - Math.round(dt * speed)
+                    x = this.x - Math.round(dt * Sprite.speed)
                     if (x >= 0) {
                         this.x = x;
                     }
                     break;
                 case Direction.Right:
-                    x = this.x + Math.round(dt * speed)
-                    if (x + tile.width * 2 <= context.canvas.width) {
+                    x = this.x + Math.round(dt * Sprite.speed)
+                    if (x + tile.width <= context.canvas.width) {
                         this.x = x;
                     }
                     break;

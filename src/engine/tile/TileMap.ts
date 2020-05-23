@@ -1,4 +1,4 @@
-import Resource from './resource/Resource';
+import Resource from '../resource/Resource';
 import Tile from './Tile';
 
 export default class TileMap {
@@ -24,7 +24,18 @@ export default class TileMap {
         }
     }
 
+    /**
+     *
+     * @param row
+     * @param column
+     */
     get = (row: number, column: number): Tile => {
+        if (row < 0 || row >= this.tileTable.length) {
+            throw new Error('Invalid row');
+        }
+        if (column < 0 || column >= this.tileTable[0].length) {
+            throw new Error('Invalid column');
+        }
         return this.tileTable[row][column];
     }
 }
