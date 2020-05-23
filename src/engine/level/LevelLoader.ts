@@ -300,16 +300,16 @@ export default class LevelLoader {
          * @param rowIndex
          * @param tileType
          */
-        const getTileTypeAt = (columnIndex: number, rowIndex: number, tileType: TileType): number => {
+        const getTileTypeAt = (columnIndex: number, rowIndex: number, tileType: TileType): string => {
             if (
                 columnIndex < 0 ||
                 columnIndex >= tileTypeMap[0].length ||
                 rowIndex < 0 ||
                 rowIndex >= tileTypeMap.length
             ) {
-                return 1;
+                return '1';
             }
-            return tileTypeMap[rowIndex][columnIndex] === tileType ? 0 : 1;
+            return tileTypeMap[rowIndex][columnIndex] === tileType ? '0' : '1';
         };
 
         /**
@@ -319,16 +319,16 @@ export default class LevelLoader {
          * @param rowIndex
          * @param tileType
          */
-        const getPatternAt = (columnIndex: number, rowIndex: number, tileType: TileType): number => {
-            let pattern = 0b00000000;
-            pattern |= getTileTypeAt(rowIndex - 1, columnIndex - 1, tileType) ? 0b10000000 : pattern;
-            pattern |= getTileTypeAt(rowIndex - 1, columnIndex, tileType) ? 0b01000000 : pattern;
-            pattern |= getTileTypeAt(rowIndex - 1, columnIndex + 1, tileType) ? 0b00100000 : pattern;
-            pattern |= getTileTypeAt(rowIndex, columnIndex - 1, tileType) ? 0b00010000 : pattern;
-            pattern |= getTileTypeAt(rowIndex, columnIndex + 1, tileType) ? 0b00001000 : pattern;
-            pattern |= getTileTypeAt(rowIndex + 1, columnIndex - 1, tileType) ? 0b00000100 : pattern;
-            pattern |= getTileTypeAt(rowIndex + 1, columnIndex, tileType) ? 0b00000010 : pattern;
-            pattern |= getTileTypeAt(rowIndex + 1, columnIndex + 1, tileType) ? 0b00000001 : pattern;
+        const getPatternAt = (columnIndex: number, rowIndex: number, tileType: TileType): string => {
+            let pattern = '';
+            pattern += getTileTypeAt(rowIndex - 1, columnIndex - 1, tileType);
+            pattern += getTileTypeAt(rowIndex - 1, columnIndex, tileType);
+            pattern += getTileTypeAt(rowIndex - 1, columnIndex + 1, tileType);
+            pattern += getTileTypeAt(rowIndex, columnIndex - 1, tileType);
+            pattern += getTileTypeAt(rowIndex, columnIndex + 1, tileType);
+            pattern += getTileTypeAt(rowIndex + 1, columnIndex - 1, tileType);
+            pattern += getTileTypeAt(rowIndex + 1, columnIndex, tileType);
+            pattern += getTileTypeAt(rowIndex + 1, columnIndex + 1, tileType);
             return pattern;
         };
 

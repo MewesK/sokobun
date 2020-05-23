@@ -62,6 +62,7 @@ export default class Game {
             this.levelLoader.load([this.resourceLoader.get(level1)], this.worldTileMap).then(() => {
                 this.level = this.levelLoader.get(level1);
 
+                // Resize canvas (for now)
                 this.canvas.width = this.level.levelMap[0].length * this.level.getTile(0, 0).width * zoom;
                 this.canvas.height = this.level.levelMap.length * this.level.getTile(0, 0).height * zoom;
                 console.log(`Setting canvas size to [${this.canvas.width}x${this.canvas.height}] for level ${this.level.src}...`);
@@ -78,6 +79,11 @@ export default class Game {
         });
     }
 
+    /**
+     * Handles the 'keydown' event.
+     *
+     * @param event
+     */
     keyDown = (event: KeyboardEvent): void => {
         switch (event.code) {
             case 'KeyS':
@@ -107,6 +113,11 @@ export default class Game {
         }
     }
 
+    /**
+     * Handles the 'keyup' event.
+     *
+     * @param event
+     */
     keyUp = (event: KeyboardEvent): void => {
         this.pressedKeyList[event.code] = false;
 
@@ -116,6 +127,9 @@ export default class Game {
         }
     }
 
+    /**
+     * The game loop.
+     */
     loop = (): void => {
         let now = Date.now();
         let dt = (now - this.lastTime) / 1000.0;
