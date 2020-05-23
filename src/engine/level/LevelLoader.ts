@@ -39,7 +39,6 @@ export default class LevelLoader {
                 this.floodFillPonds(tileTypeMap);
                 // TODO: Remove empty rows
                 // TODO: Remove empty columns
-                // TODO: Add pillar effect
 
                 this.cache.push(
                     new Level(
@@ -313,45 +312,90 @@ export default class LevelLoader {
         };
 
         /**
-         * Returns a pattern describing the surroundings of the given coordinates.
+         * Returns a floor pattern describing the surroundings of the given coordinates.
          *
          * @param columnIndex
          * @param rowIndex
          * @param tileType
          */
-        const getPatternAt = (columnIndex: number, rowIndex: number, tileType: TileType): string => {
+        const getFloorPatternAt = (columnIndex: number, rowIndex: number, tileType: TileType): string => {
             let pattern = '';
-            pattern += getTileTypeAt(columnIndex - 1,rowIndex - 1,  tileType);
-            pattern += getTileTypeAt(columnIndex,rowIndex - 1,  tileType);
-            pattern += getTileTypeAt(columnIndex + 1,rowIndex - 1,  tileType);
-            pattern += getTileTypeAt(columnIndex - 1,rowIndex,  tileType);
-            pattern += getTileTypeAt(columnIndex + 1,rowIndex,  tileType);
-            pattern += getTileTypeAt(columnIndex - 1,rowIndex + 1,  tileType);
+            pattern += getTileTypeAt(columnIndex - 1, rowIndex - 1, tileType);
+            pattern += getTileTypeAt(columnIndex, rowIndex - 1, tileType);
+            pattern += getTileTypeAt(columnIndex + 1, rowIndex - 1, tileType);
+            pattern += getTileTypeAt(columnIndex - 1, rowIndex, tileType);
+            pattern += getTileTypeAt(columnIndex + 1, rowIndex, tileType);
+            pattern += getTileTypeAt(columnIndex - 1, rowIndex + 1, tileType);
             pattern += getTileTypeAt(columnIndex, rowIndex + 1, tileType);
-            pattern += getTileTypeAt(columnIndex + 1,rowIndex + 1,  tileType);
+            pattern += getTileTypeAt(columnIndex + 1, rowIndex + 1, tileType);
+            return pattern;
+        };
+
+        /**
+         * Returns a pillar pattern describing the surroundings of the given coordinates.
+         *
+         * @param columnIndex
+         * @param rowIndex
+         * @param tileType
+         */
+        const getPillarPatternAt = (columnIndex: number, rowIndex: number, tileType: TileType): string => {
+            let pattern = '';
+            pattern += getTileTypeAt(columnIndex - 1, rowIndex,  tileType);
+            pattern += getTileTypeAt(columnIndex + 1, rowIndex,  tileType);
             return pattern;
         };
 
         const levelMap: Array<Array<Tile>> = [];
 
         for (let rowIndex = 0; rowIndex < tileTypeMap.length; rowIndex++) {
-            levelMap[rowIndex] = [];
+            // Add row if the pillar effect has not already
+            if (levelMap[rowIndex] === undefined) {
+                levelMap[rowIndex] = [];
+            }
+
             for (let columnIndex = 0; columnIndex < tileTypeMap[0].length; columnIndex++) {
                 switch (tileTypeMap[rowIndex][columnIndex]) {
                     case TileType.Floor:
-                        levelMap[rowIndex][columnIndex] = worldTileMap.getTileByPattern(
-                            getPatternAt(columnIndex, rowIndex, TileType.Floor),
+                        // Add floor tile
+                        levelMap[rowIndex][columnIndex] = worldTileMap.getFloorTileByPattern(
+                            getFloorPatternAt(columnIndex, rowIndex, TileType.Floor),
                             TileStyle.Grass
                         );
+
+                        // Add pillar effect
+                        let pillarRowIndex = rowIndex + 1;
+                        if (getTileTypeAt(columnIndex, pillarRowIndex, TileType.Void) === '0') {
+                            const pillarTiles = worldTileMap.getPillarTilesByPattern(
+                                getPillarPatternAt(columnIndex, rowIndex, TileType.Floor)
+                            );
+
+                            for (let pillarTileIndex = 0; pillarTileIndex < pillarTiles.length; pillarTileIndex++) {
+                                if (getTileTypeAt(columnIndex, pillarRowIndex, TileType.Void) === '0') {
+                                    // Add row
+                                    if (levelMap[pillarRowIndex] === undefined) {
+                                        levelMap[pillarRowIndex] = [];
+                                    }
+
+                                    // Add pillar tile
+                                    levelMap[pillarRowIndex][columnIndex] = pillarTiles[pillarTileIndex];
+                                }
+                                pillarRowIndex++;
+                            }
+                        }
+
                         break;
                     case TileType.Water:
-                        levelMap[rowIndex][columnIndex] = worldTileMap.getTileByPattern(
-                            getPatternAt(columnIndex, rowIndex, TileType.Water),
+                        // Add water tile
+                        levelMap[rowIndex][columnIndex] = worldTileMap.getFloorTileByPattern(
+                            getFloorPatternAt(columnIndex, rowIndex, TileType.Water),
                             TileStyle.Water
                         );
                         break;
                     case TileType.Void:
-                        levelMap[rowIndex][columnIndex] = worldTileMap.get(8, 21);
+                        // Add void tile if not already pillar
+                        if (levelMap[rowIndex][columnIndex] === undefined) {
+                            levelMap[rowIndex][columnIndex] = worldTileMap.get(8, 21);
+                        }
                         break;
                 }
             }

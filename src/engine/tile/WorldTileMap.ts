@@ -3,10 +3,16 @@ import {TileStyle} from '../level/Level';
 import Tile from './Tile';
 
 export default class WorldTileMap extends TileMap {
-    static rowsPerTileStyle = 8
-    static columnsPerTileStyle = 8
-
-    static tilePatternList:Array<[number, RegExp]> = [
+    // Floor tiles
+    static rowsPerFloorTileStyle = 8
+    static columnsPerFloorTileStyle = 8
+    static floorTileStyleOffset: Record<TileStyle, [number, number]> = {
+        [TileStyle.Grass]: [0, 0],
+        [TileStyle.Snow]: [0, WorldTileMap.columnsPerFloorTileStyle],
+        [TileStyle.Water]: [WorldTileMap.rowsPerFloorTileStyle, 0],
+        [TileStyle.Dirt]: [WorldTileMap.rowsPerFloorTileStyle, WorldTileMap.columnsPerFloorTileStyle]
+    }
+    static floorTilePatternList:Array<[number, RegExp]> = [
         [ 0, /00000000/],
         [ 1, /00000001/],
         [ 2, /00000100/],
@@ -56,27 +62,52 @@ export default class WorldTileMap extends TileMap {
         [46, /.1.11.1./]
     ]
 
-    static tileStyleOffset: Record<TileStyle, [number, number]> = {
-        [TileStyle.Grass]: [0, 0],
-        [TileStyle.Snow]: [WorldTileMap.rowsPerTileStyle, 0],
-        [TileStyle.Water]: [0, WorldTileMap.columnsPerTileStyle],
-        [TileStyle.Dirt]: [WorldTileMap.rowsPerTileStyle, WorldTileMap.columnsPerTileStyle]
-    }
+    // Pillar tiles
+    static pillarTileOffset: [number, number] = [WorldTileMap.rowsPerFloorTileStyle, WorldTileMap.columnsPerFloorTileStyle * 2];
+    static pillarTilePatternList:Array<[number, RegExp]> = [
+        [0, /11/],
+        [1, /10/],
+        [2, /00/],
+        [3, /00/],
+        [4, /01/],
+    ]
 
     /**
-     * Returns the tile corresponding to the given pattern in the given style.
+     * Returns the floor tile corresponding to the given pattern in the given style.
      *
      * @param pattern
      * @param tileStyle
      */
-    getTileByPattern = (pattern: string, tileStyle: TileStyle): Tile => {
-        const tilePattern = WorldTileMap.tilePatternList.find(value => pattern.match(value[1]));
+    getFloorTileByPattern = (pattern: string, tileStyle: TileStyle): Tile => {
+        const tilePattern = WorldTileMap.floorTilePatternList.find(value => pattern.match(value[1]));
         if (tilePattern === undefined) {
-            throw new Error(`Invalid pattern '${pattern}'`);
+            throw new Error(`Invalid floor pattern '${pattern}'`);
         }
+
         return this.get(
-            Math.floor(tilePattern[0] / WorldTileMap.columnsPerTileStyle) + WorldTileMap.tileStyleOffset[tileStyle][1],
-            (tilePattern[0] % WorldTileMap.columnsPerTileStyle) + WorldTileMap.tileStyleOffset[tileStyle][0]
+            Math.floor(tilePattern[0] / WorldTileMap.columnsPerFloorTileStyle) + WorldTileMap.floorTileStyleOffset[tileStyle][0],
+            (tilePattern[0] % WorldTileMap.columnsPerFloorTileStyle) + WorldTileMap.floorTileStyleOffset[tileStyle][1]
         );
+    }
+
+    /**
+     * Returns the pillar tiles corresponding to the given pattern.
+     *
+     * @param pattern
+     */
+    getPillarTilesByPattern = (pattern: string): [Tile, Tile, Tile] => {
+        const tilePattern = WorldTileMap.pillarTilePatternList.find(value => pattern.match(value[1]));
+        if (tilePattern === undefined) {
+            throw new Error(`Invalid pillar pattern '${pattern}'`);
+        }
+
+        const firstTileRow = WorldTileMap.pillarTileOffset[0];
+        const firstTileColumn = tilePattern[0] + WorldTileMap.pillarTileOffset[1];
+
+        return [
+            this.get(firstTileRow, firstTileColumn),
+            this.get(firstTileRow + 1, firstTileColumn),
+            this.get(firstTileRow + 2, firstTileColumn)
+        ];
     }
 }
