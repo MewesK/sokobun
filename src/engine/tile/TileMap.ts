@@ -59,7 +59,9 @@ export default class TileMap {
         if (tileTable[0][0] === undefined) {
             throw new Error('Invalid tile table (no cells)');
         }
+
         this.tileTable = tileTable;
+
         this.rows = tileTable.length;
         this.columns = tileTable[0].length;
         this.tileWidth = tileTable[0][0].width;

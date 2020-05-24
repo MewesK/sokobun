@@ -46,12 +46,8 @@ export default class LevelLoader {
 
                 this.cache.push(
                     new Level(
-                        this.convertToTiles(tileTypeMap),
-                        tileTypeMap.length,
-                        tileTypeMap[0].length,
-                        this.floorTileMap.tileWidth,
-                        this.floorTileMap.tileHeight,
                         resource.src,
+                        this.convertToTiles(tileTypeMap),
                         playerPosition,
                         boxPositionList,
                         destinationPositionList
@@ -309,12 +305,12 @@ export default class LevelLoader {
         };
 
         /**
-         * Returns a floor pattern describing the surroundings of the given coordinates.
+         * Returns a pattern describing the surroundings of the given coordinates.
          * @param columnIndex
          * @param rowIndex
          * @param tileType
          */
-        const getFloorPatternAt = (columnIndex: number, rowIndex: number, tileType: TileType): string => {
+        const getPatternAt = (columnIndex: number, rowIndex: number, tileType: TileType): string => {
             let pattern = '';
             pattern += isTileTypeAt(columnIndex - 1, rowIndex - 1, tileType) ? '0' : '1';
             pattern += isTileTypeAt(columnIndex, rowIndex - 1, tileType) ? '0' : '1';
@@ -324,19 +320,6 @@ export default class LevelLoader {
             pattern += isTileTypeAt(columnIndex - 1, rowIndex + 1, tileType) ? '0' : '1';
             pattern += isTileTypeAt(columnIndex, rowIndex + 1, tileType) ? '0' : '1';
             pattern += isTileTypeAt(columnIndex + 1, rowIndex + 1, tileType) ? '0' : '1';
-            return pattern;
-        };
-
-        /**
-         * Returns a pillar pattern describing the surroundings of the given coordinates.
-         * @param columnIndex
-         * @param rowIndex
-         * @param tileType
-         */
-        const getPillarPatternAt = (columnIndex: number, rowIndex: number, tileType: TileType): string => {
-            let pattern = '';
-            pattern += isTileTypeAt(columnIndex - 1, rowIndex,  tileType) ? '0' : '1';
-            pattern += isTileTypeAt(columnIndex + 1, rowIndex,  tileType) ? '0' : '1';
             return pattern;
         };
 
@@ -353,14 +336,14 @@ export default class LevelLoader {
                     case TileType.Floor:
                         // Add floor tile
                         levelMap[rowIndex][columnIndex] = this.floorTileMap.getTileListByPattern(
-                            getFloorPatternAt(columnIndex, rowIndex, TileType.Floor)
+                            getPatternAt(columnIndex, rowIndex, TileType.Floor)
                         )[0];
 
                         // Add pillar effect
                         if (isTileTypeAt(columnIndex, rowIndex + 1, TileType.Void)) {
                             // Get pillar tile list
                             this.voidTileMap.getTileListByPattern(
-                                getPillarPatternAt(columnIndex, rowIndex, TileType.Floor)
+                                getPatternAt(columnIndex, rowIndex, TileType.Floor)
                             ).forEach((value, index) => {
                                 const pillarRowIndex = rowIndex + 1 + index;
                                 if (isTileTypeAt(columnIndex, pillarRowIndex, TileType.Void)) {
@@ -379,13 +362,13 @@ export default class LevelLoader {
                     case TileType.Water:
                         // Add water tile
                         levelMap[rowIndex][columnIndex] = this.waterTileMap.getTileListByPattern(
-                            getFloorPatternAt(columnIndex, rowIndex, TileType.Water)
+                            getPatternAt(columnIndex, rowIndex, TileType.Water)
                         )[0];
                         break;
                     case TileType.Void:
                         // Add void tile if not already pillar
                         if (levelMap[rowIndex][columnIndex] === undefined) {
-                            levelMap[rowIndex][columnIndex] = this.voidTileMap.get(0, 6);
+                            levelMap[rowIndex][columnIndex] = this.voidTileMap.get(0, 5);
                         }
                         break;
                 }

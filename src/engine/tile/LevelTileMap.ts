@@ -54,11 +54,11 @@ export default class LevelTileMap extends TileMap {
     ];
 
     public static PILLAR_PATTERN_TILE_LIST: Array<[RegExp, Array<number>]> = [
-        [/11/, [0, 5, 10]],
-        [/10/, [1, 6, 11]],
-        [/00/, [2, 7, 12]],
-        [/00/, [3, 8, 13]],
-        [/01/, [4, 9, 14]]
+        [/...11.1./, [0, 6, 11]],
+        [/...10.1./, [1, 7, 12]],
+        [/...00.1./, [2, 8, 13]],
+        [/...00.1./, [3, 9, 14]],
+        [/...01.1./, [4, 10, 15]]
     ];
 
     private readonly patternTileList: Array<[RegExp, Array<number>]> = [];
@@ -68,6 +68,7 @@ export default class LevelTileMap extends TileMap {
         patternTileList: Array<[RegExp, Array<number>]>
     ) {
         super(tileTable);
+
         this.patternTileList = patternTileList;
     }
 

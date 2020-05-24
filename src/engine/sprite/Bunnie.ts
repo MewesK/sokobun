@@ -25,7 +25,8 @@ export default class Bunnie extends Sprite {
                     [DirectionType.Left]: new Direction([[0, 3], [0, 2], [0, 4], [0, 2]], 0.6),
                     [DirectionType.Right]: new Direction([[1, 3], [1, 2], [1, 4], [1, 2]], 0.6),
                 })
-            }
+            },
+            [0, tileMap.tileWidth, tileMap.tileWidth, tileMap.tileHeight] // [left, right, top, bottom]
         );
     }
 

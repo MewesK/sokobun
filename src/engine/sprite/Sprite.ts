@@ -45,10 +45,11 @@ export class Direction {
 
 export default class Sprite {
 
-    private static readonly SPEED = 40;
+    protected static readonly SPEED = 40;
 
     protected readonly tileMap: TileMap;
     protected readonly actionRecord: Record<ActionType, Action>;
+    protected readonly collisionBox: [number, number, number, number];
 
     protected x: number = 0;
     protected y: number = 0;
@@ -58,16 +59,18 @@ export default class Sprite {
 
     public constructor(
         tileMap: TileMap,
-        actionList: Record<ActionType, Action>,
+        actionRecord: Record<ActionType, Action>,
+        collisionOffset: [number, number, number, number], // [left, right, top, bottom]
         actionType: ActionType = ActionType.Stand,
         directionType: DirectionType = DirectionType.Down
     ) {
-        if (Object.keys(actionList).length === 0) {
+        if (Object.keys(actionRecord).length === 0) {
             throw new Error('There must be at least one action.');
         }
 
         this.tileMap = tileMap;
-        this.actionRecord = actionList;
+        this.actionRecord = actionRecord;
+        this.collisionBox = collisionOffset;
         this.actionType = actionType;
         this.directionType = directionType;
     }
@@ -146,29 +149,34 @@ export default class Sprite {
      */
     public move = (dt: number, context: CanvasRenderingContext2D, level: Level): void => {
         if (this.actionType === ActionType.Walk) {
+            const left = this.x + this.collisionBox[0];
+            const right = this.x + this.collisionBox[1];
+            const top = this.y + this.collisionBox[2];
+            const bottom = this.y + this.collisionBox[3];
+
             let x, y;
             switch (this.directionType) {
                 case DirectionType.Down:
                     y = this.y + Math.round(dt * Sprite.SPEED);
-                    if (!level.intersects([this.x, y, this.tileMap.tileWidth, this.tileMap.tileHeight], context)) {
+                    if (!level.intersects([left, right, y, y + this.tileMap.tileHeight], context)) {
                         this.y = y;
                     }
                     break;
                 case DirectionType.Up:
                     y = this.y - Math.round(dt * Sprite.SPEED)
-                    if (!level.intersects([this.x, y, this.tileMap.tileWidth, this.tileMap.tileHeight], context)) {
+                    if (!level.intersects([left, right, y, y + this.tileMap.tileHeight], context)) {
                         this.y = y;
                     }
                     break;
                 case DirectionType.Left:
                     x = this.x - Math.round(dt * Sprite.SPEED)
-                    if (!level.intersects([x, this.y, this.tileMap.tileWidth, this.tileMap.tileHeight], context)) {
+                    if (!level.intersects([x, x + this.tileMap.tileWidth, top, bottom], context)) {
                         this.x = x;
                     }
                     break;
                 case DirectionType.Right:
                     x = this.x + Math.round(dt * Sprite.SPEED)
-                    if (!level.intersects([x, this.y, this.tileMap.tileWidth, this.tileMap.tileHeight], context)) {
+                    if (!level.intersects([x, x + this.tileMap.tileWidth, top, bottom], context)) {
                         this.x = x;
                     }
                     break;
