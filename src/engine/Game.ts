@@ -57,9 +57,7 @@ export default class Game {
                         0, 0,
                         16, 32,
                         TileType.Sprite
-                    ),
-                    4, 6,
-                    16, 32
+                    )
                 )
             );
 
@@ -74,8 +72,6 @@ export default class Game {
                         16, 16,
                         TileType.Floor
                     ),
-                    6, 8,
-                    16, 16,
                     LevelTileMap.FLOOR_PATTERN_TILE_LIST
                 ),
                 new LevelTileMap(
@@ -86,33 +82,17 @@ export default class Game {
                         16, 16,
                         TileType.Water
                     ),
-                    6, 8,
-                    16, 16,
                     LevelTileMap.FLOOR_PATTERN_TILE_LIST
                 ),
                 new LevelTileMap(
                     TileMap.createTileTable(
                         tilesResource,
-                        3, 5,
+                        3, 6,
                         8, 16,
                         16, 16,
                         TileType.Void
                     ),
-                    3, 5,
-                    16, 16,
                     LevelTileMap.PILLAR_PATTERN_TILE_LIST
-                ),
-                new LevelTileMap(
-                    TileMap.createTileTable(
-                        tilesResource,
-                        1, 1,
-                        8, 21,
-                        16, 16,
-                        TileType.Void
-                    ),
-                    1, 1,
-                    16, 16,
-                    []
                 )
             );
 

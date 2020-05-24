@@ -9,18 +9,15 @@ export default class LevelLoader {
 
     private floorTileMap: LevelTileMap;
     private waterTileMap: LevelTileMap;
-    private pillarTileMap: LevelTileMap;
     private voidTileMap: LevelTileMap;
 
     constructor(
         floorTileMap: LevelTileMap,
         waterTileMap: LevelTileMap,
-        pillarTileMap: LevelTileMap,
         voidTileMap: LevelTileMap
     ) {
         this.floorTileMap = floorTileMap;
         this.waterTileMap = waterTileMap;
-        this.pillarTileMap = pillarTileMap;
         this.voidTileMap = voidTileMap;
     }
 
@@ -362,7 +359,7 @@ export default class LevelLoader {
                         // Add pillar effect
                         if (isTileTypeAt(columnIndex, rowIndex + 1, TileType.Void)) {
                             // Get pillar tile list
-                            this.pillarTileMap.getTileListByPattern(
+                            this.voidTileMap.getTileListByPattern(
                                 getPillarPatternAt(columnIndex, rowIndex, TileType.Floor)
                             ).forEach((value, index) => {
                                 const pillarRowIndex = rowIndex + 1 + index;
@@ -388,7 +385,7 @@ export default class LevelLoader {
                     case TileType.Void:
                         // Add void tile if not already pillar
                         if (levelMap[rowIndex][columnIndex] === undefined) {
-                            levelMap[rowIndex][columnIndex] = this.voidTileMap.get(0, 0);
+                            levelMap[rowIndex][columnIndex] = this.voidTileMap.get(0, 6);
                         }
                         break;
                 }

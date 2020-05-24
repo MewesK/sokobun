@@ -65,19 +65,9 @@ export default class LevelTileMap extends TileMap {
 
     public constructor(
         tileTable: Array<Array<Tile>>,
-        rows: number,
-        columns: number,
-        tileWith: number,
-        tileHeight: number,
         patternTileList: Array<[RegExp, Array<number>]>
     ) {
-        super(
-            tileTable,
-            rows,
-            columns,
-            tileWith,
-            tileHeight
-        );
+        super(tileTable);
         this.patternTileList = patternTileList;
     }
 

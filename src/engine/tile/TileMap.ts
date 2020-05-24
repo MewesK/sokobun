@@ -49,18 +49,21 @@ export default class TileMap {
     public readonly tileWidth: number;
     public readonly tileHeight: number;
 
-    public constructor(
-        tileTable: Array<Array<Tile>>,
-        rows: number,
-        columns: number,
-        tileWidth: number,
-        tileHeight: number
-    ) {
+    public constructor(tileTable: Array<Array<Tile>>) {
+        if (tileTable.length === 0) {
+            throw new Error('Invalid tile table (no rows)');
+        }
+        if (tileTable[0].length === 0) {
+            throw new Error('Invalid tile table (no columns)');
+        }
+        if (tileTable[0][0] === undefined) {
+            throw new Error('Invalid tile table (no cells)');
+        }
         this.tileTable = tileTable;
-        this.rows = rows;
-        this.columns = columns;
-        this.tileWidth = tileWidth;
-        this.tileHeight = tileHeight;
+        this.rows = tileTable.length;
+        this.columns = tileTable[0].length;
+        this.tileWidth = tileTable[0][0].width;
+        this.tileHeight = tileTable[0][0].height;
     }
 
     /**
