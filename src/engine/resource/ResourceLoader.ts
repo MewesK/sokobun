@@ -1,13 +1,14 @@
 import Resource from './Resource';
 
 export default class ResourceLoader {
-    cache: Array<Resource> = [];
+
+    private readonly cache: Array<Resource> = [];
 
     /**
      * Load an array of data URLs.
      * @param srcList
      */
-    load = (srcList: Array<string>): Promise<Array<Resource>> => {
+    public load = (srcList: Array<string>): Promise<Array<Resource>> => {
         return new Promise((resolve) => {
             let counter = srcList.length;
 
@@ -43,10 +44,14 @@ export default class ResourceLoader {
         });
     }
 
-    get = (src: string): Resource => {
+    /**
+     * Returns the resource corresponding to the  given src.
+     * @param src
+     */
+    public get = (src: string): Resource => {
         let result = this.cache.find(value => value.src === src);
         if (result === undefined) {
-            throw new Error();
+            throw new Error('Invalid src.');
         }
         return result;
     }

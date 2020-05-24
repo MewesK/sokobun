@@ -1,40 +1,39 @@
 import TileMap from '../tile/TileMap';
 import Tile from '../tile/Tile';
 
-export enum TileStyle {
-    Grass,
-    Snow,
-    Water,
-    Dirt
-}
+export default class Level extends TileMap {
 
-export default class Level {
-    static backgroundColor = '#252230';
+    private static BACKGROUND = '#252230';
 
-    src: string;
-    tileMap: TileMap;
+    public readonly src: string;
+    public readonly playerPosition: [number, number];
+    public readonly boxPositionList: Array<[number, number]>;
+    public readonly destinationPositionList: Array<[number, number]>;
 
-    levelMap: Array<Array<Tile>>;
-    playerPosition: [number, number];
-    boxPositionList: Array<[number, number]>;
-    destinationPositionList: Array<[number, number]>;
-
-    bufferCanvas!: HTMLCanvasElement;
-    bufferContext!: CanvasRenderingContext2D;
-    buffered: boolean = false;
+    private bufferCanvas!: HTMLCanvasElement;
+    private bufferContext!: CanvasRenderingContext2D;
+    private buffered: boolean = false;
 
     constructor(
+        tileTable: Array<Array<Tile>>,
+        rows: number,
+        columns: number,
+        tileWidth: number,
+        tileHeight: number,
         src: string,
-        tileMap: TileMap,
-        levelMap: Array<Array<Tile>>,
         playerPosition: [number, number],
         boxPositionList: Array<[number, number]>,
         destinationPositionList: Array<[number, number]>
     ) {
-        this.src = src;
-        this.tileMap = tileMap;
+        super(
+            tileTable,
+            rows,
+            columns,
+            tileWidth,
+            tileHeight
+        );
 
-        this.levelMap = levelMap;
+        this.src = src;
         this.playerPosition = playerPosition;
         this.boxPositionList = boxPositionList;
         this.destinationPositionList = destinationPositionList;
@@ -42,15 +41,14 @@ export default class Level {
 
     /**
      * Draws the level with the given context.
-     *
      * @param context
      * @param zoom
      */
-    draw = (context: CanvasRenderingContext2D, zoom: number): void => {
+    public draw = (context: CanvasRenderingContext2D, zoom: number): void => {
         if (!this.buffered) {
             this.bufferCanvas = document.createElement('canvas');
-            this.bufferCanvas.width = this.levelMap[0].length * this.getTile(0, 0).width * zoom;
-            this.bufferCanvas.height = this.levelMap.length * this.getTile(0, 0).height * zoom;
+            this.bufferCanvas.width = this.columns * this.tileWidth * zoom;
+            this.bufferCanvas.height = this.rows * this.tileHeight * zoom;
 
             const levelContext = this.bufferCanvas.getContext('2d');
             if (levelContext === null) {
@@ -59,13 +57,12 @@ export default class Level {
             this.bufferContext = levelContext;
 
             this.bufferContext.imageSmoothingEnabled = false;
-            this.bufferContext.fillStyle = Level.backgroundColor;
+            this.bufferContext.fillStyle = Level.BACKGROUND;
             this.bufferContext.fillRect(0, 0, context.canvas.width, context.canvas.height);
 
-            for (let rowIndex = 0; rowIndex < this.levelMap.length; rowIndex++) {
-                for (let columnIndex = 0; columnIndex < this.levelMap[0].length; columnIndex++) {
-                    const tile = this.getTile(rowIndex, columnIndex);
-
+            for (let rowIndex = 0; rowIndex < this.rows; rowIndex++) {
+                for (let columnIndex = 0; columnIndex < this.columns; columnIndex++) {
+                    const tile = this.get(rowIndex, columnIndex);
                     this.bufferContext.drawImage(
                         tile.resource.data,
                         tile.x,
@@ -88,18 +85,13 @@ export default class Level {
     }
 
     /**
-     * Returns the tile at the given coordinates.
-     *
-     * @param row
-     * @param column
+     * Checks if the given rectangle intersects with any blocking part of the level.
+     * @param rectangle
+     * @param context
      */
-    getTile = (row: number, column: number): Tile => {
-        if (row < 0 || row >= this.levelMap.length) {
-            throw new Error('Invalid row');
-        }
-        if (column < 0 || column >= this.levelMap[0].length) {
-            throw new Error('Invalid column');
-        }
-        return this.levelMap[row][column];
+    // @ts-ignore
+    public intersects = (rectangle: [number, number, number, number], context: CanvasRenderingContext2D): boolean => {
+        // TODO
+        return false;
     }
 }

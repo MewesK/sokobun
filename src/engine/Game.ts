@@ -3,42 +3,35 @@ import tiles from '../images/tiles.png';
 import level1 from '../levels/1.txt';
 import ResourceLoader from './resource/ResourceLoader';
 import TileMap from './tile/TileMap';
-import Bunnie from './Bunnie';
+import Bunnie from './sprite/Bunnie';
 import Level from './level/Level';
-import {Direction} from './Sprite';
+import {ActionType, DirectionType} from './sprite/Sprite';
 import LevelLoader from './level/LevelLoader';
-import WorldTileMap from './tile/WorldTileMap';
+import {TileType} from './tile/Tile';
+import LevelTileMap from './tile/LevelTileMap';
 
 export default class Game {
-    resourceLoader: ResourceLoader = new ResourceLoader();
-    levelLoader: LevelLoader = new LevelLoader();
 
-    canvas: HTMLCanvasElement;
-    context: CanvasRenderingContext2D;
+    private readonly resourceLoader: ResourceLoader = new ResourceLoader();
 
-    zoom = 2;
+    private readonly zoom: number;
+    private readonly canvas: HTMLCanvasElement;
+    private readonly context: CanvasRenderingContext2D;
 
-    spriteMap!: TileMap;
-    worldTileMap!: WorldTileMap;
-    bunnie!: Bunnie;
-    level!: Level;
+    private levelLoader!: LevelLoader;
+    private bunnie!: Bunnie;
+    private level!: Level;
 
-    lastTime: number = 0;
-    gameTime: number = 0;
+    private lastTime: number = 0;
+    private pressedKeyList: Record<string, boolean> = {};
 
-    pressedKeyList: Record<string, boolean> = {};
-
-    constructor(canvas: HTMLCanvasElement, width: number = 256, height: number = 224, zoom: number = 1) {
-        console.log('Initializing game...');
-
+    public constructor(canvas: HTMLCanvasElement, width: number = 256, height: number = 224, zoom: number = 1) {
         this.zoom = zoom;
-
-        // Prepare canvas
         this.canvas = canvas;
         this.canvas.width = width * zoom;
         this.canvas.height = height * zoom;
 
-        // Prepare context
+        // Create context
         const context = this.canvas.getContext('2d');
         if (context === null) {
             throw new Error('2D context not supported');
@@ -48,28 +41,95 @@ export default class Game {
         // Register event listener
         document.addEventListener('keydown', this.keyDown);
         document.addEventListener('keyup', this.keyUp);
+    }
+
+    public initialize = () => {
+        console.log('Initializing game...');
 
         // Prepare resources
         this.resourceLoader.load([sprites, tiles, level1]).then(() => {
-            // Prepare graphics
-            this.spriteMap = new TileMap(this.resourceLoader.get(sprites), 4, 6);
-            this.worldTileMap = new WorldTileMap(this.resourceLoader.get(tiles), 14, 22);
-
             // Prepare sprites
-            this.bunnie = new Bunnie(this.spriteMap);
+            this.bunnie = new Bunnie(
+                new TileMap(
+                    TileMap.createTileTable(
+                        this.resourceLoader.get(sprites),
+                        4, 6,
+                        0, 0,
+                        16, 32,
+                        TileType.Sprite
+                    ),
+                    4, 6,
+                    16, 32
+                )
+            );
+
+            // Prepare tiles
+            const tilesResource = this.resourceLoader.get(tiles);
+            this.levelLoader = new LevelLoader(
+                new LevelTileMap(
+                    TileMap.createTileTable(
+                        tilesResource,
+                        6, 8,
+                        0, 0,
+                        16, 16,
+                        TileType.Floor
+                    ),
+                    6, 8,
+                    16, 16,
+                    LevelTileMap.FLOOR_PATTERN_TILE_LIST
+                ),
+                new LevelTileMap(
+                    TileMap.createTileTable(
+                        tilesResource,
+                        6, 8,
+                        8, 0,
+                        16, 16,
+                        TileType.Water
+                    ),
+                    6, 8,
+                    16, 16,
+                    LevelTileMap.FLOOR_PATTERN_TILE_LIST
+                ),
+                new LevelTileMap(
+                    TileMap.createTileTable(
+                        tilesResource,
+                        3, 5,
+                        8, 16,
+                        16, 16,
+                        TileType.Void
+                    ),
+                    3, 5,
+                    16, 16,
+                    LevelTileMap.PILLAR_PATTERN_TILE_LIST
+                ),
+                new LevelTileMap(
+                    TileMap.createTileTable(
+                        tilesResource,
+                        1, 1,
+                        8, 21,
+                        16, 16,
+                        TileType.Void
+                    ),
+                    1, 1,
+                    16, 16,
+                    []
+                )
+            );
 
             // Prepare levels
-            this.levelLoader.load([this.resourceLoader.get(level1)], this.worldTileMap).then(() => {
+            this.levelLoader.load([this.resourceLoader.get(level1)]).then(() => {
                 this.level = this.levelLoader.get(level1);
 
                 // Resize canvas (for now)
-                this.canvas.width = this.level.levelMap[0].length * this.level.getTile(0, 0).width * zoom;
-                this.canvas.height = this.level.levelMap.length * this.level.getTile(0, 0).height * zoom;
+                this.canvas.width = this.level.columns * this.level.tileWidth * this.zoom;
+                this.canvas.height = this.level.rows * this.level.tileHeight * this.zoom;
                 console.log(`Setting canvas size to [${this.canvas.width}x${this.canvas.height}] for level ${this.level.src}...`);
 
                 // Set player position
-                this.bunnie.x = this.level.playerPosition[0] * this.level.getTile(0, 0).width;
-                this.bunnie.y = this.level.playerPosition[1] * this.level.getTile(0, 0).height;
+                this.bunnie.moveTo(
+                    this.level.playerPosition[0] * this.level.tileWidth,
+                    this.level.playerPosition[1] * this.level.tileHeight
+                );
 
                 // Start game loop
                 console.log('Starting game loop...');
@@ -81,62 +141,59 @@ export default class Game {
 
     /**
      * Handles the 'keydown' event.
-     *
      * @param event
      */
-    keyDown = (event: KeyboardEvent): void => {
+    private keyDown = (event: KeyboardEvent): void => {
         switch (event.code) {
             case 'KeyS':
             case 'ArrowDown':
                 this.pressedKeyList[event.code] = true;
-                this.bunnie.setAction('walk');
-                this.bunnie.setDirection(Direction.Down);
+                this.bunnie.setAction(ActionType.Walk);
+                this.bunnie.setDirection(DirectionType.Down);
                 break;
             case 'KeyW':
             case 'ArrowUp':
                 this.pressedKeyList[event.code] = true;
-                this.bunnie.setAction('walk');
-                this.bunnie.setDirection(Direction.Up);
+                this.bunnie.setAction(ActionType.Walk);
+                this.bunnie.setDirection(DirectionType.Up);
                 break;
             case 'KeyA':
             case 'ArrowLeft':
                 this.pressedKeyList[event.code] = true;
-                this.bunnie.setAction('walk');
-                this.bunnie.setDirection(Direction.Left);
+                this.bunnie.setAction(ActionType.Walk);
+                this.bunnie.setDirection(DirectionType.Left);
                 break;
             case 'KeyD':
             case 'ArrowRight':
                 this.pressedKeyList[event.code] = true;
-                this.bunnie.setAction('walk');
-                this.bunnie.setDirection(Direction.Right);
+                this.bunnie.setAction(ActionType.Walk);
+                this.bunnie.setDirection(DirectionType.Right);
                 break;
         }
     }
 
     /**
      * Handles the 'keyup' event.
-     *
      * @param event
      */
-    keyUp = (event: KeyboardEvent): void => {
+    private keyUp = (event: KeyboardEvent): void => {
         this.pressedKeyList[event.code] = false;
 
         // Set action to stand if no key is pressed anymore
         if (Object.values(this.pressedKeyList).every((value) => value === false)) {
-            this.bunnie.setAction('stand');
+            this.bunnie.setAction(ActionType.Stand);
         }
     }
 
     /**
      * The game loop.
      */
-    loop = (): void => {
+    private loop = (): void => {
         let now = Date.now();
         let dt = (now - this.lastTime) / 1000.0;
-        this.gameTime += dt;
 
         // Move sprite
-        this.bunnie.move(dt, this.context);
+        this.bunnie.move(dt, this.context, this.level);
 
         // Draw level
         this.level.draw(this.context, this.zoom);

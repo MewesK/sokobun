@@ -5,9 +5,10 @@ import './css/main.css';
 const canvas = <HTMLCanvasElement>document.getElementById('game');
 
 // Instantiate game
-new Game(
+const game = new Game(
     canvas,
     256,
     224,
     2
 );
+game.initialize();
