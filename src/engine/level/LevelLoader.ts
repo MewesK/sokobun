@@ -5,6 +5,7 @@ import LevelTileMap from '../tile/LevelTileMap';
 
 export default class LevelLoader {
 
+    private static readonly RENDER_PILLARS = true;
     private static readonly RENDER_PONDS = true;
 
     private cache: Array<Level> = [];
@@ -361,7 +362,7 @@ export default class LevelLoader {
                         )[0];
 
                         // Add pillar effect
-                        if (isTileTypeAt(columnIndex, rowIndex + 1, TileType.Void)) {
+                        if (LevelLoader.RENDER_PILLARS && isTileTypeAt(columnIndex, rowIndex + 1, TileType.Void)) {
                             // Get pillar tile list
                             this.voidTileMap.getTileListByPattern(
                                 getPatternAt(columnIndex, rowIndex, TileType.Floor)
