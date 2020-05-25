@@ -5,6 +5,8 @@ import LevelTileMap from '../tile/LevelTileMap';
 
 export default class LevelLoader {
 
+    private static readonly RENDER_PONDS = true;
+
     private cache: Array<Level> = [];
 
     private floorTileMap: LevelTileMap;
@@ -39,8 +41,12 @@ export default class LevelLoader {
                 this.fillRows(tileTypeMap);
                 this.floodFillFloor(tileTypeMap, playerPosition, boxPositionList, destinationPositionList);
                 this.removeWalls(tileTypeMap);
-                this.floodFillVoid(tileTypeMap);
-                this.floodFillPonds(tileTypeMap);
+                if (LevelLoader.RENDER_PONDS) {
+                    this.floodFillVoid(tileTypeMap);
+                    this.floodFillPonds(tileTypeMap);
+                } else {
+                    this.fillVoid(tileTypeMap);
+                }
                 // TODO: Remove empty rows
                 // TODO: Remove empty columns
 
@@ -256,6 +262,21 @@ export default class LevelLoader {
                         TileType.Water,
                         tileTypeMap
                     );
+                }
+            }
+        }
+    }
+
+    /**
+     * Replaces all undefined tiles with void.
+     * @param tileTypeMap
+     */
+    private fillVoid = (tileTypeMap: Array<Array<TileType>>): void => {
+        // Find pond
+        for (let rowIndex = 0; rowIndex < tileTypeMap.length; rowIndex++) {
+            for (let columnIndex = 0; columnIndex < tileTypeMap[0].length; columnIndex++) {
+                if (tileTypeMap[rowIndex][columnIndex] === TileType.Undefined) {
+                    tileTypeMap[rowIndex][columnIndex] = TileType.Void;
                 }
             }
         }
