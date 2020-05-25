@@ -49,7 +49,7 @@ export default class Sprite {
 
     protected readonly tileMap: TileMap;
     protected readonly actionRecord: Record<ActionType, Action>;
-    protected readonly collisionBox: [number, number, number, number];
+    protected readonly collisionOffset: [number, number, number, number];
 
     protected x: number = 0;
     protected y: number = 0;
@@ -70,7 +70,7 @@ export default class Sprite {
 
         this.tileMap = tileMap;
         this.actionRecord = actionRecord;
-        this.collisionBox = collisionOffset;
+        this.collisionOffset = collisionOffset;
         this.actionType = actionType;
         this.directionType = directionType;
     }
@@ -149,35 +149,32 @@ export default class Sprite {
      */
     public move = (dt: number, context: CanvasRenderingContext2D, level: Level): void => {
         if (this.actionType === ActionType.Walk) {
-            const left = this.x + this.collisionBox[0];
-            const right = this.x + this.collisionBox[1];
-            const top = this.y + this.collisionBox[2];
-            const bottom = this.y + this.collisionBox[3];
+            const distance = Math.round(dt * Sprite.SPEED);
 
             let x, y;
             switch (this.directionType) {
-                case DirectionType.Down:
-                    y = this.y + Math.round(dt * Sprite.SPEED);
-                    if (!level.intersects([left, right, y, y + this.tileMap.tileHeight], context)) {
-                        this.y = y;
-                    }
-                    break;
-                case DirectionType.Up:
-                    y = this.y - Math.round(dt * Sprite.SPEED)
-                    if (!level.intersects([left, right, y, y + this.tileMap.tileHeight], context)) {
-                        this.y = y;
-                    }
-                    break;
                 case DirectionType.Left:
-                    x = this.x - Math.round(dt * Sprite.SPEED)
-                    if (!level.intersects([x, x + this.tileMap.tileWidth, top, bottom], context)) {
+                    x = this.x - distance;
+                    if (!level.intersects(this.getCollisionBox(x, this.y), context)) {
                         this.x = x;
                     }
                     break;
                 case DirectionType.Right:
-                    x = this.x + Math.round(dt * Sprite.SPEED)
-                    if (!level.intersects([x, x + this.tileMap.tileWidth, top, bottom], context)) {
+                    x = this.x + distance;
+                    if (!level.intersects(this.getCollisionBox(x, this.y), context)) {
                         this.x = x;
+                    }
+                    break;
+                case DirectionType.Up:
+                    y = this.y - distance;
+                    if (!level.intersects(this.getCollisionBox(this.x, y), context)) {
+                        this.y = y;
+                    }
+                    break;
+                case DirectionType.Down:
+                    y = this.y + distance;
+                    if (!level.intersects(this.getCollisionBox(this.x, y), context)) {
+                        this.y = y;
                     }
                     break;
             }
@@ -199,6 +196,20 @@ export default class Sprite {
      */
     protected getAction = (): Action => {
         return this.actionRecord[this.actionType];
+    }
+
+    /**
+     * Calculates the collision box based on the given coordinates.
+     * @param x
+     * @param y
+     */
+    protected getCollisionBox(x: number, y: number): [number, number, number, number] {
+        return [
+            x + this.collisionOffset[0],
+            x + this.collisionOffset[1],
+            y + this.collisionOffset[2],
+            y + this.collisionOffset[3]
+        ];
     }
 
     /**
