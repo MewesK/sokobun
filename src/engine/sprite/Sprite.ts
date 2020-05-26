@@ -1,6 +1,7 @@
 import Tile from '../tile/Tile';
 import Level from '../level/Level';
 import TileMap from '../tile/TileMap';
+import CollisionBox from '../CollisionBox';
 
 export enum ActionType {
     Walk,
@@ -46,7 +47,7 @@ export default class Sprite {
 
     protected readonly tileMap: TileMap;
     protected readonly actionRecord: Record<ActionType, Action>;
-    protected readonly collisionOffset: [number, number, number, number];
+    protected readonly collisionOffset: CollisionBox;
 
     protected x: number = 0;
     protected y: number = 0;
@@ -57,7 +58,7 @@ export default class Sprite {
     public constructor(
         tileMap: TileMap,
         actionRecord: Record<ActionType, Action>,
-        collisionOffset: [number, number, number, number], // [left, right, top, bottom]
+        collisionOffset: CollisionBox,
         actionType: ActionType = ActionType.Stand,
         directionType: DirectionType = DirectionType.Down
     ) {
@@ -122,7 +123,7 @@ export default class Sprite {
      * @param context
      * @param zoom
      */
-    public draw = (context: CanvasRenderingContext2D, zoom: number): void => {
+    public draw = (context: CanvasRenderingContext2D): void => {
         const tile = this.getTile();
         context.imageSmoothingEnabled = false;
         context.drawImage(
@@ -131,10 +132,10 @@ export default class Sprite {
             tile.y,
             tile.width,
             tile.height,
-            this.x * zoom,
-            this.y * zoom,
-            tile.width * zoom,
-            tile.height * zoom
+            this.x,
+            this.y,
+            tile.width,
+            tile.height
         );
     };
 
@@ -152,25 +153,25 @@ export default class Sprite {
             switch (this.directionType) {
                 case DirectionType.Left:
                     x = this.x - distance;
-                    if (!level.intersects(this.getCollisionBox(x, this.y), context)) {
+                    if (!level.intersects(this.createCollisionBox(x, this.y), context)) {
                         this.x = x;
                     }
                     break;
                 case DirectionType.Right:
                     x = this.x + distance;
-                    if (!level.intersects(this.getCollisionBox(x, this.y), context)) {
+                    if (!level.intersects(this.createCollisionBox(x, this.y), context)) {
                         this.x = x;
                     }
                     break;
                 case DirectionType.Up:
                     y = this.y - distance;
-                    if (!level.intersects(this.getCollisionBox(this.x, y), context)) {
+                    if (!level.intersects(this.createCollisionBox(this.x, y), context)) {
                         this.y = y;
                     }
                     break;
                 case DirectionType.Down:
                     y = this.y + distance;
-                    if (!level.intersects(this.getCollisionBox(this.x, y), context)) {
+                    if (!level.intersects(this.createCollisionBox(this.x, y), context)) {
                         this.y = y;
                     }
                     break;
@@ -184,8 +185,22 @@ export default class Sprite {
      * @param y
      */
     public moveTo = (x: number, y: number): void => {
-        this.x = x;
-        this.y = y;
+        this.x = x - this.collisionOffset.left;
+        this.y = y - this.collisionOffset.top;
+    };
+
+    /**
+     * Calculates the collision box based on the given coordinates.
+     * @param x
+     * @param y
+     */
+    protected createCollisionBox = (x: number, y: number): CollisionBox => {
+        return new CollisionBox(
+            x + this.collisionOffset.left,
+            x + this.collisionOffset.right,
+            y + this.collisionOffset.top,
+            y + this.collisionOffset.bottom
+        );
     };
 
     /**
@@ -194,20 +209,6 @@ export default class Sprite {
     protected getAction = (): Action => {
         return this.actionRecord[this.actionType];
     };
-
-    /**
-     * Calculates the collision box based on the given coordinates.
-     * @param x
-     * @param y
-     */
-    protected getCollisionBox(x: number, y: number): [number, number, number, number] {
-        return [
-            x + this.collisionOffset[0],
-            x + this.collisionOffset[1],
-            y + this.collisionOffset[2],
-            y + this.collisionOffset[3]
-        ];
-    }
 
     /**
      * Return the current direction.

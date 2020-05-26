@@ -14,8 +14,10 @@ export default class Game {
     private readonly resourceLoader: ResourceLoader = new ResourceLoader();
 
     private readonly zoom: number;
-    private readonly canvas: HTMLCanvasElement;
-    private readonly context: CanvasRenderingContext2D;
+    private readonly bufferCanvas: HTMLCanvasElement;
+    private readonly bufferContext: CanvasRenderingContext2D;
+    private readonly outputCanvas: HTMLCanvasElement;
+    private readonly outputContext: CanvasRenderingContext2D;
 
     private levelLoader!: LevelLoader;
     private bunnie!: Bunnie;
@@ -26,16 +28,30 @@ export default class Game {
 
     public constructor(canvas: HTMLCanvasElement, width: number = 256, height: number = 224, zoom: number = 1) {
         this.zoom = zoom;
-        this.canvas = canvas;
-        this.canvas.width = width * zoom;
-        this.canvas.height = height * zoom;
 
-        // Create context
-        const context = this.canvas.getContext('2d');
+        // Buffer canvas
+        this.bufferCanvas = document.createElement('canvas');
+        this.bufferCanvas.width = width;
+        this.bufferCanvas.height = height;
+
+        // Output canvas
+        this.outputCanvas = canvas;
+        this.outputCanvas.width = width * zoom;
+        this.outputCanvas.height = height * zoom;
+
+        // Create buffer context
+        const bufferContext = this.bufferCanvas.getContext('2d');
+        if (bufferContext === null) {
+            throw new Error('2D context not supported');
+        }
+        this.bufferContext = bufferContext;
+
+        // Create output context
+        const context = this.outputCanvas.getContext('2d');
         if (context === null) {
             throw new Error('2D context not supported');
         }
-        this.context = context;
+        this.outputContext = context;
 
         // Register event listener
         document.addEventListener('keydown', this.keyDown);
@@ -76,10 +92,12 @@ export default class Game {
                 this.level = this.levelLoader.get(level1);
 
                 // Resize canvas (for now)
-                this.canvas.width = this.level.columns * this.level.tileWidth * this.zoom;
-                this.canvas.height = this.level.rows * this.level.tileHeight * this.zoom;
+                this.bufferCanvas.width = this.level.columns * this.level.tileWidth;
+                this.bufferCanvas.height = this.level.rows * this.level.tileHeight;
+                this.outputCanvas.width = this.level.columns * this.level.tileWidth * this.zoom;
+                this.outputCanvas.height = this.level.rows * this.level.tileHeight * this.zoom;
                 console.log(
-                    `Setting canvas size to [${this.canvas.width}x${this.canvas.height}] for level ${this.level.src}...`
+                    `Setting canvas size to [${this.outputCanvas.width}x${this.outputCanvas.height}] for level ${this.level.src}...`
                 );
 
                 // Set player position
@@ -149,17 +167,31 @@ export default class Game {
         let now = Date.now();
         let dt = (now - this.lastTime) / 1000.0;
 
-        // Move sprite
-        this.bunnie.move(dt, this.context, this.level);
-
         // Draw level
-        this.level.draw(this.context, this.zoom);
+        this.level.draw(this.bufferContext);
 
         // Draw sprite
-        this.bunnie.draw(this.context, this.zoom);
+        this.bunnie.draw(this.bufferContext);
+
+        // Move sprite
+        this.bunnie.move(dt, this.bufferContext, this.level);
 
         // Update sprite
         this.bunnie.update(dt);
+
+        // Draw buffer canvas
+        this.outputContext.imageSmoothingEnabled = false;
+        this.outputContext.drawImage(
+            this.bufferCanvas,
+            0,
+            0,
+            this.bufferCanvas.width,
+            this.bufferCanvas.height,
+            0,
+            0,
+            this.outputCanvas.width,
+            this.outputCanvas.height
+        );
 
         this.lastTime = now;
         window.requestAnimationFrame(this.loop);

@@ -1,8 +1,9 @@
 import TileMap from '../tile/TileMap';
 import Tile, { TileType } from '../tile/Tile';
+import CollisionBox from '../CollisionBox';
 
 export default class Level extends TileMap {
-    private static BACKGROUND = '#252230';
+    private static BACKGROUND_COLOR = '#252230';
 
     public readonly src: string;
 
@@ -33,13 +34,12 @@ export default class Level extends TileMap {
     /**
      * Draws the level with the given context.
      * @param context
-     * @param zoom
      */
-    public draw = (context: CanvasRenderingContext2D, zoom: number): void => {
+    public draw = (context: CanvasRenderingContext2D): void => {
         if (!this.buffered) {
             this.bufferCanvas = document.createElement('canvas');
-            this.bufferCanvas.width = this.columns * this.tileWidth * zoom;
-            this.bufferCanvas.height = this.rows * this.tileHeight * zoom;
+            this.bufferCanvas.width = this.columns * this.tileWidth;
+            this.bufferCanvas.height = this.rows * this.tileHeight;
 
             const levelContext = this.bufferCanvas.getContext('2d');
             if (levelContext === null) {
@@ -48,7 +48,7 @@ export default class Level extends TileMap {
             this.bufferContext = levelContext;
 
             this.bufferContext.imageSmoothingEnabled = false;
-            this.bufferContext.fillStyle = Level.BACKGROUND;
+            this.bufferContext.fillStyle = Level.BACKGROUND_COLOR;
             this.bufferContext.fillRect(0, 0, context.canvas.width, context.canvas.height);
 
             for (let rowIndex = 0; rowIndex < this.rows; rowIndex++) {
@@ -60,10 +60,10 @@ export default class Level extends TileMap {
                         tile.y,
                         tile.width,
                         tile.height,
-                        columnIndex * tile.width * zoom,
-                        rowIndex * tile.height * zoom,
-                        tile.width * zoom,
-                        tile.height * zoom
+                        columnIndex * tile.width,
+                        rowIndex * tile.height,
+                        tile.width,
+                        tile.height
                     );
                 }
             }
@@ -77,40 +77,39 @@ export default class Level extends TileMap {
 
     /**
      * Checks if the given rectangle intersects with any blocking part of the level or the canvas boundaries.
-     * @param rectangle [left, right, top, bottom]
+     * @param collisionBox
      * @param context
      */
-    public intersects = (rectangle: [number, number, number, number], context: CanvasRenderingContext2D): boolean => {
+    public intersects = (collisionBox: CollisionBox, context: CanvasRenderingContext2D): boolean => {
         // Check canvas boundaries
         if (
-            rectangle[0] < 0 ||
-            rectangle[1] >= context.canvas.width ||
-            rectangle[2] < 0 ||
-            rectangle[3] >= context.canvas.height
+            collisionBox.left < 0 ||
+            collisionBox.right >= context.canvas.width ||
+            collisionBox.top < 0 ||
+            collisionBox.bottom >= context.canvas.height
         ) {
             return true;
         }
 
         // Check all none floor tiles
-        let tile: Tile, tileRectangle: [number, number, number, number];
+        let tile: Tile, tileCollisionBox: CollisionBox;
         for (let rowIndex = 0; rowIndex < this.rows; rowIndex++) {
             for (let columnIndex = 0; columnIndex < this.columns; columnIndex++) {
                 tile = this.tileTable[rowIndex][columnIndex];
                 if (tile.type !== TileType.Floor) {
-                    tileRectangle = [
+                    tileCollisionBox = new CollisionBox(
                         columnIndex * this.tileWidth,
-                        (columnIndex + 1) * this.tileWidth,
+                        columnIndex * this.tileWidth + this.tileWidth,
                         rowIndex * this.tileHeight,
-                        (rowIndex + 1) * this.tileHeight
-                    ];
+                        rowIndex * this.tileHeight + this.tileHeight
+                    );
 
                     if (
-                        rectangle[0] <= tileRectangle[1] &&
-                        tileRectangle[0] <= rectangle[1] &&
-                        rectangle[2] <= tileRectangle[3] &&
-                        tileRectangle[2] <= rectangle[3]
+                        collisionBox.left < tileCollisionBox.right &&
+                        tileCollisionBox.left < collisionBox.right &&
+                        collisionBox.top < tileCollisionBox.bottom &&
+                        tileCollisionBox.top < collisionBox.bottom
                     ) {
-                        console.debug('Collides with tile', rowIndex, columnIndex, rectangle, tileRectangle);
                         return true;
                     }
                 }

@@ -1,5 +1,6 @@
 import Sprite, { Action, ActionType, DirectionType, Direction } from './Sprite';
 import TileMap from '../tile/TileMap';
+import CollisionBox from '../CollisionBox';
 
 export default class Bunnie extends Sprite {
     public constructor(tileMap: TileMap) {
@@ -89,28 +90,7 @@ export default class Bunnie extends Sprite {
                     )
                 })
             },
-            [0, tileMap.tileWidth, tileMap.tileWidth, tileMap.tileHeight] // [left, right, top, bottom]
+            new CollisionBox(0, tileMap.tileWidth, tileMap.tileWidth, tileMap.tileHeight)
         );
     }
-
-    /**
-     * Draws the sprite with the given context.
-     * @param context
-     * @param zoom
-     */
-    public draw = (context: CanvasRenderingContext2D, zoom: number): void => {
-        const tile = this.getTile();
-        context.imageSmoothingEnabled = false;
-        context.drawImage(
-            tile.resource.data,
-            tile.x,
-            tile.y,
-            tile.width,
-            tile.height,
-            this.x * zoom,
-            (this.y - Math.round(tile.height / 2)) * zoom,
-            tile.width * zoom,
-            tile.height * zoom
-        );
-    };
 }
