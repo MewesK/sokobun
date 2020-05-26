@@ -90,7 +90,7 @@ export default class Bunnie extends Sprite {
                     )
                 })
             },
-            new CollisionBox(0, tileMap.tileWidth, tileMap.tileWidth, tileMap.tileHeight)
+            new CollisionBox(0, 16, 24, 40)
         );
     }
 }
