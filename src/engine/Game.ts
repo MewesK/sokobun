@@ -1,5 +1,5 @@
 import sprites from '../images/sprites.png';
-import tiles from '../images/tiles.png';
+import tiles from '../images/tiles2.png';
 import level1 from '../levels/1.txt';
 import ResourceLoader from './resource/ResourceLoader';
 import TileMap from './tile/TileMap';
@@ -82,7 +82,7 @@ export default class Game {
                     LevelTileMap.FLOOR_PATTERN_TILE_LIST
                 ),
                 new LevelTileMap(
-                    TileMap.createTileTable(tilesResource, 3, 6, 8, 16, 16, 16, TileType.Void),
+                    TileMap.createTileTable(tilesResource, 3, 6, 8, 8, 16, 16, TileType.Void),
                     LevelTileMap.PILLAR_PATTERN_TILE_LIST
                 )
             );
