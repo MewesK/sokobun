@@ -1,8 +1,7 @@
 import Resource from '../resource/Resource';
-import Tile, {TileType} from './Tile';
+import Tile, { TileType } from './Tile';
 
 export default class TileMap {
-
     /**
      * Creates a tile table based on the given resource.
      * @param input
@@ -82,5 +81,5 @@ export default class TileMap {
         }
 
         return this.tileTable[row][column];
-    }
+    };
 }

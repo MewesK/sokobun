@@ -1,5 +1,4 @@
 export default class Resource {
-
     public readonly src: string;
     public readonly data: any;
 

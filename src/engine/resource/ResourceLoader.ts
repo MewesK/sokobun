@@ -1,7 +1,6 @@
 import Resource from './Resource';
 
 export default class ResourceLoader {
-
     private readonly cache: Array<Resource> = [];
 
     /**
@@ -24,35 +23,39 @@ export default class ResourceLoader {
                 // Image data handling
                 if (src.match(/^.*\.png$/)) {
                     const image = new Image();
-                    image.addEventListener('load', () => {
-                        this.cache.push(new Resource(src, image));
-                        decreaseCounter();
-                    }, false);
+                    image.addEventListener(
+                        'load',
+                        () => {
+                            this.cache.push(new Resource(src, image));
+                            decreaseCounter();
+                        },
+                        false
+                    );
                     image.src = src;
                 }
 
                 // Other data handling
                 else {
-                    fetch(src).then(response => {
-                        response.text().then(value => {
+                    fetch(src).then((response) => {
+                        response.text().then((value) => {
                             this.cache.push(new Resource(src, value));
                             decreaseCounter();
-                        })
+                        });
                     });
                 }
             });
         });
-    }
+    };
 
     /**
      * Returns the resource corresponding to the  given src.
      * @param src
      */
     public get = (src: string): Resource => {
-        let result = this.cache.find(value => value.src === src);
+        let result = this.cache.find((value) => value.src === src);
         if (result === undefined) {
             throw new Error('Invalid src.');
         }
         return result;
-    }
+    };
 }

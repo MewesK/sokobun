@@ -3,13 +3,12 @@ import Level from '../level/Level';
 import TileMap from '../tile/TileMap';
 
 export enum ActionType {
-    Walk ,
+    Walk,
     Push,
     Stand
 }
 
 export class Action {
-
     public readonly directionRecord: Record<DirectionType, Direction>;
 
     public constructor(directionList: Record<DirectionType, Direction>) {
@@ -22,14 +21,13 @@ export class Action {
 }
 
 export enum DirectionType {
-    Up ,
+    Up,
     Down,
     Left,
     Right
 }
 
 export class Direction {
-
     public readonly tileCoordinatesList: Array<[number, number]>;
     public readonly duration: number;
 
@@ -44,7 +42,6 @@ export class Direction {
 }
 
 export default class Sprite {
-
     protected static readonly SPEED = 40;
 
     protected readonly tileMap: TileMap;
@@ -90,7 +87,7 @@ export default class Sprite {
 
         this.timer = 0;
         this.actionType = actionType;
-    }
+    };
 
     /**
      * Sets the directionType.
@@ -107,7 +104,7 @@ export default class Sprite {
 
         this.timer = 0;
         this.directionType = directionType;
-    }
+    };
 
     /**
      * Updates the internal sprite timer.
@@ -118,7 +115,7 @@ export default class Sprite {
         if (this.timer >= this.getDirection().duration) {
             this.timer = 0;
         }
-    }
+    };
 
     /**
      * Draws the sprite with the given context.
@@ -139,7 +136,7 @@ export default class Sprite {
             tile.width * zoom,
             tile.height * zoom
         );
-    }
+    };
 
     /**
      * Updates the internal X and Y coordinates based on the current direction type.
@@ -179,24 +176,24 @@ export default class Sprite {
                     break;
             }
         }
-    }
+    };
 
     /**
      * Moves the internal X and Y to the given coordinates.
      * @param x
      * @param y
      */
-    public moveTo = (x: number, y: number) : void => {
+    public moveTo = (x: number, y: number): void => {
         this.x = x;
         this.y = y;
-    }
+    };
 
     /**
      * Return the current action.
      */
     protected getAction = (): Action => {
         return this.actionRecord[this.actionType];
-    }
+    };
 
     /**
      * Calculates the collision box based on the given coordinates.
@@ -217,16 +214,17 @@ export default class Sprite {
      */
     protected getDirection = (): Direction => {
         return this.getAction().directionRecord[this.directionType];
-    }
+    };
 
     /**
      * Returns the current tile to draw.
      */
     protected getTile = (): Tile => {
         const direction = this.getDirection();
-        const tileCoordinates = direction.tileCoordinatesList[
-            Math.floor(this.timer / (direction.duration / direction.tileCoordinatesList.length))
-        ];
+        const tileCoordinates =
+            direction.tileCoordinatesList[
+                Math.floor(this.timer / (direction.duration / direction.tileCoordinatesList.length))
+            ];
         return this.tileMap.get(tileCoordinates[0], tileCoordinates[1]);
-    }
+    };
 }

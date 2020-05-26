@@ -1,10 +1,9 @@
 import Resource from '../resource/Resource';
 import Level from './Level';
-import Tile, {TileType} from '../tile/Tile';
+import Tile, { TileType } from '../tile/Tile';
 import LevelTileMap from '../tile/LevelTileMap';
 
 export default class LevelLoader {
-
     private static readonly RENDER_PILLARS = true;
     private static readonly RENDER_PONDS = true;
 
@@ -14,11 +13,7 @@ export default class LevelLoader {
     private waterTileMap: LevelTileMap;
     private voidTileMap: LevelTileMap;
 
-    constructor(
-        floorTileMap: LevelTileMap,
-        waterTileMap: LevelTileMap,
-        voidTileMap: LevelTileMap
-    ) {
+    constructor(floorTileMap: LevelTileMap, waterTileMap: LevelTileMap, voidTileMap: LevelTileMap) {
         this.floorTileMap = floorTileMap;
         this.waterTileMap = waterTileMap;
         this.voidTileMap = voidTileMap;
@@ -28,7 +23,7 @@ export default class LevelLoader {
      * Loads the given levels using the the given world tile map.
      * @param resourceList
      */
-    public load = (resourceList: Array<Resource>): Promise<Array<Level>> =>  {
+    public load = (resourceList: Array<Resource>): Promise<Array<Level>> => {
         return new Promise((resolve) => {
             resourceList.forEach((resource) => {
                 console.debug(`Loading level ${resource.src}...`);
@@ -65,7 +60,7 @@ export default class LevelLoader {
             console.log('Levels finished loading...');
             resolve(this.cache);
         });
-    }
+    };
 
     /**
      * Returns the level with the given src.
@@ -73,12 +68,12 @@ export default class LevelLoader {
      * @param src
      */
     public get = (src: string): Level => {
-        let result = this.cache.find(value => value.src === src);
+        let result = this.cache.find((value) => value.src === src);
         if (result === undefined) {
             throw new Error();
         }
         return result;
-    }
+    };
 
     /**
      * Parses the level file and creates an two dimensional array.
@@ -97,9 +92,9 @@ export default class LevelLoader {
     ): void => {
         let columnIndex = 0;
         let rowIndex = 0;
-        let tempPlayerPosition: [number, number]|undefined = undefined;
+        let tempPlayerPosition: [number, number] | undefined = undefined;
 
-        [...resource.data].forEach(character => {
+        [...resource.data].forEach((character) => {
             switch (character) {
                 case '\n':
                     columnIndex = 0;
@@ -116,19 +111,19 @@ export default class LevelLoader {
                         throw new Error('Invalid level (multiple player)');
                     }
 
-                    console.debug(`Player found at [${columnIndex}, ${rowIndex}]`)
+                    console.debug(`Player found at [${columnIndex}, ${rowIndex}]`);
 
                     tempPlayerPosition = [columnIndex, rowIndex];
                     tileTypeMap[rowIndex][columnIndex++] = TileType.Undefined;
                     break;
                 case '$':
-                    console.debug(`Box found at [${columnIndex}, ${rowIndex}]`)
+                    console.debug(`Box found at [${columnIndex}, ${rowIndex}]`);
 
                     boxPositionList.push([columnIndex, rowIndex]);
                     tileTypeMap[rowIndex][columnIndex++] = TileType.Undefined;
                     break;
                 case '.':
-                    console.debug(`Destination found at [${columnIndex}, ${rowIndex}]`)
+                    console.debug(`Destination found at [${columnIndex}, ${rowIndex}]`);
 
                     destinationPositionList.push([columnIndex, rowIndex]);
                     tileTypeMap[rowIndex][columnIndex++] = TileType.Undefined;
@@ -152,7 +147,7 @@ export default class LevelLoader {
         if (boxPositionList.length !== destinationPositionList.length) {
             throw new Error('Invalid level (box and destination count is not equal)');
         }
-    }
+    };
 
     /**
      * Makes sure that all rows have the same length.
@@ -161,16 +156,16 @@ export default class LevelLoader {
     private fillRows = (tileTypeMap: Array<Array<TileType>>): void => {
         // Find max row length
         let maxRowLength = 0;
-        tileTypeMap.forEach(row => {
+        tileTypeMap.forEach((row) => {
             if (row.length > maxRowLength) {
                 maxRowLength = row.length;
             }
         });
 
-        console.debug(`Max row length is ${maxRowLength}`)
+        console.debug(`Max row length is ${maxRowLength}`);
 
         // Fill all rows to match max row length
-        tileTypeMap.forEach(row => {
+        tileTypeMap.forEach((row) => {
             let missingColumns = maxRowLength - row.length;
             if (missingColumns > 0) {
                 for (let i = 0; i < missingColumns; i++) {
@@ -178,7 +173,7 @@ export default class LevelLoader {
                 }
             }
         });
-    }
+    };
 
     /**
      * Flood fills the floor based on the position of the player.
@@ -193,39 +188,34 @@ export default class LevelLoader {
         boxPositionList: Array<[number, number]>,
         destinationPositionList: Array<[number, number]>
     ): void => {
-        this.floodFill(
-            playerPosition[0],
-            playerPosition[1],
-            TileType.Floor,
-            tileTypeMap
-        );
+        this.floodFill(playerPosition[0], playerPosition[1], TileType.Floor, tileTypeMap);
 
         // Error checks
-        boxPositionList.forEach(boxPosition => {
+        boxPositionList.forEach((boxPosition) => {
             if (tileTypeMap[boxPosition[1]][boxPosition[0]] !== TileType.Floor) {
                 throw new Error('Invalid level (box position not on floor)');
             }
         });
-        destinationPositionList.forEach(destinationPosition => {
+        destinationPositionList.forEach((destinationPosition) => {
             if (tileTypeMap[destinationPosition[1]][destinationPosition[0]] !== TileType.Floor) {
                 throw new Error('Invalid level (destination position not on floor)');
             }
         });
-    }
+    };
 
     /**
      * Replaces all walls with void.
      * @param tileTypeMap
      */
     private removeWalls = (tileTypeMap: Array<Array<TileType>>): void => {
-        tileTypeMap.forEach(row => {
+        tileTypeMap.forEach((row) => {
             row.forEach((cell, columnIndex) => {
                 if (cell === TileType.Wall) {
                     row[columnIndex] = TileType.Undefined;
                 }
-            })
+            });
         });
-    }
+    };
 
     /**
      * Flood fills the void.
@@ -237,13 +227,8 @@ export default class LevelLoader {
             throw new Error('Invalid level (position [0,0] cannot be floor)');
         }
 
-        this.floodFill(
-            0,
-            0,
-            TileType.Void,
-            tileTypeMap
-        );
-    }
+        this.floodFill(0, 0, TileType.Void, tileTypeMap);
+    };
 
     /**
      * Finds and flood fills all ponds.
@@ -254,19 +239,14 @@ export default class LevelLoader {
         for (let rowIndex = 0; rowIndex < tileTypeMap.length; rowIndex++) {
             for (let columnIndex = 0; columnIndex < tileTypeMap[0].length; columnIndex++) {
                 if (tileTypeMap[rowIndex][columnIndex] === TileType.Undefined) {
-                    console.debug(`Pond found at [${columnIndex}, ${rowIndex}]`)
+                    console.debug(`Pond found at [${columnIndex}, ${rowIndex}]`);
 
                     // Fill pond
-                    this.floodFill(
-                        columnIndex,
-                        rowIndex,
-                        TileType.Water,
-                        tileTypeMap
-                    );
+                    this.floodFill(columnIndex, rowIndex, TileType.Water, tileTypeMap);
                 }
             }
         }
-    }
+    };
 
     /**
      * Replaces all undefined tiles with void.
@@ -281,7 +261,7 @@ export default class LevelLoader {
                 }
             }
         }
-    }
+    };
 
     /**
      * Removes all empty rows at the top and bottom of the level.
@@ -294,20 +274,20 @@ export default class LevelLoader {
         do {
             oldLevelMap = tileTypeMap;
             tileTypeMap = tileTypeMap.filter(
-                (row, rowIndex) => !(
-                    (rowIndex === 0 || rowIndex === tileTypeMap.length - 1) &&
-                    row.every(cell => cell === TileType.Undefined)
-                )
+                (row, rowIndex) =>
+                    !(
+                        (rowIndex === 0 || rowIndex === tileTypeMap.length - 1) &&
+                        row.every((cell) => cell === TileType.Undefined)
+                    )
             );
         } while (oldLevelMap.length !== tileTypeMap.length);
-    }
+    };
 
     /**
      * Converts tile types into tiles.
      * @param tileTypeMap
      */
     private convertToTiles = (tileTypeMap: Array<Array<TileType>>): Array<Array<Tile>> => {
-
         /**
          * Checks if the given tile type is at the given coordinates.
          * @param columnIndex
@@ -364,20 +344,20 @@ export default class LevelLoader {
                         // Add pillar effect
                         if (LevelLoader.RENDER_PILLARS && isTileTypeAt(columnIndex, rowIndex + 1, TileType.Void)) {
                             // Get pillar tile list
-                            this.voidTileMap.getTileListByPattern(
-                                getPatternAt(columnIndex, rowIndex, TileType.Floor)
-                            ).forEach((value, index) => {
-                                const pillarRowIndex = rowIndex + 1 + index;
-                                if (isTileTypeAt(columnIndex, pillarRowIndex, TileType.Void)) {
-                                    // Add row
-                                    if (levelMap[pillarRowIndex] === undefined) {
-                                        levelMap[pillarRowIndex] = [];
-                                    }
+                            this.voidTileMap
+                                .getTileListByPattern(getPatternAt(columnIndex, rowIndex, TileType.Floor))
+                                .forEach((value, index) => {
+                                    const pillarRowIndex = rowIndex + 1 + index;
+                                    if (isTileTypeAt(columnIndex, pillarRowIndex, TileType.Void)) {
+                                        // Add row
+                                        if (levelMap[pillarRowIndex] === undefined) {
+                                            levelMap[pillarRowIndex] = [];
+                                        }
 
-                                    // Add pillar tile
-                                    levelMap[pillarRowIndex][columnIndex] = value;
-                                }
-                            });
+                                        // Add pillar tile
+                                        levelMap[pillarRowIndex][columnIndex] = value;
+                                    }
+                                });
                         }
 
                         break;
@@ -398,7 +378,7 @@ export default class LevelLoader {
         }
 
         return levelMap;
-    }
+    };
 
     /**
      * Flood fill algorithm based on http://www.williammalone.com/articles/html5-canvas-javascript-paint-bucket-tool/
@@ -408,19 +388,24 @@ export default class LevelLoader {
      * @param fillTile
      * @param levelMap
      */
-    private floodFill = (startX: number, startY: number, fillTile: TileType, levelMap: Array<Array<TileType>>): void => {
+    private floodFill = (
+        startX: number,
+        startY: number,
+        fillTile: TileType,
+        levelMap: Array<Array<TileType>>
+    ): void => {
         let startTileType = levelMap[startY][startX];
         let levelWidth = levelMap[0].length;
         let levelHeight = levelMap.length;
 
         let positionStack: Array<Array<number>> = [[startX, startY]];
-        while(positionStack.length) {
+        while (positionStack.length) {
             let position = positionStack.pop()!;
             let columnIndex = position[0];
             let rowIndex = position[1];
 
             // Travel up
-            while(rowIndex >= 0 && levelMap[rowIndex][columnIndex] === startTileType) {
+            while (rowIndex >= 0 && levelMap[rowIndex][columnIndex] === startTileType) {
                 rowIndex--;
             }
             rowIndex++;
@@ -428,29 +413,29 @@ export default class LevelLoader {
             // Travel down
             let reachLeft = false;
             let reachRight = false;
-            while(rowIndex < levelHeight && levelMap[rowIndex][columnIndex] === startTileType) {
+            while (rowIndex < levelHeight && levelMap[rowIndex][columnIndex] === startTileType) {
                 levelMap[rowIndex][columnIndex] = fillTile;
 
                 // Reach left
-                if(columnIndex > 0) {
-                    if(levelMap[rowIndex][columnIndex - 1] === startTileType) {
-                        if(!reachLeft) {
+                if (columnIndex > 0) {
+                    if (levelMap[rowIndex][columnIndex - 1] === startTileType) {
+                        if (!reachLeft) {
                             positionStack.push([columnIndex - 1, rowIndex]);
                             reachLeft = true;
                         }
-                    } else if(reachLeft) {
+                    } else if (reachLeft) {
                         reachLeft = false;
                     }
                 }
 
                 // Reach right
-                if(columnIndex < levelWidth - 1) {
-                    if(levelMap[rowIndex][columnIndex + 1] === startTileType) {
-                        if(!reachRight) {
+                if (columnIndex < levelWidth - 1) {
+                    if (levelMap[rowIndex][columnIndex + 1] === startTileType) {
+                        if (!reachRight) {
                             positionStack.push([columnIndex + 1, rowIndex]);
                             reachRight = true;
                         }
-                    } else if(reachRight) {
+                    } else if (reachRight) {
                         reachRight = false;
                     }
                 }
@@ -458,5 +443,5 @@ export default class LevelLoader {
                 rowIndex++;
             }
         }
-    }
+    };
 }

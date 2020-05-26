@@ -10,7 +10,6 @@ export enum TileType {
 }
 
 export default class Tile {
-
     public readonly resource: Resource;
     public readonly x: number;
     public readonly y: number;
@@ -18,14 +17,7 @@ export default class Tile {
     public readonly height: number;
     public readonly type: TileType;
 
-    public constructor(
-        resource: Resource,
-        x: number,
-        y: number,
-        width: number,
-        height: number,
-        type: TileType
-    ) {
+    public constructor(resource: Resource, x: number, y: number, width: number, height: number, type: TileType) {
         this.resource = resource;
         this.x = x;
         this.y = y;

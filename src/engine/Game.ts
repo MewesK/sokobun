@@ -5,13 +5,12 @@ import ResourceLoader from './resource/ResourceLoader';
 import TileMap from './tile/TileMap';
 import Bunnie from './sprite/Bunnie';
 import Level from './level/Level';
-import {ActionType, DirectionType} from './sprite/Sprite';
+import { ActionType, DirectionType } from './sprite/Sprite';
 import LevelLoader from './level/LevelLoader';
-import {TileType} from './tile/Tile';
+import { TileType } from './tile/Tile';
 import LevelTileMap from './tile/LevelTileMap';
 
 export default class Game {
-
     private readonly resourceLoader: ResourceLoader = new ResourceLoader();
 
     private readonly zoom: number;
@@ -51,13 +50,7 @@ export default class Game {
             // Prepare sprites
             this.bunnie = new Bunnie(
                 new TileMap(
-                    TileMap.createTileTable(
-                        this.resourceLoader.get(sprites),
-                        4, 6,
-                        0, 0,
-                        16, 32,
-                        TileType.Sprite
-                    )
+                    TileMap.createTileTable(this.resourceLoader.get(sprites), 4, 6, 0, 0, 16, 32, TileType.Sprite)
                 )
             );
 
@@ -65,33 +58,15 @@ export default class Game {
             const tilesResource = this.resourceLoader.get(tiles);
             this.levelLoader = new LevelLoader(
                 new LevelTileMap(
-                    TileMap.createTileTable(
-                        tilesResource,
-                        6, 8,
-                        0, 0,
-                        16, 16,
-                        TileType.Floor
-                    ),
+                    TileMap.createTileTable(tilesResource, 6, 8, 0, 0, 16, 16, TileType.Floor),
                     LevelTileMap.FLOOR_PATTERN_TILE_LIST
                 ),
                 new LevelTileMap(
-                    TileMap.createTileTable(
-                        tilesResource,
-                        6, 8,
-                        8, 0,
-                        16, 16,
-                        TileType.Water
-                    ),
+                    TileMap.createTileTable(tilesResource, 6, 8, 8, 0, 16, 16, TileType.Water),
                     LevelTileMap.FLOOR_PATTERN_TILE_LIST
                 ),
                 new LevelTileMap(
-                    TileMap.createTileTable(
-                        tilesResource,
-                        3, 6,
-                        8, 16,
-                        16, 16,
-                        TileType.Void
-                    ),
+                    TileMap.createTileTable(tilesResource, 3, 6, 8, 16, 16, 16, TileType.Void),
                     LevelTileMap.PILLAR_PATTERN_TILE_LIST
                 )
             );
@@ -103,7 +78,9 @@ export default class Game {
                 // Resize canvas (for now)
                 this.canvas.width = this.level.columns * this.level.tileWidth * this.zoom;
                 this.canvas.height = this.level.rows * this.level.tileHeight * this.zoom;
-                console.log(`Setting canvas size to [${this.canvas.width}x${this.canvas.height}] for level ${this.level.src}...`);
+                console.log(
+                    `Setting canvas size to [${this.canvas.width}x${this.canvas.height}] for level ${this.level.src}...`
+                );
 
                 // Set player position
                 this.bunnie.moveTo(
@@ -117,7 +94,7 @@ export default class Game {
                 this.loop();
             });
         });
-    }
+    };
 
     /**
      * Handles the 'keydown' event.
@@ -150,7 +127,7 @@ export default class Game {
                 this.bunnie.setDirection(DirectionType.Right);
                 break;
         }
-    }
+    };
 
     /**
      * Handles the 'keyup' event.
@@ -163,7 +140,7 @@ export default class Game {
         if (Object.values(this.pressedKeyList).every((value) => value === false)) {
             this.bunnie.setAction(ActionType.Stand);
         }
-    }
+    };
 
     /**
      * The game loop.
@@ -186,5 +163,5 @@ export default class Game {
 
         this.lastTime = now;
         window.requestAnimationFrame(this.loop);
-    }
+    };
 }

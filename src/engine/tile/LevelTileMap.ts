@@ -2,7 +2,6 @@ import Tile from './Tile';
 import TileMap from './TileMap';
 
 export default class LevelTileMap extends TileMap {
-
     public static FLOOR_PATTERN_TILE_LIST: Array<[RegExp, Array<number>]> = [
         [/00000000/, [0]],
         [/00000001/, [1]],
@@ -63,10 +62,7 @@ export default class LevelTileMap extends TileMap {
 
     private readonly patternTileList: Array<[RegExp, Array<number>]> = [];
 
-    public constructor(
-        tileTable: Array<Array<Tile>>,
-        patternTileList: Array<[RegExp, Array<number>]>
-    ) {
+    public constructor(tileTable: Array<Array<Tile>>, patternTileList: Array<[RegExp, Array<number>]>) {
         super(tileTable);
 
         this.patternTileList = patternTileList;
@@ -77,14 +73,11 @@ export default class LevelTileMap extends TileMap {
      * @param pattern
      */
     public getTileListByPattern = (pattern: string): Array<Tile> => {
-        const patternTile = this.patternTileList.find(value => pattern.match(value[0]));
+        const patternTile = this.patternTileList.find((value) => pattern.match(value[0]));
         if (patternTile === undefined) {
             throw new Error(`Invalid pattern '${pattern}'`);
         }
 
-        return patternTile[1].map(value => this.get(
-            Math.floor(value / this.columns),
-            value % this.columns
-        ));
-    }
+        return patternTile[1].map((value) => this.get(Math.floor(value / this.columns), value % this.columns));
+    };
 }

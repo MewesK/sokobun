@@ -1,8 +1,7 @@
 import TileMap from '../tile/TileMap';
-import Tile, {TileType} from '../tile/Tile';
+import Tile, { TileType } from '../tile/Tile';
 
 export default class Level extends TileMap {
-
     private static BACKGROUND = '#252230';
 
     public readonly src: string;
@@ -74,7 +73,7 @@ export default class Level extends TileMap {
 
         context.imageSmoothingEnabled = false;
         context.drawImage(this.bufferCanvas, 0, 0);
-    }
+    };
 
     /**
      * Checks if the given rectangle intersects with any blocking part of the level or the canvas boundaries.
@@ -105,7 +104,8 @@ export default class Level extends TileMap {
                         (rowIndex + 1) * this.tileHeight
                     ];
 
-                    if (rectangle[0] <= tileRectangle[1] &&
+                    if (
+                        rectangle[0] <= tileRectangle[1] &&
                         tileRectangle[0] <= rectangle[1] &&
                         rectangle[2] <= tileRectangle[3] &&
                         tileRectangle[2] <= rectangle[3]
@@ -118,5 +118,5 @@ export default class Level extends TileMap {
         }
 
         return false;
-    }
+    };
 }

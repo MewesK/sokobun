@@ -9,14 +9,12 @@
   ],
   "repository": "github:MewesK/sokobun",
   "scripts": {
-    "type-check": "tsc --noEmit",
-    "type-check:watch": "npm run type-check -- --watch",
     "build:types": "tsc --emitDeclarationOnly",
     "build:js": "webpack --mode=production",
     "build": "npm run build:types && npm run build:js",
-    "watch": "webpack --watch",
+    "deploy": "npm run build && gh-pages -d dist",
     "serve": "webpack-dev-server",
-    "deploy": "npm run build && gh-pages -d dist"
+    "format": "prettier --write ./src/**/*.{css,ts}"
   },
   "main": "dist/bundle.js",
   "types": "dist/types/index.d.ts",
@@ -38,6 +36,7 @@
     "html-webpack-plugin": "^4.3.0",
     "mini-css-extract-plugin": "^0.9.0",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
+    "prettier": "2.0.5",
     "style-loader": "^1.2.1",
     "terser-webpack-plugin": "^3.0.1",
     "typescript": "^3.8.3",
