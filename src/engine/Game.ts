@@ -11,6 +11,8 @@ import { TileType } from './tile/Tile';
 import LevelTileMap from './tile/LevelTileMap';
 
 export default class Game {
+    private static readonly SMOOTHING = false;
+
     private readonly resourceLoader: ResourceLoader = new ResourceLoader();
 
     private readonly zoom: number;
@@ -180,7 +182,7 @@ export default class Game {
         this.bunnie.update(dt);
 
         // Draw buffer canvas
-        this.outputContext.imageSmoothingEnabled = false;
+        this.outputContext.imageSmoothingEnabled = Game.SMOOTHING;
         this.outputContext.drawImage(
             this.bufferCanvas,
             0,
