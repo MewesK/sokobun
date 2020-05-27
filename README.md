@@ -6,11 +6,10 @@ A Sokoban clone featuring buunnie!
 https://www.twitch.tv/buunnie
 
 ## Tiles
-"The Field of the Floating Islands" tiles are made by [Buch](https://opengameart.org/users/buch).
+Based on "The Field of the Floating Islands" tiles by [Buch](https://opengameart.org/users/buch).
 
 ## Next steps
 
- - intersect implementation
  - render destinations
  - add box sprites
  - make box sprites pushable

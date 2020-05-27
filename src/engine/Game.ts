@@ -25,6 +25,13 @@ export default class Game {
     private bunnie!: Bunnie;
     private level!: Level;
 
+    // @ts-ignore
+    private moves: number = 0;
+    // @ts-ignore
+    private pushes: number = 0;
+    // @ts-ignore
+    private time: number = 0;
+
     private lastTime: number = 0;
     private pressedKeyList: Record<string, boolean> = {};
 

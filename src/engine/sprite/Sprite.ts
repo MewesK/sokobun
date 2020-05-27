@@ -121,7 +121,6 @@ export default class Sprite {
     /**
      * Draws the sprite with the given context.
      * @param context
-     * @param zoom
      */
     public draw = (context: CanvasRenderingContext2D): void => {
         const tile = this.getTile();
