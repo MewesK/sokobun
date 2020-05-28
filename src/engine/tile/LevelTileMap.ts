@@ -60,8 +60,8 @@ export default class LevelTileMap extends TileMap {
         [/...01.1./, [4, 11, 18]]
     ];
 
-    public static VOID_BIAS_TILE_LIST: Array<[number, number]> = [
-        [5, 0.5],
+    public static VOID_WEIGHTED_TILE_LIST: Array<[number, number]> = [
+        [5, 2.0],
         [6, 0.1],
         [12, 0.1],
         [13, 0.1],
@@ -69,26 +69,35 @@ export default class LevelTileMap extends TileMap {
         [20, 0.1]
     ];
 
-    private readonly biasTileList: Array<[number, number]> = [];
+    private readonly weightedTileList: Array<[number, number]> = [];
     private readonly patternTileList: Array<[RegExp, Array<number>]> = [];
 
     public constructor(
         tileTable: Array<Array<Tile>>,
-        biasTileList: Array<[number, number]>,
+        weightedTileList: Array<[number, number]>,
         patternTileList: Array<[RegExp, Array<number>]>
     ) {
         super(tileTable);
 
-        this.biasTileList = biasTileList;
+        this.weightedTileList = weightedTileList;
         this.patternTileList = patternTileList;
     }
 
     /**
-     * Return a random tile based with the configured bias.
+     * Return a random tile based according to the defined probabilities.
      */
-    public getRandomTileWithBias = (): Tile => {
-        const value = this.biasTileList[0][0];
-        return this.get(Math.floor(value / this.columns), value % this.columns);
+    public getWeightedRandomTile = (): Tile => {
+        let sum = 0;
+        let random = Math.random() * this.weightedTileList.reduce((previousValue, currentValue) => previousValue + currentValue[1], this.weightedTileList[0][1]);
+        let tileIndex = this.weightedTileList[0][0];
+        for (let i in this.weightedTileList) {
+            sum += this.weightedTileList[i][1];
+            if (random <= sum) {
+                tileIndex = this.weightedTileList[i][0];
+                break;
+            }
+        }
+        return this.get(Math.floor(tileIndex / this.columns), tileIndex % this.columns);
     };
 
     /**

@@ -94,7 +94,7 @@ export default class Game {
                 ),
                 new LevelTileMap(
                     TileMap.createTileTable(tilesResource, 3, 7, 8, 8, 16, 16, TileType.Void),
-                    LevelTileMap.VOID_BIAS_TILE_LIST,
+                    LevelTileMap.VOID_WEIGHTED_TILE_LIST,
                     LevelTileMap.PILLAR_PATTERN_TILE_LIST
                 )
             );
