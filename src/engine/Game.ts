@@ -5,9 +5,9 @@ import ResourceLoader from './resource/ResourceLoader';
 import TileMap from './tile/TileMap';
 import Bunnie from './sprite/Bunnie';
 import Level from './level/Level';
-import { ActionType, DirectionType } from './sprite/Sprite';
+import {ActionType, DirectionType} from './sprite/Sprite';
 import LevelLoader from './level/LevelLoader';
-import { TileType } from './tile/Tile';
+import {TileType} from './tile/Tile';
 import LevelTileMap from './tile/LevelTileMap';
 
 export default class Game {
@@ -36,6 +36,7 @@ export default class Game {
     private time: number = 0;
 
     private lastTime: number = 0;
+    private pressedKeyList: Record<string, boolean> = {};
 
     public constructor(canvas: HTMLCanvasElement, width: number = 400, height: number = 304, zoom: number = 1) {
         // Buffer canvas
@@ -63,7 +64,12 @@ export default class Game {
         this.outputContext = context;
 
         // Register event listener
-        document.addEventListener('keydown', this.keyDown);
+        document.addEventListener('keydown', (event: KeyboardEvent): void => {
+            this.pressedKeyList[event.code] = true;
+        });
+        document.addEventListener('keyup', (event: KeyboardEvent): void => {
+            this.pressedKeyList[event.code] = false;
+        });
     }
 
     public initialize = () => {
@@ -121,37 +127,6 @@ export default class Game {
     };
 
     /**
-     * Handles the 'keydown' event.
-     * @param event
-     */
-    private keyDown = (event: KeyboardEvent): void => {
-        if (this.bunnie.actionType === ActionType.Stand) {
-            switch (event.code) {
-                case 'KeyS':
-                case 'ArrowDown':
-                    this.bunnie.setAction(ActionType.Walk);
-                    this.bunnie.setDirection(DirectionType.Down);
-                    break;
-                case 'KeyW':
-                case 'ArrowUp':
-                    this.bunnie.setAction(ActionType.Walk);
-                    this.bunnie.setDirection(DirectionType.Up);
-                    break;
-                case 'KeyA':
-                case 'ArrowLeft':
-                    this.bunnie.setAction(ActionType.Walk);
-                    this.bunnie.setDirection(DirectionType.Left);
-                    break;
-                case 'KeyD':
-                case 'ArrowRight':
-                    this.bunnie.setAction(ActionType.Walk);
-                    this.bunnie.setDirection(DirectionType.Right);
-                    break;
-            }
-        }
-    };
-
-    /**
      * The game loop.
      */
     private loop = (): void => {
@@ -162,6 +137,34 @@ export default class Game {
         this.level.draw([this.bunnie], this.voidTileMap, this.moonTileMap, this.bufferContext);
 
         // Move sprite
+        if (this.bunnie.actionType === ActionType.Stand) {
+            for (let i in this.pressedKeyList) {
+                if (this.pressedKeyList[i]) {
+                    switch (i) {
+                        case 'KeyS':
+                        case 'ArrowDown':
+                            this.bunnie.setAction(ActionType.Walk);
+                            this.bunnie.setDirection(DirectionType.Down);
+                            break;
+                        case 'KeyW':
+                        case 'ArrowUp':
+                            this.bunnie.setAction(ActionType.Walk);
+                            this.bunnie.setDirection(DirectionType.Up);
+                            break;
+                        case 'KeyA':
+                        case 'ArrowLeft':
+                            this.bunnie.setAction(ActionType.Walk);
+                            this.bunnie.setDirection(DirectionType.Left);
+                            break;
+                        case 'KeyD':
+                        case 'ArrowRight':
+                            this.bunnie.setAction(ActionType.Walk);
+                            this.bunnie.setDirection(DirectionType.Right);
+                            break;
+                    }
+                }
+            }
+        }
         this.bunnie.move(dt, this.bufferContext, this.level);
 
         // Update sprite
