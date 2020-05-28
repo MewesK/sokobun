@@ -29,10 +29,10 @@ export enum DirectionType {
 }
 
 export class Direction {
-    public readonly tileCoordinatesList: Array<[number, number]>;
+    public readonly tileCoordinatesList: Array<[number, number, number]>;
     public readonly duration: number;
 
-    public constructor(tileCoordinatesList: Array<[number, number]>, duration: number) {
+    public constructor(tileCoordinatesList: Array<[number, number, number]>, duration: number) {
         if (tileCoordinatesList.length === 0) {
             throw new Error('There must be at least one pair of tile coordinates.');
         }
@@ -49,11 +49,15 @@ export default class Sprite {
     protected readonly actionRecord: Record<ActionType, Action>;
     protected readonly collisionOffset: CollisionBox;
 
+    public actionType: ActionType;
+    public directionType: DirectionType;
+
     protected x: number = 0;
     protected y: number = 0;
-    protected actionType: ActionType;
-    protected directionType: DirectionType;
-    protected timer: number = 0;
+
+    protected actionTimer: number = 0;
+    protected animationIndex: number = 0;
+    protected animationTimer: number = 0;
 
     public constructor(
         tileMap: TileMap,
@@ -86,8 +90,10 @@ export default class Sprite {
             throw new Error('Invalid action type');
         }
 
-        this.timer = 0;
         this.actionType = actionType;
+        this.actionTimer = 0;
+        this.animationIndex = 0;
+        this.animationTimer = 0;
     };
 
     /**
@@ -103,8 +109,10 @@ export default class Sprite {
             throw new Error('Invalid direction type');
         }
 
-        this.timer = 0;
         this.directionType = directionType;
+        this.actionTimer = 0;
+        this.animationIndex = 0;
+        this.animationTimer = 0;
     };
 
     /**
@@ -112,9 +120,28 @@ export default class Sprite {
      * @param dt
      */
     public update = (dt: number): void => {
-        this.timer += dt;
-        if (this.timer >= this.getDirection().duration) {
-            this.timer = 0;
+        this.actionTimer += dt;
+        this.animationTimer += dt;
+
+        // Check if animation index need update
+        const direction = this.getDirection();
+        const tileCoordinates = direction.tileCoordinatesList[this.animationIndex];
+        if (this.animationTimer > tileCoordinates[2]) {
+            this.animationTimer = 0;
+            this.animationIndex++;
+            if (this.animationIndex >= direction.tileCoordinatesList.length) {
+                this.animationIndex = 0;
+            }
+        }
+
+        // Check if action is finished
+        if (this.actionTimer >= direction.duration) {
+            this.actionTimer = 0;
+            this.animationTimer = 0;
+            this.animationIndex = 0;
+            this.actionType = ActionType.Stand;
+            this.x = Math.round((this.x - this.collisionOffset.left) / 16) * 16 + this.collisionOffset.left;
+            this.y = Math.round((this.y - this.collisionOffset.top) / 16) * 16 + this.collisionOffset.top;
         }
     };
 
@@ -147,8 +174,8 @@ export default class Sprite {
      * @param level
      */
     public move = (dt: number, context: CanvasRenderingContext2D, level: Level): void => {
-        if (this.actionType === ActionType.Walk) {
-            const distance = Math.round(dt * Sprite.SPEED);
+        if (this.actionType !== ActionType.Stand) {
+            const distance = 16 / (this.getDirection().duration / dt);
 
             let x, y;
             switch (this.directionType) {
@@ -222,11 +249,7 @@ export default class Sprite {
      * Returns the current tile to draw.
      */
     protected getTile = (): Tile => {
-        const direction = this.getDirection();
-        const tileCoordinates =
-            direction.tileCoordinatesList[
-                Math.floor(this.timer / (direction.duration / direction.tileCoordinatesList.length))
-            ];
+        const tileCoordinates = this.getDirection().tileCoordinatesList[this.animationIndex];
         return this.tileMap.get(tileCoordinates[0], tileCoordinates[1]);
     };
 }
