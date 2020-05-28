@@ -84,14 +84,17 @@ export default class Game {
             this.levelLoader = new LevelLoader(
                 new LevelTileMap(
                     TileMap.createTileTable(tilesResource, 6, 8, 0, 0, 16, 16, TileType.Floor),
+                    [],
                     LevelTileMap.FLOOR_PATTERN_TILE_LIST
                 ),
                 new LevelTileMap(
                     TileMap.createTileTable(tilesResource, 6, 8, 8, 0, 16, 16, TileType.Water),
+                    [],
                     LevelTileMap.FLOOR_PATTERN_TILE_LIST
                 ),
                 new LevelTileMap(
-                    TileMap.createTileTable(tilesResource, 3, 6, 8, 8, 16, 16, TileType.Void),
+                    TileMap.createTileTable(tilesResource, 3, 7, 8, 8, 16, 16, TileType.Void),
+                    LevelTileMap.VOID_BIAS_TILE_LIST,
                     LevelTileMap.PILLAR_PATTERN_TILE_LIST
                 )
             );

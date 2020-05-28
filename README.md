@@ -9,11 +9,13 @@ https://www.twitch.tv/buunnie
 Based on "The Field of the Floating Islands" tiles by [Buch](https://opengameart.org/users/buch).
 
 ## Next steps
-
+ - render stars
  - render destinations
  - add box sprites
  - make box sprites pushable
- - implement wind and lose condition
+ - calculate and render status
+ - implement win and lose condition
+ - implement scenes
 
 ## Font ideas
 

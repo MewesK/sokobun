@@ -53,20 +53,43 @@ export default class LevelTileMap extends TileMap {
     ];
 
     public static PILLAR_PATTERN_TILE_LIST: Array<[RegExp, Array<number>]> = [
-        [/...11.1./, [0, 6, 12]],
-        [/...10.1./, [1, 7, 13]],
-        [/...00.1./, [2, 8, 14]],
-        [/...00.1./, [3, 9, 15]],
-        [/...01.1./, [4, 10, 16]]
+        [/...11.1./, [0, 7, 14]],
+        [/...10.1./, [1, 8, 15]],
+        [/...00.1./, [2, 9, 16]],
+        [/...00.1./, [3, 10, 17]],
+        [/...01.1./, [4, 11, 18]]
     ];
 
+    public static VOID_BIAS_TILE_LIST: Array<[number, number]> = [
+        [5, 0.5],
+        [6, 0.1],
+        [12, 0.1],
+        [13, 0.1],
+        [19, 0.1],
+        [20, 0.1]
+    ];
+
+    private readonly biasTileList: Array<[number, number]> = [];
     private readonly patternTileList: Array<[RegExp, Array<number>]> = [];
 
-    public constructor(tileTable: Array<Array<Tile>>, patternTileList: Array<[RegExp, Array<number>]>) {
+    public constructor(
+        tileTable: Array<Array<Tile>>,
+        biasTileList: Array<[number, number]>,
+        patternTileList: Array<[RegExp, Array<number>]>
+    ) {
         super(tileTable);
 
+        this.biasTileList = biasTileList;
         this.patternTileList = patternTileList;
     }
+
+    /**
+     * Return a random tile based with the configured bias.
+     */
+    public getRandomTileWithBias = (): Tile => {
+        const value = this.biasTileList[0][0];
+        return this.get(Math.floor(value / this.columns), value % this.columns);
+    };
 
     /**
      * Returns the tile list corresponding to the given pattern.

@@ -370,7 +370,7 @@ export default class LevelLoader {
                     case TileType.Void:
                         // Add void tile if not already pillar
                         if (levelMap[rowIndex][columnIndex] === undefined) {
-                            levelMap[rowIndex][columnIndex] = this.voidTileMap.get(0, 5);
+                            levelMap[rowIndex][columnIndex] = this.voidTileMap.getRandomTileWithBias();
                         }
                         break;
                 }
