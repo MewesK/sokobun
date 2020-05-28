@@ -1,6 +1,6 @@
 import sprites from '../images/sprites.png';
 import tiles from '../images/tiles.png';
-import level1 from '../levels/1.txt';
+import level1 from '../levels/2.txt';
 import ResourceLoader from './resource/ResourceLoader';
 import TileMap from './tile/TileMap';
 import Bunnie from './sprite/Bunnie';
@@ -138,9 +138,9 @@ export default class Game {
 
         // Move sprite
         if (this.bunnie.actionType === ActionType.Stand) {
-            for (let i in this.pressedKeyList) {
-                if (this.pressedKeyList[i]) {
-                    switch (i) {
+            Object.keys(this.pressedKeyList).forEach((pressedKey) => {
+                if (this.pressedKeyList[pressedKey]) {
+                    switch (pressedKey) {
                         case 'KeyS':
                         case 'ArrowDown':
                             this.bunnie.setAction(ActionType.Walk);
@@ -163,7 +163,7 @@ export default class Game {
                             break;
                     }
                 }
-            }
+            });
         }
         this.bunnie.move(dt, this.bufferContext, this.level);
 

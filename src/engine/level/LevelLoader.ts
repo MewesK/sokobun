@@ -1,6 +1,6 @@
 import Resource from '../resource/Resource';
 import Level from './Level';
-import Tile, { TileType } from '../tile/Tile';
+import Tile, {TileType} from '../tile/Tile';
 import LevelTileMap from '../tile/LevelTileMap';
 
 export default class LevelLoader {
@@ -28,7 +28,7 @@ export default class LevelLoader {
             resourceList.forEach((resource) => {
                 console.debug(`Loading level ${resource.src}...`);
 
-                const tileTypeMap: Array<Array<TileType>> = [[]];
+                let tileTypeMap: Array<Array<TileType>> = [[]];
                 const playerPosition: [number, number] = [0, 0];
                 const boxPositionList: Array<[number, number]> = [];
                 const destinationPositionList: Array<[number, number]> = [];
@@ -43,8 +43,9 @@ export default class LevelLoader {
                 } else {
                     this.fillVoid(tileTypeMap);
                 }
-                // TODO: Remove empty rows
-                // TODO: Remove empty columns
+                tileTypeMap = this.removeEmptyRows(tileTypeMap);
+                tileTypeMap = this.removeEmptyColumns(tileTypeMap);
+                tileTypeMap = this.addEmptyRows(tileTypeMap, 3);
 
                 this.cache.push(
                     new Level(
@@ -264,24 +265,48 @@ export default class LevelLoader {
     };
 
     /**
-     * Removes all empty rows at the top and bottom of the level.
+     * Removes all empty rows.
      * @param tileTypeMap
      */
-    // @ts-ignore
-    private removeEmptyRows = (tileTypeMap: Array<Array<TileType>>): void => {
-        // TODO: Adjust player/box/destination positions
-        let oldLevelMap;
-        do {
-            oldLevelMap = tileTypeMap;
-            tileTypeMap = tileTypeMap.filter(
-                (row, rowIndex) =>
-                    !(
-                        (rowIndex === 0 || rowIndex === tileTypeMap.length - 1) &&
-                        row.every((cell) => cell === TileType.Undefined)
-                    )
-            );
-        } while (oldLevelMap.length !== tileTypeMap.length);
+    private removeEmptyRows = (tileTypeMap: Array<Array<TileType>>): Array<Array<TileType>> => {
+        // Detect empty rows
+        const emptyRowList = (tileTypeMap || []).map((_row, index) => tileTypeMap[index].some(tileType => tileType !== TileType.Void));
+
+        // Filter empty rows
+        return tileTypeMap.filter((_row, index) => emptyRowList[index]);
     };
+
+    /**
+     * Removes all empty columns.
+     * @param tileTypeMap
+     */
+    private removeEmptyColumns = (tileTypeMap: Array<Array<TileType>>): Array<Array<TileType>> => {
+        // Detect empty columns
+        const emptyColumnList = (tileTypeMap[0] || []).map((_tileType, index) => tileTypeMap.some(row => row[index] !== TileType.Void));
+
+        // Filter empty columns
+        return tileTypeMap.map(row => row.filter((_tileType, index) => emptyColumnList[index]));
+    };
+
+    /**
+     * Adds the desired amount of empty rows to the bottom of the array.
+     * @param tileTypeMap
+     * @param rowCount
+     */
+    private addEmptyRows = (tileTypeMap: Array<Array<TileType>>, rowCount: number): Array<Array<TileType>> => {
+        // Create empty row
+        let row:Array<TileType> = [];
+        for (let columnIndex = 0; columnIndex < tileTypeMap[0].length; columnIndex++) {
+            row.push(TileType.Void);
+        }
+
+        // Add empty rows
+        for (let i = 0; i < rowCount; i++) {
+            tileTypeMap.push(row);
+        }
+
+        return tileTypeMap;
+    }
 
     /**
      * Converts tile types into tiles.
