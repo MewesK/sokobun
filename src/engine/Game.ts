@@ -1,5 +1,5 @@
 import sprites from '../images/sprites.png';
-import tiles from '../images/tiles2.png';
+import tiles from '../images/tiles.png';
 import level1 from '../levels/1.txt';
 import ResourceLoader from './resource/ResourceLoader';
 import TileMap from './tile/TileMap';
@@ -15,12 +15,15 @@ export default class Game {
 
     private readonly resourceLoader: ResourceLoader = new ResourceLoader();
 
-    private readonly zoom: number;
     private readonly bufferCanvas: HTMLCanvasElement;
     private readonly bufferContext: CanvasRenderingContext2D;
     private readonly outputCanvas: HTMLCanvasElement;
     private readonly outputContext: CanvasRenderingContext2D;
 
+    private floorTileMap!: LevelTileMap;
+    private waterTileMap!: LevelTileMap;
+    private voidTileMap!: LevelTileMap;
+    private moonTileMap!: LevelTileMap;
     private levelLoader!: LevelLoader;
     private bunnie!: Bunnie;
     private level!: Level;
@@ -35,9 +38,7 @@ export default class Game {
     private lastTime: number = 0;
     private pressedKeyList: Record<string, boolean> = {};
 
-    public constructor(canvas: HTMLCanvasElement, width: number = 256, height: number = 224, zoom: number = 1) {
-        this.zoom = zoom;
-
+    public constructor(canvas: HTMLCanvasElement, width: number = 400, height: number = 304, zoom: number = 1) {
         // Buffer canvas
         this.bufferCanvas = document.createElement('canvas');
         this.bufferCanvas.width = width;
@@ -81,36 +82,35 @@ export default class Game {
 
             // Prepare tiles
             const tilesResource = this.resourceLoader.get(tiles);
+            this.floorTileMap = new LevelTileMap(
+                TileMap.createTileTable(tilesResource, 6, 8, 0, 0, 16, 16, TileType.Floor),
+                [],
+                LevelTileMap.FLOOR_PATTERN_TILE_LIST
+            );
+            this.waterTileMap = new LevelTileMap(
+                TileMap.createTileTable(tilesResource, 6, 8, 8, 0, 16, 16, TileType.Water),
+                [],
+                LevelTileMap.FLOOR_PATTERN_TILE_LIST
+            );
+            this.voidTileMap = new LevelTileMap(
+                TileMap.createTileTable(tilesResource, 3, 8, 8, 8, 16, 16, TileType.Void),
+                LevelTileMap.VOID_WEIGHTED_TILE_LIST,
+                LevelTileMap.PILLAR_PATTERN_TILE_LIST
+            );
+            this.moonTileMap = new LevelTileMap(
+                TileMap.createTileTable(tilesResource, 2, 2, 11, 13, 16, 16, TileType.Void),
+                [],
+                []
+            );
             this.levelLoader = new LevelLoader(
-                new LevelTileMap(
-                    TileMap.createTileTable(tilesResource, 6, 8, 0, 0, 16, 16, TileType.Floor),
-                    [],
-                    LevelTileMap.FLOOR_PATTERN_TILE_LIST
-                ),
-                new LevelTileMap(
-                    TileMap.createTileTable(tilesResource, 6, 8, 8, 0, 16, 16, TileType.Water),
-                    [],
-                    LevelTileMap.FLOOR_PATTERN_TILE_LIST
-                ),
-                new LevelTileMap(
-                    TileMap.createTileTable(tilesResource, 3, 7, 8, 8, 16, 16, TileType.Void),
-                    LevelTileMap.VOID_WEIGHTED_TILE_LIST,
-                    LevelTileMap.PILLAR_PATTERN_TILE_LIST
-                )
+                this.floorTileMap,
+                this.waterTileMap,
+                this.voidTileMap
             );
 
             // Prepare levels
             this.levelLoader.load([this.resourceLoader.get(level1)]).then(() => {
                 this.level = this.levelLoader.get(level1);
-
-                // Resize canvas (for now)
-                this.bufferCanvas.width = this.level.columns * this.level.tileWidth;
-                this.bufferCanvas.height = this.level.rows * this.level.tileHeight;
-                this.outputCanvas.width = this.level.columns * this.level.tileWidth * this.zoom;
-                this.outputCanvas.height = this.level.rows * this.level.tileHeight * this.zoom;
-                console.log(
-                    `Setting canvas size to [${this.outputCanvas.width}x${this.outputCanvas.height}] for level ${this.level.src}...`
-                );
 
                 // Set player position
                 this.bunnie.moveTo(
@@ -179,11 +179,8 @@ export default class Game {
         let now = Date.now();
         let dt = (now - this.lastTime) / 1000.0;
 
-        // Draw level
-        this.level.draw(this.bufferContext);
-
-        // Draw sprite
-        this.bunnie.draw(this.bufferContext);
+        // Draw level and sprites
+        this.level.draw([this.bunnie], this.voidTileMap, this.moonTileMap, this.bufferContext);
 
         // Move sprite
         this.bunnie.move(dt, this.bufferContext, this.level);

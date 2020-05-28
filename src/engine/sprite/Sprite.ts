@@ -120,9 +120,11 @@ export default class Sprite {
 
     /**
      * Draws the sprite with the given context.
+     * @param xOffset
+     * @param yOffset
      * @param context
      */
-    public draw = (context: CanvasRenderingContext2D): void => {
+    public draw = (xOffset: number, yOffset: number, context: CanvasRenderingContext2D): void => {
         const tile = this.getTile();
         context.imageSmoothingEnabled = false;
         context.drawImage(
@@ -131,8 +133,8 @@ export default class Sprite {
             tile.y,
             tile.width,
             tile.height,
-            this.x,
-            this.y,
+            xOffset + this.x,
+            yOffset + this.y,
             tile.width,
             tile.height
         );

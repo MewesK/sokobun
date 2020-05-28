@@ -53,20 +53,20 @@ export default class LevelTileMap extends TileMap {
     ];
 
     public static PILLAR_PATTERN_TILE_LIST: Array<[RegExp, Array<number>]> = [
-        [/...11.1./, [0, 7, 14]],
-        [/...10.1./, [1, 8, 15]],
-        [/...00.1./, [2, 9, 16]],
-        [/...00.1./, [3, 10, 17]],
-        [/...01.1./, [4, 11, 18]]
+        [/...11.1./, [0, 8, 16]],
+        [/...10.1./, [1, 9, 17]],
+        [/...00.1./, [2, 10, 18]],
+        [/...00.1./, [3, 11, 19]],
+        [/...01.1./, [4, 12, 20]]
     ];
 
     public static VOID_WEIGHTED_TILE_LIST: Array<[number, number]> = [
         [5, 2.0],
         [6, 0.1],
-        [12, 0.1],
+        [7, 0.1],
         [13, 0.1],
-        [19, 0.1],
-        [20, 0.1]
+        [14, 0.1],
+        [15, 0.1]
     ];
 
     private readonly weightedTileList: Array<[number, number]> = [];
