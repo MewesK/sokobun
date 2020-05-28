@@ -49,8 +49,8 @@ export default class Level extends TileMap {
     ): void => {
         const rowMax = context.canvas.height / this.tileHeight;
         const columnMax = context.canvas.width / this.tileWidth;
-        const xOffset = (columnMax - this.columns) / 2 * this.tileWidth;
-        const yOffset = (rowMax - this.rows) / 2 * this.tileHeight;
+        const xOffset = ((columnMax - this.columns) / 2) * this.tileWidth;
+        const yOffset = ((rowMax - this.rows) / 2) * this.tileHeight;
 
         if (!this.buffered) {
             this.bufferCanvas = document.createElement('canvas');
@@ -86,8 +86,12 @@ export default class Level extends TileMap {
             }
 
             // Draw moon
-
-            [[0, 0], [0, 1], [1, 0], [1, 1]].forEach((value) => {
+            [
+                [0, 0],
+                [0, 1],
+                [1, 0],
+                [1, 1]
+            ].forEach((value) => {
                 const tile = moonTileMap.get(value[0], value[1]);
                 this.bufferContext.drawImage(
                     tile.resource.data,
@@ -128,7 +132,7 @@ export default class Level extends TileMap {
         context.drawImage(this.bufferCanvas, 0, 0);
 
         // Draw sprites
-        spriteList.forEach(value => value.draw(xOffset, yOffset, context))
+        spriteList.forEach((value) => value.draw(xOffset, yOffset, context));
     };
 
     /**

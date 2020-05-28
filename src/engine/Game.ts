@@ -5,9 +5,9 @@ import ResourceLoader from './resource/ResourceLoader';
 import TileMap from './tile/TileMap';
 import Bunnie from './sprite/Bunnie';
 import Level from './level/Level';
-import {ActionType, DirectionType} from './sprite/Sprite';
+import { ActionType, DirectionType } from './sprite/Sprite';
 import LevelLoader from './level/LevelLoader';
-import {TileType} from './tile/Tile';
+import { TileType } from './tile/Tile';
 import LevelTileMap from './tile/LevelTileMap';
 
 export default class Game {
@@ -100,11 +100,7 @@ export default class Game {
                 [],
                 []
             );
-            this.levelLoader = new LevelLoader(
-                this.floorTileMap,
-                this.waterTileMap,
-                this.voidTileMap
-            );
+            this.levelLoader = new LevelLoader(this.floorTileMap, this.waterTileMap, this.voidTileMap);
 
             // Prepare levels
             this.levelLoader.load([this.resourceLoader.get(level1)]).then(() => {

@@ -8,30 +8,10 @@ export default class Bunnie extends Sprite {
             tileMap,
             {
                 [ActionType.Stand]: new Action({
-                    [DirectionType.Up]: new Direction(
-                        [
-                            [2, 0, 0.0]
-                        ],
-                        0.0
-                    ),
-                    [DirectionType.Down]: new Direction(
-                        [
-                            [3, 0, 0.0]
-                        ],
-                        0.0
-                    ),
-                    [DirectionType.Left]: new Direction(
-                        [
-                            [0, 0, 0.0]
-                        ],
-                        0.0
-                    ),
-                    [DirectionType.Right]: new Direction(
-                        [
-                            [1, 0, 0.0]
-                        ],
-                        0.0
-                    )
+                    [DirectionType.Up]: new Direction([[2, 0, 0.0]], 0.0),
+                    [DirectionType.Down]: new Direction([[3, 0, 0.0]], 0.0),
+                    [DirectionType.Left]: new Direction([[0, 0, 0.0]], 0.0),
+                    [DirectionType.Right]: new Direction([[1, 0, 0.0]], 0.0)
                 }),
                 [ActionType.Walk]: new Action({
                     [DirectionType.Up]: new Direction(

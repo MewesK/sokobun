@@ -88,8 +88,13 @@ export default class LevelTileMap extends TileMap {
      */
     public getWeightedRandomTile = (): Tile => {
         let sum = 0;
-        let random = Math.random() * this.weightedTileList.reduce((previousValue, currentValue) => previousValue + currentValue[1], this.weightedTileList[0][1]);
         let tileIndex = this.weightedTileList[0][0];
+        let random =
+            Math.random() *
+            this.weightedTileList.reduce(
+                (previousValue, currentValue) => previousValue + currentValue[1],
+                this.weightedTileList[0][1]
+            );
         for (let i in this.weightedTileList) {
             sum += this.weightedTileList[i][1];
             if (random <= sum) {
