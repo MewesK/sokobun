@@ -124,10 +124,7 @@ export default class Game {
                 );
                 this.boxList = this.level.boxPositionList.map((boxPosition) => {
                     let box = new Box(bunTileMap);
-                    box.moveTo(
-                        boxPosition[0] * this.level.tileWidth,
-                        boxPosition[1] * this.level.tileHeight
-                    );
+                    box.moveTo(boxPosition[0] * this.level.tileWidth, boxPosition[1] * this.level.tileHeight);
                     return box;
                 });
 
