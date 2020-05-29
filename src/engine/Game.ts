@@ -92,17 +92,17 @@ export default class Game {
                 LevelTileMap.FLOOR_PATTERN_TILE_LIST
             );
             this.waterTileMap = new LevelTileMap(
-                TileMap.createTileTable(tilesResource, 6, 8, 8, 0, 16, 16, TileType.Water),
+                TileMap.createTileTable(tilesResource, 6, 8, 6, 0, 16, 16, TileType.Water),
                 [],
                 LevelTileMap.FLOOR_PATTERN_TILE_LIST
             );
             this.voidTileMap = new LevelTileMap(
-                TileMap.createTileTable(tilesResource, 3, 8, 8, 8, 16, 16, TileType.Void),
+                TileMap.createTileTable(tilesResource, 3, 8, 6, 8, 16, 16, TileType.Void),
                 LevelTileMap.VOID_WEIGHTED_TILE_LIST,
                 LevelTileMap.PILLAR_PATTERN_TILE_LIST
             );
             this.moonTileMap = new LevelTileMap(
-                TileMap.createTileTable(tilesResource, 2, 2, 11, 13, 16, 16, TileType.Void),
+                TileMap.createTileTable(tilesResource, 2, 2, 9, 13, 16, 16, TileType.Void),
                 [],
                 []
             );
@@ -137,27 +137,33 @@ export default class Game {
         if (this.bunnie.actionType === ActionType.Stand) {
             Object.keys(this.pressedKeyList).forEach((pressedKey) => {
                 if (this.pressedKeyList[pressedKey]) {
+                    let actionSet = false;
+                    
                     switch (pressedKey) {
                         case 'KeyS':
                         case 'ArrowDown':
-                            this.bunnie.setAction(ActionType.Walk);
+                            actionSet = actionSet || this.bunnie.setAction(ActionType.Walk);
                             this.bunnie.setDirection(DirectionType.Down);
                             break;
                         case 'KeyW':
                         case 'ArrowUp':
-                            this.bunnie.setAction(ActionType.Walk);
+                            actionSet = actionSet || this.bunnie.setAction(ActionType.Walk);
                             this.bunnie.setDirection(DirectionType.Up);
                             break;
                         case 'KeyA':
                         case 'ArrowLeft':
-                            this.bunnie.setAction(ActionType.Walk);
+                            actionSet = actionSet || this.bunnie.setAction(ActionType.Walk);
                             this.bunnie.setDirection(DirectionType.Left);
                             break;
                         case 'KeyD':
                         case 'ArrowRight':
-                            this.bunnie.setAction(ActionType.Walk);
+                            actionSet = actionSet || this.bunnie.setAction(ActionType.Walk);
                             this.bunnie.setDirection(DirectionType.Right);
                             break;
+                    }
+
+                    if (actionSet) {
+                        this.moves++;
                     }
                 }
             });

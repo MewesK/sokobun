@@ -81,9 +81,9 @@ export default class Sprite {
      * Sets the current actionType.
      * @param actionType
      */
-    public setAction = (actionType: ActionType): void => {
+    public setAction = (actionType: ActionType): boolean => {
         if (this.actionType === actionType) {
-            return;
+            return false;
         }
 
         if (this.actionRecord[actionType] === undefined) {
@@ -94,15 +94,17 @@ export default class Sprite {
         this.actionTimer = 0;
         this.animationIndex = 0;
         this.animationTimer = 0;
+
+        return true;
     };
 
     /**
      * Sets the directionType.
      * @param directionType
      */
-    public setDirection = (directionType: DirectionType): void => {
+    public setDirection = (directionType: DirectionType): boolean => {
         if (this.directionType === directionType) {
-            return;
+            return false;
         }
 
         if (this.getAction().directionRecord[directionType] === undefined) {
@@ -113,6 +115,8 @@ export default class Sprite {
         this.actionTimer = 0;
         this.animationIndex = 0;
         this.animationTimer = 0;
+
+        return true;
     };
 
     /**
