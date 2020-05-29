@@ -43,8 +43,8 @@ export default class LevelLoader {
                 } else {
                     this.fillVoid(tileTypeMap);
                 }
-                tileTypeMap = this.removeEmptyRows(tileTypeMap);
-                tileTypeMap = this.removeEmptyColumns(tileTypeMap);
+                tileTypeMap = this.removeEmptyRows(tileTypeMap, playerPosition, boxPositionList, destinationPositionList);
+                tileTypeMap = this.removeEmptyColumns(tileTypeMap, playerPosition, boxPositionList, destinationPositionList);
                 tileTypeMap = this.addEmptyRows(tileTypeMap, 3);
 
                 this.cache.push(
@@ -267,10 +267,27 @@ export default class LevelLoader {
     /**
      * Removes all empty rows.
      * @param tileTypeMap
+     * @param playerPosition
+     * @param boxPositionList
+     * @param destinationPositionList
      */
-    private removeEmptyRows = (tileTypeMap: Array<Array<TileType>>): Array<Array<TileType>> => {
+    private removeEmptyRows = (
+        tileTypeMap: Array<Array<TileType>>,
+        playerPosition: [number, number],
+        boxPositionList: Array<[number, number]>,
+        destinationPositionList: Array<[number, number]>
+    ): Array<Array<TileType>> => {
         // Detect empty rows
         const emptyRowList = (tileTypeMap || []).map((_row, index) => tileTypeMap[index].some(tileType => tileType !== TileType.Void));
+
+        // Update positions
+        const leadingEmptyRowCount = emptyRowList.reduce<number>(
+            (result, value, index) => !value && (index === 0 || !emptyRowList[index - 1]) ? result + 1 : result,
+            0
+        );
+        playerPosition[1] -= leadingEmptyRowCount;
+        boxPositionList.forEach(boxPosition => { boxPosition[1] -= leadingEmptyRowCount });
+        destinationPositionList.forEach(destinationPosition => { destinationPosition[1] -= leadingEmptyRowCount });
 
         // Filter empty rows
         return tileTypeMap.filter((_row, index) => emptyRowList[index]);
@@ -279,10 +296,27 @@ export default class LevelLoader {
     /**
      * Removes all empty columns.
      * @param tileTypeMap
+     * @param playerPosition
+     * @param boxPositionList
+     * @param destinationPositionList
      */
-    private removeEmptyColumns = (tileTypeMap: Array<Array<TileType>>): Array<Array<TileType>> => {
+    private removeEmptyColumns = (
+        tileTypeMap: Array<Array<TileType>>,
+        playerPosition: [number, number],
+        boxPositionList: Array<[number, number]>,
+        destinationPositionList: Array<[number, number]>
+    ): Array<Array<TileType>> => {
         // Detect empty columns
         const emptyColumnList = (tileTypeMap[0] || []).map((_tileType, index) => tileTypeMap.some(row => row[index] !== TileType.Void));
+
+        // Update positions
+        const leadingEmptyColumnsCount = emptyColumnList.reduce<number>(
+            (result, value, index) => !value && (index === 0 || !emptyColumnList[index - 1]) ? result + 1 : result,
+            0
+        );
+        playerPosition[0] -= leadingEmptyColumnsCount;
+        boxPositionList.forEach(boxPosition => { boxPosition[0] -= leadingEmptyColumnsCount });
+        destinationPositionList.forEach(destinationPosition => { destinationPosition[0] -= leadingEmptyColumnsCount });
 
         // Filter empty columns
         return tileTypeMap.map(row => row.filter((_tileType, index) => emptyColumnList[index]));

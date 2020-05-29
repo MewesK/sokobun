@@ -133,9 +133,6 @@ export default class Game {
         let now = Date.now();
         let dt = (now - this.lastTime) / 1000.0;
 
-        // Draw level and sprites
-        this.level.draw([this.bunnie], this.voidTileMap, this.moonTileMap, this.bufferContext);
-
         // Move sprite
         if (this.bunnie.actionType === ActionType.Stand) {
             Object.keys(this.pressedKeyList).forEach((pressedKey) => {
@@ -169,6 +166,9 @@ export default class Game {
 
         // Update sprite
         this.bunnie.update(dt);
+
+        // Draw level and sprites
+        this.level.draw([this.bunnie], this.voidTileMap, this.moonTileMap, this.bufferContext);
 
         // Draw buffer canvas
         this.outputContext.imageSmoothingEnabled = Game.SMOOTHING;
