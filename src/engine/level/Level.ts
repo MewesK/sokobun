@@ -132,7 +132,7 @@ export default class Level extends TileMap {
         context.drawImage(this.bufferCanvas, 0, 0);
 
         // Draw sprites
-        spriteList.forEach((value) => value.draw(xOffset, yOffset, context));
+        spriteList.forEach((sprite) => sprite.draw(xOffset, yOffset, context));
     };
 
     /**

@@ -1,14 +1,17 @@
-import sprites from '../images/sprites.png';
-import tiles from '../images/tiles.png';
-import level1 from '../levels/2.txt';
+import { ActionType, DirectionType } from './sprite/Sprite';
+import { TileType } from './tile/Tile';
+import Box from './sprite/Box';
+import Level from './level/Level';
+import LevelLoader from './level/LevelLoader';
+import LevelTileMap from './tile/LevelTileMap';
+import Player from './sprite/Player';
 import ResourceLoader from './resource/ResourceLoader';
 import TileMap from './tile/TileMap';
-import Bunnie from './sprite/Bunnie';
-import Level from './level/Level';
-import {ActionType, DirectionType} from './sprite/Sprite';
-import LevelLoader from './level/LevelLoader';
-import {TileType} from './tile/Tile';
-import LevelTileMap from './tile/LevelTileMap';
+
+import boxSprites from '../images/bun.png';
+import playerSprites from '../images/bunnie.png';
+import tiles from '../images/tiles.png';
+import level from '../levels/1.txt';
 
 export default class Game {
     private static readonly SMOOTHING = false;
@@ -25,7 +28,8 @@ export default class Game {
     private voidTileMap!: LevelTileMap;
     private moonTileMap!: LevelTileMap;
     private levelLoader!: LevelLoader;
-    private bunnie!: Bunnie;
+    private player!: Player;
+    private boxList!: Array<Box>;
     private level!: Level;
 
     // @ts-ignore
@@ -76,14 +80,7 @@ export default class Game {
         console.log('Initializing game...');
 
         // Prepare resources
-        this.resourceLoader.load([sprites, tiles, level1]).then(() => {
-            // Prepare sprites
-            this.bunnie = new Bunnie(
-                new TileMap(
-                    TileMap.createTileTable(this.resourceLoader.get(sprites), 4, 6, 0, 0, 16, 32, TileType.Sprite)
-                )
-            );
-
+        this.resourceLoader.load([playerSprites, boxSprites, tiles, level]).then(() => {
             // Prepare tiles
             const tilesResource = this.resourceLoader.get(tiles);
             this.floorTileMap = new LevelTileMap(
@@ -106,17 +103,33 @@ export default class Game {
                 [],
                 []
             );
-            this.levelLoader = new LevelLoader(this.floorTileMap, this.waterTileMap, this.voidTileMap);
 
             // Prepare levels
-            this.levelLoader.load([this.resourceLoader.get(level1)]).then(() => {
-                this.level = this.levelLoader.get(level1);
+            this.levelLoader = new LevelLoader(this.floorTileMap, this.waterTileMap, this.voidTileMap);
+            this.levelLoader.load([this.resourceLoader.get(level)]).then(() => {
+                this.level = this.levelLoader.get(level);
 
-                // Set player position
-                this.bunnie.moveTo(
+                // Prepare sprites
+                const playerResource = this.resourceLoader.get(playerSprites);
+                this.player = new Player(
+                    new TileMap(TileMap.createTileTable(playerResource, 4, 6, 0, 0, 16, 32, TileType.Sprite))
+                );
+                this.player.moveTo(
                     this.level.playerPosition[0] * this.level.tileWidth,
                     this.level.playerPosition[1] * this.level.tileHeight
                 );
+
+                const bunTileMap = new TileMap(
+                    TileMap.createTileTable(this.resourceLoader.get(boxSprites), 1, 1, 0, 0, 16, 16, TileType.Sprite)
+                );
+                this.boxList = this.level.boxPositionList.map((boxPosition) => {
+                    let box = new Box(bunTileMap);
+                    box.moveTo(
+                        boxPosition[0] * this.level.tileWidth,
+                        boxPosition[1] * this.level.tileHeight
+                    );
+                    return box;
+                });
 
                 // Start game loop
                 console.log('Starting game loop...');
@@ -132,33 +145,34 @@ export default class Game {
     private loop = (): void => {
         let now = Date.now();
         let dt = (now - this.lastTime) / 1000.0;
+        this.time += dt;
 
         // Move sprite
-        if (this.bunnie.actionType === ActionType.Stand) {
+        if (this.player.actionType === ActionType.Stand) {
             Object.keys(this.pressedKeyList).forEach((pressedKey) => {
                 if (this.pressedKeyList[pressedKey]) {
                     let actionSet = false;
-                    
+
                     switch (pressedKey) {
                         case 'KeyS':
                         case 'ArrowDown':
-                            actionSet = actionSet || this.bunnie.setAction(ActionType.Walk);
-                            this.bunnie.setDirection(DirectionType.Down);
+                            actionSet = actionSet || this.player.setAction(ActionType.Walk);
+                            this.player.setDirection(DirectionType.Down);
                             break;
                         case 'KeyW':
                         case 'ArrowUp':
-                            actionSet = actionSet || this.bunnie.setAction(ActionType.Walk);
-                            this.bunnie.setDirection(DirectionType.Up);
+                            actionSet = actionSet || this.player.setAction(ActionType.Walk);
+                            this.player.setDirection(DirectionType.Up);
                             break;
                         case 'KeyA':
                         case 'ArrowLeft':
-                            actionSet = actionSet || this.bunnie.setAction(ActionType.Walk);
-                            this.bunnie.setDirection(DirectionType.Left);
+                            actionSet = actionSet || this.player.setAction(ActionType.Walk);
+                            this.player.setDirection(DirectionType.Left);
                             break;
                         case 'KeyD':
                         case 'ArrowRight':
-                            actionSet = actionSet || this.bunnie.setAction(ActionType.Walk);
-                            this.bunnie.setDirection(DirectionType.Right);
+                            actionSet = actionSet || this.player.setAction(ActionType.Walk);
+                            this.player.setDirection(DirectionType.Right);
                             break;
                     }
 
@@ -168,13 +182,14 @@ export default class Game {
                 }
             });
         }
-        this.bunnie.move(dt, this.bufferContext, this.level);
+        this.player.move(dt, this.bufferContext, this.level);
 
         // Update sprite
-        this.bunnie.update(dt);
+        this.player.update(dt);
+        this.boxList.forEach((bun) => bun.update(dt));
 
         // Draw level and sprites
-        this.level.draw([this.bunnie], this.voidTileMap, this.moonTileMap, this.bufferContext);
+        this.level.draw([this.player, ...this.boxList], this.voidTileMap, this.moonTileMap, this.bufferContext);
 
         // Draw buffer canvas
         this.outputContext.imageSmoothingEnabled = Game.SMOOTHING;

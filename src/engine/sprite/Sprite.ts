@@ -43,10 +43,8 @@ export class Direction {
 }
 
 export default class Sprite {
-    protected static readonly SPEED = 40;
-
     protected readonly tileMap: TileMap;
-    protected readonly actionRecord: Record<ActionType, Action>;
+    protected readonly actionRecord: Partial<Record<ActionType, Action>>;
     protected readonly collisionOffset: CollisionBox;
 
     public actionType: ActionType;
@@ -61,7 +59,7 @@ export default class Sprite {
 
     public constructor(
         tileMap: TileMap,
-        actionRecord: Record<ActionType, Action>,
+        actionRecord: Partial<Record<ActionType, Action>>,
         collisionOffset: CollisionBox,
         actionType: ActionType = ActionType.Stand,
         directionType: DirectionType = DirectionType.Down
@@ -130,7 +128,7 @@ export default class Sprite {
         // Check if animation index need update
         const direction = this.getDirection();
         const tileCoordinates = direction.tileCoordinatesList[this.animationIndex];
-        if (this.animationTimer > tileCoordinates[2]) {
+        if (this.animationTimer > tileCoordinates[2] && tileCoordinates[2] > 0) {
             this.animationTimer = 0;
             this.animationIndex++;
             if (this.animationIndex >= direction.tileCoordinatesList.length) {
@@ -140,10 +138,7 @@ export default class Sprite {
 
         // Check if action is finished
         if (this.actionTimer >= direction.duration) {
-            this.actionTimer = 0;
-            this.animationTimer = 0;
-            this.animationIndex = 0;
-            this.actionType = ActionType.Stand;
+            this.setAction(ActionType.Stand);
             this.x = Math.round((this.x - this.collisionOffset.left) / 16) * 16 + this.collisionOffset.left;
             this.y = Math.round((this.y - this.collisionOffset.top) / 16) * 16 + this.collisionOffset.top;
         }
@@ -239,7 +234,7 @@ export default class Sprite {
      * Return the current action.
      */
     protected getAction = (): Action => {
-        return this.actionRecord[this.actionType];
+        return <Action>this.actionRecord[this.actionType];
     };
 
     /**

@@ -1,6 +1,6 @@
 import Resource from '../resource/Resource';
 import Level from './Level';
-import Tile, {TileType} from '../tile/Tile';
+import Tile, { TileType } from '../tile/Tile';
 import LevelTileMap from '../tile/LevelTileMap';
 
 export default class LevelLoader {
@@ -43,10 +43,22 @@ export default class LevelLoader {
                 } else {
                     this.fillVoid(tileTypeMap);
                 }
-                tileTypeMap = this.removeEmptyRows(tileTypeMap, playerPosition, boxPositionList, destinationPositionList);
-                tileTypeMap = this.removeEmptyColumns(tileTypeMap, playerPosition, boxPositionList, destinationPositionList);
+                console.log(playerPosition);
+                tileTypeMap = this.removeEmptyRows(
+                    tileTypeMap,
+                    playerPosition,
+                    boxPositionList,
+                    destinationPositionList
+                );
+                console.log(playerPosition);
+                tileTypeMap = this.removeEmptyColumns(
+                    tileTypeMap,
+                    playerPosition,
+                    boxPositionList,
+                    destinationPositionList
+                );
+                console.log(playerPosition);
                 tileTypeMap = this.addEmptyRows(tileTypeMap, 3);
-
                 this.cache.push(
                     new Level(
                         resource.src,
@@ -278,16 +290,26 @@ export default class LevelLoader {
         destinationPositionList: Array<[number, number]>
     ): Array<Array<TileType>> => {
         // Detect empty rows
-        const emptyRowList = (tileTypeMap || []).map((_row, index) => tileTypeMap[index].some(tileType => tileType !== TileType.Void));
+        const emptyRowList = (tileTypeMap || []).map((_row, index) =>
+            tileTypeMap[index].some((tileType) => tileType !== TileType.Void)
+        );
 
         // Update positions
-        const leadingEmptyRowCount = emptyRowList.reduce<number>(
-            (result, value, index) => !value && (index === 0 || !emptyRowList[index - 1]) ? result + 1 : result,
-            0
-        );
+        let leadingEmptyRowCount = 0;
+        for (let emptyRowIndex = 0; emptyRowIndex < emptyRowList.length; emptyRowIndex++) {
+            if (!emptyRowList[emptyRowIndex] && (emptyRowIndex === 0 || !emptyRowList[emptyRowIndex - 1])) {
+                leadingEmptyRowCount++;
+            } else {
+                break;
+            }
+        }
         playerPosition[1] -= leadingEmptyRowCount;
-        boxPositionList.forEach(boxPosition => { boxPosition[1] -= leadingEmptyRowCount });
-        destinationPositionList.forEach(destinationPosition => { destinationPosition[1] -= leadingEmptyRowCount });
+        boxPositionList.forEach((boxPosition) => {
+            boxPosition[1] -= leadingEmptyRowCount;
+        });
+        destinationPositionList.forEach((destinationPosition) => {
+            destinationPosition[1] -= leadingEmptyRowCount;
+        });
 
         // Filter empty rows
         return tileTypeMap.filter((_row, index) => emptyRowList[index]);
@@ -307,19 +329,29 @@ export default class LevelLoader {
         destinationPositionList: Array<[number, number]>
     ): Array<Array<TileType>> => {
         // Detect empty columns
-        const emptyColumnList = (tileTypeMap[0] || []).map((_tileType, index) => tileTypeMap.some(row => row[index] !== TileType.Void));
+        const emptyColumnList = (tileTypeMap[0] || []).map((_tileType, index) =>
+            tileTypeMap.some((row) => row[index] !== TileType.Void)
+        );
 
         // Update positions
-        const leadingEmptyColumnsCount = emptyColumnList.reduce<number>(
-            (result, value, index) => !value && (index === 0 || !emptyColumnList[index - 1]) ? result + 1 : result,
-            0
-        );
+        let leadingEmptyColumnsCount = 0;
+        for (let emptyRowIndex = 0; emptyRowIndex < emptyColumnList.length; emptyRowIndex++) {
+            if (!emptyColumnList[emptyRowIndex] && (emptyRowIndex === 0 || !emptyColumnList[emptyRowIndex - 1])) {
+                leadingEmptyColumnsCount++;
+            } else {
+                break;
+            }
+        }
         playerPosition[0] -= leadingEmptyColumnsCount;
-        boxPositionList.forEach(boxPosition => { boxPosition[0] -= leadingEmptyColumnsCount });
-        destinationPositionList.forEach(destinationPosition => { destinationPosition[0] -= leadingEmptyColumnsCount });
+        boxPositionList.forEach((boxPosition) => {
+            boxPosition[0] -= leadingEmptyColumnsCount;
+        });
+        destinationPositionList.forEach((destinationPosition) => {
+            destinationPosition[0] -= leadingEmptyColumnsCount;
+        });
 
         // Filter empty columns
-        return tileTypeMap.map(row => row.filter((_tileType, index) => emptyColumnList[index]));
+        return tileTypeMap.map((row) => row.filter((_tileType, index) => emptyColumnList[index]));
     };
 
     /**
@@ -329,7 +361,7 @@ export default class LevelLoader {
      */
     private addEmptyRows = (tileTypeMap: Array<Array<TileType>>, rowCount: number): Array<Array<TileType>> => {
         // Create empty row
-        let row:Array<TileType> = [];
+        let row: Array<TileType> = [];
         for (let columnIndex = 0; columnIndex < tileTypeMap[0].length; columnIndex++) {
             row.push(TileType.Void);
         }
@@ -340,7 +372,7 @@ export default class LevelLoader {
         }
 
         return tileTypeMap;
-    }
+    };
 
     /**
      * Converts tile types into tiles.
