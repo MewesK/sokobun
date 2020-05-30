@@ -144,7 +144,7 @@ export default class Game {
         let dt = (now - this.lastTime) / 1000.0;
         this.time += dt;
 
-        // Move sprite
+        // Move sprites
         if (this.player.actionType === ActionType.Stand) {
             Object.keys(this.pressedKeyList).forEach((pressedKey) => {
                 if (this.pressedKeyList[pressedKey]) {
@@ -180,13 +180,14 @@ export default class Game {
             });
         }
         this.player.move(dt, this.bufferContext, this.level);
+        this.boxList.forEach((bun) => bun.move(dt, this.bufferContext, this.level));
 
         // Update sprite
         this.player.update(dt);
         this.boxList.forEach((bun) => bun.update(dt));
 
         // Draw level and sprites
-        this.level.draw([this.player, ...this.boxList], this.voidTileMap, this.moonTileMap, this.bufferContext);
+        this.level.draw([...this.boxList, this.player], this.voidTileMap, this.moonTileMap, this.bufferContext);
 
         // Draw buffer canvas
         this.outputContext.imageSmoothingEnabled = Game.SMOOTHING;
