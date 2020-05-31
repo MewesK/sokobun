@@ -9,7 +9,7 @@ https://www.twitch.tv/buunnie
 Based on or inspired by the following works:
 
  - "The Field of the Floating Islands" by [Buch](https://opengameart.org/users/buch)
- - "Zelda-like tilesets and sprites" by [Buch](https://opengameart.org/users/armm1998)
+ - "Zelda-like tilesets and sprites" by [ArMM1998](https://opengameart.org/users/armm1998)
 
 ## Font ideas
 Bitmap font based on:
@@ -17,7 +17,10 @@ Bitmap font based on:
  - "Yoster Island Font" by [codeman38](https://www.1001fonts.com/yoster-island-font.html)
 
 ## Next steps
- - implement bitmap font
  - render destinations
- - implement win and lose condition
- - implement scenes / panels
+ - implement win/lose condition
+ - implement bitmap font mechanics
+ - implement scenes & panels mechanics
+ - implement menu (level select, character select, options, credits)
+ - implement pause screen & win/lose screen
+ - implement intro
