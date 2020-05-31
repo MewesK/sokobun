@@ -6,17 +6,18 @@ A Sokoban clone featuring buunnie!
 https://www.twitch.tv/buunnie
 
 ## Tiles
-Based on "The Field of the Floating Islands" tiles by [Buch](https://opengameart.org/users/buch).
+Based on or inspired by the following works:
 
-## Next steps
- - render destinations
- - calculate and render status
- - implement win and lose condition
- - implement scenes
+ - "The Field of the Floating Islands" by [Buch](https://opengameart.org/users/buch)
+ - "Zelda-like tilesets and sprites" by [Buch](https://opengameart.org/users/armm1998)
 
 ## Font ideas
+Bitmap font based on:
 
- - https://www.1001fonts.com/serif-pixel-7-font.html
- - https://www.1001fonts.com/yoster-island-font.html
+ - "Yoster Island Font" by [codeman38](https://www.1001fonts.com/yoster-island-font.html)
 
-
+## Next steps
+ - implement bitmap font
+ - render destinations
+ - implement win and lose condition
+ - implement scenes / panels

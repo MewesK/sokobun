@@ -54,11 +54,8 @@ export default class Game {
     private boxList!: Array<Box>;
     private level!: Level;
 
-    // @ts-ignore
     private moves: number = 0;
-    // @ts-ignore
     private pushes: number = 0;
-    // @ts-ignore
     private time: number = 0;
 
     private levelDrawn: boolean = false;
@@ -229,25 +226,25 @@ export default class Game {
                 switch (pressedKey) {
                     case 'KeyW':
                     case 'ArrowUp':
-                        actionType = this.doControl(DirectionType.Up, 0, -1);
+                        actionType = this.controlDirection(DirectionType.Up, 0, -1);
                         isPushing = actionType === ActionType.Push;
                         isMoving = actionType === ActionType.Walk;
                         break;
                     case 'KeyS':
                     case 'ArrowDown':
-                        actionType = this.doControl(DirectionType.Down, 0, 1);
+                        actionType = this.controlDirection(DirectionType.Down, 0, 1);
                         isPushing = actionType === ActionType.Push;
                         isMoving = actionType === ActionType.Walk;
                         break;
                     case 'KeyA':
                     case 'ArrowLeft':
-                        actionType = this.doControl(DirectionType.Left, -1, 0);
+                        actionType = this.controlDirection(DirectionType.Left, -1, 0);
                         isPushing = actionType === ActionType.Push;
                         isMoving = actionType === ActionType.Walk;
                         break;
                     case 'KeyD':
                     case 'ArrowRight':
-                        actionType = this.doControl(DirectionType.Right, 1, 0);
+                        actionType = this.controlDirection(DirectionType.Right, 1, 0);
                         isPushing = actionType === ActionType.Push;
                         isMoving = actionType === ActionType.Walk;
                         break;
@@ -269,7 +266,7 @@ export default class Game {
      * @param columnOffset
      * @param rowOffset
      */
-    private doControl = (directionType: DirectionType, columnOffset: number, rowOffset: number): ActionType => {
+    private controlDirection = (directionType: DirectionType, columnOffset: number, rowOffset: number): ActionType => {
         let actionType: ActionType | undefined = undefined;
 
         const playerCoordinates = this.player.getCoordinates();
@@ -344,6 +341,16 @@ export default class Game {
         [...this.boxList, this.player].forEach((sprite) => {
             sprite.draw(xOffset, yOffset, this.bufferContext);
         });
+
+        // Draw status
+        this.bufferContext.font = '11px serif';
+        this.bufferContext.fillStyle = 'white';
+        this.bufferContext.fillText('Moves:', 16, 256);
+        this.bufferContext.fillText(String(this.moves), 60, 256);
+        this.bufferContext.fillText('Pushes:', 16, 272);
+        this.bufferContext.fillText(String(this.pushes), 60, 272);
+        this.bufferContext.fillText('Time:', 16, 288);
+        this.bufferContext.fillText(String(Math.floor(this.time)), 60, 288);
 
         // Draw buffer canvas
         this.outputContext.imageSmoothingEnabled = Game.SMOOTHING;
