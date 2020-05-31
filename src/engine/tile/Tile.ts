@@ -15,14 +15,23 @@ export default class Tile {
     public readonly y: number;
     public readonly width: number;
     public readonly height: number;
-    public readonly type: TileType;
 
-    public constructor(resource: Resource, x: number, y: number, width: number, height: number, type: TileType) {
+    public constructor(resource: Resource, x: number, y: number, width: number, height: number) {
         this.resource = resource;
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-        this.type = type;
     }
+
+    /**
+     * Draws the sprite with the given context.
+     * @param x
+     * @param y
+     * @param context
+     */
+    public draw = (x: number, y: number, context: CanvasRenderingContext2D): void => {
+        context.imageSmoothingEnabled = false;
+        context.drawImage(this.resource.data, this.x, this.y, this.width, this.height, x, y, this.width, this.height);
+    };
 }

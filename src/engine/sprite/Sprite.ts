@@ -1,5 +1,3 @@
-import Tile from '../tile/Tile';
-import Level from '../level/Level';
 import TileMap from '../tile/TileMap';
 import CollisionBox from '../CollisionBox';
 
@@ -43,15 +41,15 @@ export class Direction {
 }
 
 export default class Sprite {
-    protected readonly tileMap: TileMap;
-    protected readonly actionRecord: Partial<Record<ActionType, Action>>;
-    protected readonly collisionOffset: CollisionBox;
+    public readonly tileMap: TileMap;
+    public readonly actionRecord: Partial<Record<ActionType, Action>>;
+    public readonly collisionOffset: CollisionBox;
 
     public actionType: ActionType;
     public directionType: DirectionType;
 
-    protected x: number = 0;
-    protected y: number = 0;
+    public x: number = 0;
+    public y: number = 0;
 
     protected actionTimer: number = 0;
     protected animationIndex: number = 0;
@@ -151,59 +149,9 @@ export default class Sprite {
      * @param context
      */
     public draw = (xOffset: number, yOffset: number, context: CanvasRenderingContext2D): void => {
-        const tile = this.getTile();
-        context.imageSmoothingEnabled = false;
-        context.drawImage(
-            tile.resource.data,
-            tile.x,
-            tile.y,
-            tile.width,
-            tile.height,
-            xOffset + this.x,
-            yOffset + this.y,
-            tile.width,
-            tile.height
-        );
-    };
-
-    /**
-     * Updates the internal X and Y coordinates based on the current direction type.
-     * @param dt
-     * @param context
-     * @param level
-     */
-    public move = (dt: number, context: CanvasRenderingContext2D, level: Level): void => {
-        if (this.actionType !== ActionType.Stand) {
-            const distance = 16 / (this.getDirection().duration / dt);
-
-            let x, y;
-            switch (this.directionType) {
-                case DirectionType.Left:
-                    x = this.x - distance;
-                    if (!level.intersects(this.createCollisionBox(x, this.y), context)) {
-                        this.x = x;
-                    }
-                    break;
-                case DirectionType.Right:
-                    x = this.x + distance;
-                    if (!level.intersects(this.createCollisionBox(x, this.y), context)) {
-                        this.x = x;
-                    }
-                    break;
-                case DirectionType.Up:
-                    y = this.y - distance;
-                    if (!level.intersects(this.createCollisionBox(this.x, y), context)) {
-                        this.y = y;
-                    }
-                    break;
-                case DirectionType.Down:
-                    y = this.y + distance;
-                    if (!level.intersects(this.createCollisionBox(this.x, y), context)) {
-                        this.y = y;
-                    }
-                    break;
-            }
-        }
+        const tileCoordinates = this.getDirection().tileCoordinatesList[this.animationIndex];
+        const tile = this.tileMap.get(tileCoordinates[0], tileCoordinates[1]);
+        tile.draw(xOffset + this.x, yOffset + this.y, context);
     };
 
     /**
@@ -221,7 +169,7 @@ export default class Sprite {
      * @param x
      * @param y
      */
-    protected createCollisionBox = (x: number, y: number): CollisionBox => {
+    public createCollisionBox = (x: number, y: number): CollisionBox => {
         return new CollisionBox(
             x + this.collisionOffset.left,
             x + this.collisionOffset.right,
@@ -242,13 +190,5 @@ export default class Sprite {
      */
     protected getDirection = (): Direction => {
         return this.getAction().directionRecord[this.directionType];
-    };
-
-    /**
-     * Returns the current tile to draw.
-     */
-    protected getTile = (): Tile => {
-        const tileCoordinates = this.getDirection().tileCoordinatesList[this.animationIndex];
-        return this.tileMap.get(tileCoordinates[0], tileCoordinates[1]);
     };
 }

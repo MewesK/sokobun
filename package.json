@@ -13,7 +13,7 @@
     "build:js": "webpack --mode=production",
     "build": "npm run build:types && npm run build:js",
     "deploy": "npm run build && gh-pages -d dist",
-    "serve": "webpack-dev-server",
+    "serve": "webpack-dev-server --mode=development",
     "format": "prettier --write ./src/**/*.{css,ts}"
   },
   "main": "dist/bundle.js",

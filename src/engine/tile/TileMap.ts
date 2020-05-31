@@ -1,5 +1,5 @@
 import Resource from '../resource/Resource';
-import Tile, { TileType } from './Tile';
+import Tile from './Tile';
 
 export default class TileMap {
     /**
@@ -20,8 +20,7 @@ export default class TileMap {
         offsetRows: number,
         offsetColumns: number,
         tileWidth: number,
-        tileHeight: number,
-        tileType: TileType
+        tileHeight: number
     ) {
         // Create individual tiles
         const tileTable: Array<Array<Tile>> = [];
@@ -33,8 +32,7 @@ export default class TileMap {
                     (column + offsetColumns) * tileWidth,
                     (row + offsetRows) * tileHeight,
                     tileWidth,
-                    tileHeight,
-                    tileType
+                    tileHeight
                 );
             }
         }
