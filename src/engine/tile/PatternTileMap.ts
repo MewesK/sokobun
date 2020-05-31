@@ -81,7 +81,7 @@ export default class PatternTileMap extends TileMap {
 
         const tileDefinitionList: Array<[Tile, [number, number]]> = [];
 
-        patternTileDefinitionList.forEach(patternTileDefinition => {
+        patternTileDefinitionList.forEach((patternTileDefinition) => {
             tileDefinitionList.push(
                 ...patternTileDefinition[1].map<[Tile, [number, number]]>((tileDefinition) => [
                     this.get(Math.floor(tileDefinition[0] / this.columns), tileDefinition[0] % this.columns),

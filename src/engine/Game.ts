@@ -1,4 +1,4 @@
-import {ActionType, DirectionType} from './sprite/Sprite';
+import { ActionType, DirectionType } from './sprite/Sprite';
 import Box from './sprite/Box';
 import Level from './level/Level';
 import LevelLoader from './level/LevelLoader';
@@ -6,7 +6,7 @@ import Player from './sprite/Player';
 import PatternTileMap from './tile/PatternTileMap';
 import RandomTileMap from './tile/RandomTileMap';
 import ResourceLoader from './resource/ResourceLoader';
-import Tile, {TileType} from './tile/Tile';
+import Tile, { TileType } from './tile/Tile';
 import TileMap from './tile/TileMap';
 
 import boxSprites from '../images/bun.png';
@@ -169,10 +169,7 @@ export default class Game {
                     // Create sprites and set initial position
                     const playerResource = this.resourceLoader.get(playerSprites);
                     this.player = new Player(new TileMap(TileMap.createTileTable(playerResource, 4, 6, 0, 0, 16, 32)));
-                    this.player.setCoordinates(
-                        this.level.playerPosition[0],
-                        this.level.playerPosition[1]
-                    );
+                    this.player.setCoordinates(this.level.playerPosition[0], this.level.playerPosition[1]);
 
                     const bunTileMap = new TileMap(
                         TileMap.createTileTable(this.resourceLoader.get(boxSprites), 1, 1, 0, 0, 16, 16)
@@ -211,42 +208,50 @@ export default class Game {
                     switch (pressedKey) {
                         case 'KeyW':
                         case 'ArrowUp':
-                            if (this.level.isTileTypeAt(playerCoordinates[0], playerCoordinates[1] - 1, TileType.Floor)) {
+                            if (
+                                this.level.isTileTypeAt(playerCoordinates[0], playerCoordinates[1] - 1, TileType.Floor)
+                            ) {
                                 isMoving = true;
                                 this.player.setAction(ActionType.Walk, DirectionType.Up);
                                 // TODO: Push
                             } else {
-                                this.player.setAction(ActionType.Stand, DirectionType.Up)
+                                this.player.setAction(ActionType.Stand, DirectionType.Up);
                             }
                             break;
                         case 'KeyS':
                         case 'ArrowDown':
-                            if (this.level.isTileTypeAt(playerCoordinates[0], playerCoordinates[1] + 1, TileType.Floor)) {
+                            if (
+                                this.level.isTileTypeAt(playerCoordinates[0], playerCoordinates[1] + 1, TileType.Floor)
+                            ) {
                                 isMoving = true;
                                 this.player.setAction(ActionType.Walk, DirectionType.Down);
                                 // TODO: Push
                             } else {
-                                this.player.setAction(ActionType.Stand, DirectionType.Down)
+                                this.player.setAction(ActionType.Stand, DirectionType.Down);
                             }
                             break;
                         case 'KeyA':
                         case 'ArrowLeft':
-                            if (this.level.isTileTypeAt(playerCoordinates[0]-1, playerCoordinates[1], TileType.Floor)) {
+                            if (
+                                this.level.isTileTypeAt(playerCoordinates[0] - 1, playerCoordinates[1], TileType.Floor)
+                            ) {
                                 isMoving = true;
                                 this.player.setAction(ActionType.Walk, DirectionType.Left);
                                 // TODO: Push
                             } else {
-                                this.player.setAction(ActionType.Stand, DirectionType.Left)
+                                this.player.setAction(ActionType.Stand, DirectionType.Left);
                             }
                             break;
                         case 'KeyD':
                         case 'ArrowRight':
-                            if (this.level.isTileTypeAt(playerCoordinates[0] + 1, playerCoordinates[1], TileType.Floor)) {
+                            if (
+                                this.level.isTileTypeAt(playerCoordinates[0] + 1, playerCoordinates[1], TileType.Floor)
+                            ) {
                                 isMoving = true;
                                 this.player.setAction(ActionType.Walk, DirectionType.Right);
                                 // TODO: Push
                             } else {
-                                this.player.setAction(ActionType.Stand, DirectionType.Right)
+                                this.player.setAction(ActionType.Stand, DirectionType.Right);
                             }
                             break;
                     }
@@ -297,13 +302,7 @@ export default class Game {
         // Draw shadows
         if (Game.RENDER_SHADOWS) {
             [...this.boxList, this.player].forEach((sprite) => {
-                this.shadowTileMap
-                    .get(0, 0)
-                    .draw(
-                        xOffset + sprite.x,
-                        yOffset + sprite.y,
-                        this.bufferContext
-                    );
+                this.shadowTileMap.get(0, 0).draw(xOffset + sprite.x, yOffset + sprite.y, this.bufferContext);
             });
         }
 
@@ -369,19 +368,23 @@ export default class Game {
 
                         if (Game.RENDER_PILLARS) {
                             pattern = this.level.getPatternAt(columnIndex, rowIndex, TileType.Floor);
-                            borderTileDefinitionList = pattern.match(/......0./) ? this.pillarTileMap.getTileListByPattern(pattern) : [];
+                            borderTileDefinitionList = pattern.match(/......0./)
+                                ? this.pillarTileMap.getTileListByPattern(pattern)
+                                : [];
                             tileDefinitionList.push(...borderTileDefinitionList);
                         }
 
                         break;
                     case TileType.Void:
                         pattern = this.level.getPatternAt(columnIndex, rowIndex, TileType.Floor);
-                        borderTileDefinitionList = pattern !== '00000000' ? this.voidBorderTileMap.getTileListByPattern(pattern) : [];
+                        borderTileDefinitionList =
+                            pattern !== '00000000' ? this.voidBorderTileMap.getTileListByPattern(pattern) : [];
                         tileDefinitionList.push(...borderTileDefinitionList);
                         break;
                     case TileType.Water:
                         pattern = this.level.getPatternAt(columnIndex, rowIndex, TileType.Floor);
-                        borderTileDefinitionList = pattern !== '00000000' ? this.waterBorderTileMap.getTileListByPattern(pattern) : [];
+                        borderTileDefinitionList =
+                            pattern !== '00000000' ? this.waterBorderTileMap.getTileListByPattern(pattern) : [];
                         tileDefinitionList.push(
                             [
                                 borderTileDefinitionList.length === 0
