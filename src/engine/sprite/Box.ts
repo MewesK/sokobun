@@ -20,7 +20,7 @@ export default class Box extends Sprite {
                     [DirectionType.Right]: new Direction([[0, 0, 0.0]], 0.0)
                 })
             },
-            new CollisionBox(0, 16, 0, 16)
+            new CollisionBox(0, 16, 4, 16)
         );
     }
 }

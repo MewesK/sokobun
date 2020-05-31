@@ -151,7 +151,11 @@ export default class Sprite {
     public draw = (xOffset: number, yOffset: number, context: CanvasRenderingContext2D): void => {
         const tileCoordinates = this.getDirection().tileCoordinatesList[this.animationIndex];
         const tile = this.tileMap.get(tileCoordinates[0], tileCoordinates[1]);
-        tile.draw(xOffset + this.x, yOffset + this.y, context);
+        tile.draw(
+            xOffset + this.x - this.collisionOffset.left,
+            yOffset + this.y - this.collisionOffset.top,
+            context
+        );
     };
 
     /**
@@ -160,8 +164,8 @@ export default class Sprite {
      * @param y
      */
     public moveTo = (x: number, y: number): void => {
-        this.x = x - this.collisionOffset.left;
-        this.y = y - this.collisionOffset.top;
+        this.x = x;
+        this.y = y;
     };
 
     /**

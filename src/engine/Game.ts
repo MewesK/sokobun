@@ -238,8 +238,8 @@ export default class Game {
         //this.move(dt);
 
         // Update sprite
-        this.player.update(dt);
-        this.boxList.forEach((bun) => bun.update(dt));
+        //this.player.update(dt);
+        //this.boxList.forEach((bun) => bun.update(dt));
 
         // Draw level and sprites
         this.draw();
@@ -349,8 +349,8 @@ export default class Game {
             this.shadowTileMap
                 .get(0, 0)
                 .draw(
-                    xOffset + sprite.x + sprite.collisionOffset.left,
-                    yOffset + sprite.y + sprite.collisionOffset.top + 3,
+                    xOffset + sprite.x,
+                    yOffset + sprite.y,
                     this.bufferContext
                 );
             sprite.draw(xOffset, yOffset, this.bufferContext);

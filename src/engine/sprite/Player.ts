@@ -90,7 +90,7 @@ export default class Player extends Sprite {
                     )
                 })
             },
-            new CollisionBox(0, 16, 16, 32) // TODO: top 16, 20, 24 WTF?
+            new CollisionBox(0, 16, 20, 32)
         );
     }
 }
