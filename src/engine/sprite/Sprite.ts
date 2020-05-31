@@ -1,5 +1,6 @@
 import TileMap from '../tile/TileMap';
 import CollisionBox from '../CollisionBox';
+import Game from '../Game';
 
 export enum ActionType {
     Walk,
@@ -50,6 +51,8 @@ export default class Sprite {
 
     public x: number = 0;
     public y: number = 0;
+    public endX: number = 0;
+    public endY: number = 0;
 
     protected actionTimer: number = 0;
     protected animationIndex: number = 0;
@@ -76,43 +79,44 @@ export default class Sprite {
     /**
      * Sets the current actionType.
      * @param actionType
+     * @param directionType
      */
-    public setAction = (actionType: ActionType): boolean => {
-        if (this.actionType === actionType) {
-            return false;
+    public setAction = (actionType: ActionType, directionType: DirectionType): void => {
+        // Cannot set action while moving
+        if (this.x !== this.endX || this.y !== this.endY) {
+            return;
         }
 
         if (this.actionRecord[actionType] === undefined) {
             throw new Error('Invalid action type');
         }
 
-        this.actionType = actionType;
-        this.actionTimer = 0;
-        this.animationIndex = 0;
-        this.animationTimer = 0;
-
-        return true;
-    };
-
-    /**
-     * Sets the directionType.
-     * @param directionType
-     */
-    public setDirection = (directionType: DirectionType): boolean => {
-        if (this.directionType === directionType) {
-            return false;
-        }
-
         if (this.getAction().directionRecord[directionType] === undefined) {
             throw new Error('Invalid direction type');
         }
 
+        this.actionType = actionType;
         this.directionType = directionType;
         this.actionTimer = 0;
         this.animationIndex = 0;
         this.animationTimer = 0;
 
-        return true;
+        if (this.actionType !== ActionType.Stand) {
+            switch (directionType) {
+                case DirectionType.Up:
+                    this.endY -= Game.TILE_HEIGHT;
+                    break;
+                case DirectionType.Down:
+                    this.endY += Game.TILE_HEIGHT;
+                    break;
+                case DirectionType.Left:
+                    this.endX -= Game.TILE_WIDTH;
+                    break;
+                case DirectionType.Right:
+                    this.endX += Game.TILE_WIDTH;
+                    break;
+            }
+        }
     };
 
     /**
@@ -136,9 +140,9 @@ export default class Sprite {
 
         // Check if action is finished
         if (this.actionTimer >= direction.duration) {
-            this.setAction(ActionType.Stand);
-            this.x = Math.round((this.x - this.collisionOffset.left) / 16) * 16 + this.collisionOffset.left;
-            this.y = Math.round((this.y - this.collisionOffset.top) / 16) * 16 + this.collisionOffset.top;
+            this.setAction(ActionType.Stand, this.directionType);
+            this.x = this.endX;
+            this.y = this.endY;
         }
     };
 
@@ -159,13 +163,43 @@ export default class Sprite {
     };
 
     /**
-     * Moves the internal X and Y to the given coordinates.
-     * @param x
-     * @param y
+     * Updates the internal X and Y coordinates based on the end coordinates.
+     * @param dt
      */
-    public moveTo = (x: number, y: number): void => {
-        this.x = x;
-        this.y = y;
+    public move = (dt: number): void => {
+        const distance = 16 / (this.getDirection().duration / dt);
+        if (this.x > this.endX) {
+            this.x -= distance;
+        } else if (this.x < this.endX) {
+            this.x += distance;
+        }
+        if (this.y > this.endY) {
+            this.y -= distance;
+        } else if (this.y < this.endY) {
+            this.y += distance;
+        }
+    };
+
+    /**
+     * Converts the internal X and Y to coordinates.
+     */
+    public getCoordinates = (): [number, number] => {
+        return [
+            this.endX / Game.TILE_WIDTH,
+            this.endY / Game.TILE_HEIGHT
+        ];
+    };
+
+    /**
+     * Moves the internal X and Y to the given coordinates.
+     * @param columnIndex
+     * @param rowIndex
+     */
+    public setCoordinates = (columnIndex: number, rowIndex: number): void => {
+        this.x = columnIndex * Game.TILE_WIDTH;
+        this.y = rowIndex * Game.TILE_HEIGHT
+        this.endX = this.x;
+        this.endY = this.y;
     };
 
     /**

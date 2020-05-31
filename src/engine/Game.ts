@@ -1,4 +1,4 @@
-import { ActionType, DirectionType } from './sprite/Sprite';
+import {ActionType, DirectionType} from './sprite/Sprite';
 import Box from './sprite/Box';
 import Level from './level/Level';
 import LevelLoader from './level/LevelLoader';
@@ -6,7 +6,7 @@ import Player from './sprite/Player';
 import PatternTileMap from './tile/PatternTileMap';
 import RandomTileMap from './tile/RandomTileMap';
 import ResourceLoader from './resource/ResourceLoader';
-import Tile, { TileType } from './tile/Tile';
+import Tile, {TileType} from './tile/Tile';
 import TileMap from './tile/TileMap';
 
 import boxSprites from '../images/bun.png';
@@ -26,6 +26,7 @@ export default class Game {
     public static readonly MOON_OFFSET = 32;
     public static readonly RENDER_PONDS = true;
     public static readonly RENDER_PILLARS = true;
+    public static readonly RENDER_SHADOWS = true;
     public static readonly SMOOTHING = false;
     public static readonly TILE_WIDTH = 16;
     public static readonly TILE_HEIGHT = 16;
@@ -168,9 +169,9 @@ export default class Game {
                     // Create sprites and set initial position
                     const playerResource = this.resourceLoader.get(playerSprites);
                     this.player = new Player(new TileMap(TileMap.createTileTable(playerResource, 4, 6, 0, 0, 16, 32)));
-                    this.player.moveTo(
-                        this.level.playerPosition[0] * Game.TILE_WIDTH,
-                        this.level.playerPosition[1] * Game.TILE_HEIGHT
+                    this.player.setCoordinates(
+                        this.level.playerPosition[0],
+                        this.level.playerPosition[1]
                     );
 
                     const bunTileMap = new TileMap(
@@ -178,7 +179,7 @@ export default class Game {
                     );
                     this.boxList = this.level.boxPositionList.map((boxPosition) => {
                         let box = new Box(bunTileMap);
-                        box.moveTo(boxPosition[0] * Game.TILE_WIDTH, boxPosition[1] * Game.TILE_HEIGHT);
+                        box.setCoordinates(boxPosition[0], boxPosition[1]);
                         return box;
                     });
 
@@ -200,52 +201,122 @@ export default class Game {
 
         // Set player action
         if (this.player.actionType === ActionType.Stand) {
+            let playerCoordinates = this.player.getCoordinates();
+
             Object.keys(this.pressedKeyList).forEach((pressedKey) => {
                 if (this.pressedKeyList[pressedKey]) {
-                    let actionSet = false;
+                    let isMoving = false;
+                    let isPushing = false;
 
                     switch (pressedKey) {
-                        case 'KeyS':
-                        case 'ArrowDown':
-                            actionSet = actionSet || this.player.setAction(ActionType.Walk);
-                            this.player.setDirection(DirectionType.Down);
-                            break;
                         case 'KeyW':
                         case 'ArrowUp':
-                            actionSet = actionSet || this.player.setAction(ActionType.Walk);
-                            this.player.setDirection(DirectionType.Up);
+                            if (this.level.isTileTypeAt(playerCoordinates[0], playerCoordinates[1] - 1, TileType.Floor)) {
+                                isMoving = true;
+                                this.player.setAction(ActionType.Walk, DirectionType.Up);
+                                // TODO: Push
+                            } else {
+                                this.player.setAction(ActionType.Stand, DirectionType.Up)
+                            }
+                            break;
+                        case 'KeyS':
+                        case 'ArrowDown':
+                            if (this.level.isTileTypeAt(playerCoordinates[0], playerCoordinates[1] + 1, TileType.Floor)) {
+                                isMoving = true;
+                                this.player.setAction(ActionType.Walk, DirectionType.Down);
+                                // TODO: Push
+                            } else {
+                                this.player.setAction(ActionType.Stand, DirectionType.Down)
+                            }
                             break;
                         case 'KeyA':
                         case 'ArrowLeft':
-                            actionSet = actionSet || this.player.setAction(ActionType.Walk);
-                            this.player.setDirection(DirectionType.Left);
+                            if (this.level.isTileTypeAt(playerCoordinates[0]-1, playerCoordinates[1], TileType.Floor)) {
+                                isMoving = true;
+                                this.player.setAction(ActionType.Walk, DirectionType.Left);
+                                // TODO: Push
+                            } else {
+                                this.player.setAction(ActionType.Stand, DirectionType.Left)
+                            }
                             break;
                         case 'KeyD':
                         case 'ArrowRight':
-                            actionSet = actionSet || this.player.setAction(ActionType.Walk);
-                            this.player.setDirection(DirectionType.Right);
+                            if (this.level.isTileTypeAt(playerCoordinates[0] + 1, playerCoordinates[1], TileType.Floor)) {
+                                isMoving = true;
+                                this.player.setAction(ActionType.Walk, DirectionType.Right);
+                                // TODO: Push
+                            } else {
+                                this.player.setAction(ActionType.Stand, DirectionType.Right)
+                            }
                             break;
                     }
 
-                    if (actionSet) {
+                    if (isMoving) {
                         this.moves++;
+                    }
+                    if (isPushing) {
+                        this.pushes++;
                     }
                 }
             });
         }
 
         // Move sprites
-        //this.move(dt);
+        this.player.move(dt);
+        this.boxList.forEach((box) => box.move(dt));
 
         // Update sprite
-        //this.player.update(dt);
-        //this.boxList.forEach((bun) => bun.update(dt));
+        this.player.update(dt);
+        this.boxList.forEach((box) => box.update(dt));
 
         // Draw level and sprites
         this.draw();
 
+        this.lastTime = now;
+        window.requestAnimationFrame(this.loop);
+    };
+
+    /**
+     * Draws the level buffer and all sprites.
+     */
+    private draw = (): void => {
+        const rowMax = this.bufferCanvas.height / Game.TILE_HEIGHT;
+        const columnMax = this.bufferCanvas.width / Game.TILE_WIDTH;
+        const xOffset = ((columnMax - this.level.columns) / 2) * Game.TILE_WIDTH;
+        const yOffset = ((rowMax - this.level.rows) / 2) * Game.TILE_HEIGHT;
+
+        if (!this.levelDrawn) {
+            this.drawLevelToBuffer();
+            this.levelDrawn = true;
+        }
+
+        // Draw level buffer
+        this.bufferContext.imageSmoothingEnabled = false;
+        this.bufferContext.drawImage(this.levelCanvas, 0, 0);
+
+        // Draw shadows
+        if (Game.RENDER_SHADOWS) {
+            [...this.boxList, this.player].forEach((sprite) => {
+                this.shadowTileMap
+                    .get(0, 0)
+                    .draw(
+                        xOffset + sprite.x,
+                        yOffset + sprite.y,
+                        this.bufferContext
+                    );
+            });
+        }
+
+        // Draw sprites
+        [...this.boxList, this.player].forEach((sprite) => {
+            sprite.draw(xOffset, yOffset, this.bufferContext);
+        });
+
         // Draw buffer canvas
         this.outputContext.imageSmoothingEnabled = Game.SMOOTHING;
+        if (Game.SMOOTHING) {
+            this.outputContext.imageSmoothingQuality = 'high';
+        }
         this.outputContext.drawImage(
             this.bufferCanvas,
             0,
@@ -257,187 +328,80 @@ export default class Game {
             this.outputCanvas.width,
             this.outputCanvas.height
         );
-
-        this.lastTime = now;
-        window.requestAnimationFrame(this.loop);
     };
 
     /**
-     * Draws the level with the given context.
+     * Draws the level to the level buffer.
      */
-    private draw = (): void => {
+    private drawLevelToBuffer = (): void => {
         const rowMax = this.bufferCanvas.height / Game.TILE_HEIGHT;
         const columnMax = this.bufferCanvas.width / Game.TILE_WIDTH;
         const xOffset = ((columnMax - this.level.columns) / 2) * Game.TILE_WIDTH;
         const yOffset = ((rowMax - this.level.rows) / 2) * Game.TILE_HEIGHT;
 
-        if (!this.levelDrawn) {
-            this.levelContext.imageSmoothingEnabled = false;
-            this.levelContext.fillStyle = Game.BACKGROUND_COLOR;
-            this.levelContext.fillRect(0, 0, this.levelContext.canvas.width, this.levelContext.canvas.height);
+        this.levelContext.imageSmoothingEnabled = false;
+        this.levelContext.fillStyle = Game.BACKGROUND_COLOR;
+        this.levelContext.fillRect(0, 0, this.levelContext.canvas.width, this.levelContext.canvas.height);
 
-            // Draw background
-            for (let rowIndex = 0; rowIndex < rowMax; rowIndex++) {
-                for (let columnIndex = 0; columnIndex < columnMax; columnIndex++) {
-                    const tile = this.voidTileMap.getRandomTile();
-                    tile.draw(columnIndex * tile.width, rowIndex * tile.height, this.levelContext);
-                }
+        // Draw background
+        for (let rowIndex = 0; rowIndex < rowMax; rowIndex++) {
+            for (let columnIndex = 0; columnIndex < columnMax; columnIndex++) {
+                const tile = this.voidTileMap.getRandomTile();
+                tile.draw(columnIndex * tile.width, rowIndex * tile.height, this.levelContext);
             }
+        }
 
-            // Draw moon
-            const moonTile = this.moonTileMap.get(0, 0);
-            moonTile.draw(Game.MOON_OFFSET, Game.MOON_OFFSET, this.levelContext);
+        // Draw moon
+        const moonTile = this.moonTileMap.get(0, 0);
+        moonTile.draw(Game.MOON_OFFSET, Game.MOON_OFFSET, this.levelContext);
 
-            // Draw level
-            let pattern: string;
-            let tileDefinitionList: Array<[Tile, [number, number]]>;
-            let borderTileDefinitionList: Array<[Tile, [number, number]]>;
-            for (let rowIndex = 0; rowIndex < this.level.rows; rowIndex++) {
-                for (let columnIndex = 0; columnIndex < this.level.columns; columnIndex++) {
-                    tileDefinitionList = [];
+        // Draw level
+        let pattern: string;
+        let tileDefinitionList: Array<[Tile, [number, number]]>;
+        let borderTileDefinitionList: Array<[Tile, [number, number]]>;
+        for (let rowIndex = 0; rowIndex < this.level.rows; rowIndex++) {
+            for (let columnIndex = 0; columnIndex < this.level.columns; columnIndex++) {
+                tileDefinitionList = [];
 
-                    switch (this.level.tileTypeMap[rowIndex][columnIndex]) {
-                        case TileType.Floor:
-                            tileDefinitionList.push([this.floorTileMap.getRandomTile(), [0, 0]]);
+                switch (this.level.tileTypeMap[rowIndex][columnIndex]) {
+                    case TileType.Floor:
+                        tileDefinitionList.push([this.floorTileMap.getRandomTile(), [0, 0]]);
 
-                            if (Game.RENDER_PILLARS) {
-                                pattern = this.level.getPatternAt(columnIndex, rowIndex, TileType.Floor);
-                                borderTileDefinitionList = pattern.match(/......0./) ? this.pillarTileMap.getTileListByPattern(pattern) : [];
-                                tileDefinitionList.push(...borderTileDefinitionList);
-                            }
-
-                            break;
-                        case TileType.Void:
+                        if (Game.RENDER_PILLARS) {
                             pattern = this.level.getPatternAt(columnIndex, rowIndex, TileType.Floor);
-                            borderTileDefinitionList = pattern !== '00000000' ? this.voidBorderTileMap.getTileListByPattern(pattern) : [];
+                            borderTileDefinitionList = pattern.match(/......0./) ? this.pillarTileMap.getTileListByPattern(pattern) : [];
                             tileDefinitionList.push(...borderTileDefinitionList);
-                            break;
-                        case TileType.Water:
-                            pattern = this.level.getPatternAt(columnIndex, rowIndex, TileType.Floor);
-                            borderTileDefinitionList = pattern !== '00000000' ? this.waterBorderTileMap.getTileListByPattern(pattern) : [];
-                            tileDefinitionList.push(
-                                [
-                                    borderTileDefinitionList.length === 0
-                                        ? this.waterTileMap.getRandomTile()
-                                        : this.waterTileMap.get(0, 0),
-                                    [0, 0]
-                                ],
-                                ...borderTileDefinitionList
-                            );
-                            break;
-                    }
+                        }
 
-                    tileDefinitionList.forEach((tileDefinition) =>
-                        tileDefinition[0].draw(
-                            tileDefinition[1][0] + xOffset + columnIndex * Game.TILE_WIDTH,
-                            tileDefinition[1][1] + yOffset + rowIndex * Game.TILE_HEIGHT,
-                            this.levelContext
-                        )
-                    );
+                        break;
+                    case TileType.Void:
+                        pattern = this.level.getPatternAt(columnIndex, rowIndex, TileType.Floor);
+                        borderTileDefinitionList = pattern !== '00000000' ? this.voidBorderTileMap.getTileListByPattern(pattern) : [];
+                        tileDefinitionList.push(...borderTileDefinitionList);
+                        break;
+                    case TileType.Water:
+                        pattern = this.level.getPatternAt(columnIndex, rowIndex, TileType.Floor);
+                        borderTileDefinitionList = pattern !== '00000000' ? this.waterBorderTileMap.getTileListByPattern(pattern) : [];
+                        tileDefinitionList.push(
+                            [
+                                borderTileDefinitionList.length === 0
+                                    ? this.waterTileMap.getRandomTile()
+                                    : this.waterTileMap.get(0, 0),
+                                [0, 0]
+                            ],
+                            ...borderTileDefinitionList
+                        );
+                        break;
                 }
-            }
 
-            this.levelDrawn = true;
-        }
-
-        // Draw level buffer
-        this.bufferContext.imageSmoothingEnabled = false;
-        this.bufferContext.drawImage(this.levelCanvas, 0, 0);
-
-        // Draw sprites
-        [...this.boxList, this.player].forEach((sprite) => {
-            this.shadowTileMap
-                .get(0, 0)
-                .draw(
-                    xOffset + sprite.x,
-                    yOffset + sprite.y,
-                    this.bufferContext
+                tileDefinitionList.forEach((tileDefinition) =>
+                    tileDefinition[0].draw(
+                        tileDefinition[1][0] + xOffset + columnIndex * Game.TILE_WIDTH,
+                        tileDefinition[1][1] + yOffset + rowIndex * Game.TILE_HEIGHT,
+                        this.levelContext
+                    )
                 );
-            sprite.draw(xOffset, yOffset, this.bufferContext);
-        });
+            }
+        }
     };
-
-    /**
-     * Checks if the given rectangle intersects with any blocking part of the level or the canvas boundaries.
-     * @param collisionBox
-     * @param context
-     */
-    /*public intersects = (collisionBox: CollisionBox, context: CanvasRenderingContext2D): boolean => {
-        // Check canvas boundaries
-        if (
-            collisionBox.left < 0 ||
-            collisionBox.right >= context.canvas.width ||
-            collisionBox.top < 0 ||
-            collisionBox.bottom >= context.canvas.height
-        ) {
-            return true;
-        }
-
-        // Check all none floor tiles
-        let tile: Tile, tileCollisionBox: CollisionBox;
-        for (let rowIndex = 0; rowIndex < this.rows; rowIndex++) {
-            for (let columnIndex = 0; columnIndex < this.columns; columnIndex++) {
-                tile = this.tileTable[rowIndex][columnIndex];
-                if (tile.type !== TileType.Floor) {
-                    tileCollisionBox = new CollisionBox(
-                        columnIndex * tile.width,
-                        columnIndex * tile.width + tile.width,
-                        rowIndex * tile.height,
-                        rowIndex * tile.height + tile.height
-                    );
-
-                    if (
-                        collisionBox.left < tileCollisionBox.right &&
-                        tileCollisionBox.left < collisionBox.right &&
-                        collisionBox.top < tileCollisionBox.bottom &&
-                        tileCollisionBox.top < collisionBox.bottom
-                    ) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    };*/
-
-    /**
-     * Updates the internal X and Y coordinates based on the current direction type.
-     * @param dt
-     * @param context
-     * @param level
-     */
-    /*public move = (dt: number, context: CanvasRenderingContext2D, level: Level): void => {
-        if (this.actionType !== ActionType.Stand) {
-            const distance = 16 / (this.getDirection().duration / dt);
-
-            let x, y;
-            switch (this.directionType) {
-                case DirectionType.Left:
-                    x = this.x - distance;
-                    if (!this.intersects(this.player.createCollisionBox(x, this.y), context)) {
-                        this.x = x;
-                    }
-                    break;
-                case DirectionType.Right:
-                    x = this.x + distance;
-                    if (!this.intersects(this.player.createCollisionBox(x, this.y), context)) {
-                        this.x = x;
-                    }
-                    break;
-                case DirectionType.Up:
-                    y = this.y - distance;
-                    if (!this.intersects(this.player.createCollisionBox(this.x, y), context)) {
-                        this.y = y;
-                    }
-                    break;
-                case DirectionType.Down:
-                    y = this.y + distance;
-                    if (!this.intersects(this.player.createCollisionBox(this.x, y), context)) {
-                        this.y = y;
-                    }
-                    break;
-            }
-        }
-    };*/
 }

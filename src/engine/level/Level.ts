@@ -57,7 +57,7 @@ export default class Level {
      * @param rowIndex
      * @param tileType
      */
-    private isTileTypeAt = (columnIndex: number, rowIndex: number, tileType: TileType): boolean => {
+    public isTileTypeAt = (columnIndex: number, rowIndex: number, tileType: TileType): boolean => {
         if (
             columnIndex < 0 ||
             columnIndex >= this.tileTypeMap[0].length ||
