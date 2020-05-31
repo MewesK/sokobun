@@ -2,16 +2,21 @@
 
 A Sokoban clone featuring [buunnie](https://www.twitch.tv/buunnie)!
 
-Written from scratch in TypeScript, just because it's fun. 
+## Stuff I've used
 
-## Tiles
+ - [Babel](https://babeljs.io/)
+ - [Bootstrap](https://getbootstrap.com/)
+ - [TypeScript](https://www.typescriptlang.org/)
+ - [Webpack](https://webpack.js.org/)
+
+### Tiles
 
 Based on or inspired by the following works:
 
  - "The Field of the Floating Islands" by [Buch](https://opengameart.org/users/buch)
  - "Zelda-like tilesets and sprites" by [ArMM1998](https://opengameart.org/users/armm1998)
 
-## Font
+### Fonts
 
 Bitmap font based on:
 
