@@ -216,6 +216,9 @@ export default class Game {
         window.requestAnimationFrame(this.loop);
     };
 
+    /**
+     * Controls the player based on the user input.
+     */
     private control = () => {
         Object.keys(this.pressedKeyList).forEach((pressedKey) => {
             if (this.pressedKeyList[pressedKey]) {
@@ -260,8 +263,14 @@ export default class Game {
         });
     };
 
+    /**
+     * Controls the player for the given direction.
+     * @param directionType
+     * @param columnOffset
+     * @param rowOffset
+     */
     private doControl = (directionType: DirectionType, columnOffset: number, rowOffset: number): ActionType => {
-        let actionType;
+        let actionType: ActionType | undefined = undefined;
 
         const playerCoordinates = this.player.getCoordinates();
         if (
@@ -271,19 +280,32 @@ export default class Game {
                 TileType.Floor
             )
         ) {
-            let canPush = false;
             for (let boxIndex = 0; boxIndex < this.boxList.length; boxIndex++) {
                 const boxCoordinates = this.boxList[boxIndex].getCoordinates();
                 if (
                     boxCoordinates[0] === playerCoordinates[0] + columnOffset &&
                     boxCoordinates[1] === playerCoordinates[1] + rowOffset
                 ) {
-                    canPush = true;
-                    this.boxList[boxIndex].setAction(ActionType.Walk, directionType);
+                    if (
+                        this.level.isTileTypeAt(
+                            playerCoordinates[0] + 2 * columnOffset,
+                            playerCoordinates[1] + 2 * rowOffset,
+                            TileType.Floor
+                        )
+                    ) {
+                        actionType = ActionType.Push;
+                        this.boxList[boxIndex].setAction(ActionType.Walk, directionType);
+                    } else {
+                        actionType = ActionType.Stand;
+                    }
+
                     break;
                 }
             }
-            actionType = canPush ? ActionType.Push : ActionType.Walk;
+
+            if (actionType === undefined) {
+                actionType = ActionType.Walk;
+            }
         } else {
             actionType = ActionType.Stand;
         }
