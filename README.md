@@ -10,7 +10,6 @@ Based on "The Field of the Floating Islands" tiles by [Buch](https://opengameart
 
 ## Next steps
  - render destinations
- - make box sprites pushable
  - calculate and render status
  - implement win and lose condition
  - implement scenes

@@ -196,89 +196,101 @@ export default class Game {
         let dt = (now - this.lastTime) / 1000.0;
         this.time += dt;
 
-        // Set player action
+        // Set sprite actions
         if (this.player.actionType === ActionType.Stand) {
-            let playerCoordinates = this.player.getCoordinates();
-
-            Object.keys(this.pressedKeyList).forEach((pressedKey) => {
-                if (this.pressedKeyList[pressedKey]) {
-                    let isMoving = false;
-                    let isPushing = false;
-
-                    switch (pressedKey) {
-                        case 'KeyW':
-                        case 'ArrowUp':
-                            if (
-                                this.level.isTileTypeAt(playerCoordinates[0], playerCoordinates[1] - 1, TileType.Floor)
-                            ) {
-                                isMoving = true;
-                                this.player.setAction(ActionType.Walk, DirectionType.Up);
-                                // TODO: Push
-                            } else {
-                                this.player.setAction(ActionType.Stand, DirectionType.Up);
-                            }
-                            break;
-                        case 'KeyS':
-                        case 'ArrowDown':
-                            if (
-                                this.level.isTileTypeAt(playerCoordinates[0], playerCoordinates[1] + 1, TileType.Floor)
-                            ) {
-                                isMoving = true;
-                                this.player.setAction(ActionType.Walk, DirectionType.Down);
-                                // TODO: Push
-                            } else {
-                                this.player.setAction(ActionType.Stand, DirectionType.Down);
-                            }
-                            break;
-                        case 'KeyA':
-                        case 'ArrowLeft':
-                            if (
-                                this.level.isTileTypeAt(playerCoordinates[0] - 1, playerCoordinates[1], TileType.Floor)
-                            ) {
-                                isMoving = true;
-                                this.player.setAction(ActionType.Walk, DirectionType.Left);
-                                // TODO: Push
-                            } else {
-                                this.player.setAction(ActionType.Stand, DirectionType.Left);
-                            }
-                            break;
-                        case 'KeyD':
-                        case 'ArrowRight':
-                            if (
-                                this.level.isTileTypeAt(playerCoordinates[0] + 1, playerCoordinates[1], TileType.Floor)
-                            ) {
-                                isMoving = true;
-                                this.player.setAction(ActionType.Walk, DirectionType.Right);
-                                // TODO: Push
-                            } else {
-                                this.player.setAction(ActionType.Stand, DirectionType.Right);
-                            }
-                            break;
-                    }
-
-                    if (isMoving) {
-                        this.moves++;
-                    }
-                    if (isPushing) {
-                        this.pushes++;
-                    }
-                }
-            });
+            this.control();
         }
 
-        // Move sprites
+        // Move and update sprites
         this.player.move(dt);
-        this.boxList.forEach((box) => box.move(dt));
-
-        // Update sprite
         this.player.update(dt);
-        this.boxList.forEach((box) => box.update(dt));
+        this.boxList.forEach((box) => {
+            box.move(dt);
+            box.update(dt);
+        });
 
         // Draw level and sprites
         this.draw();
 
         this.lastTime = now;
         window.requestAnimationFrame(this.loop);
+    };
+
+    private control = () => {
+        Object.keys(this.pressedKeyList).forEach((pressedKey) => {
+            if (this.pressedKeyList[pressedKey]) {
+                let actionType;
+                let isMoving = false;
+                let isPushing = false;
+
+                switch (pressedKey) {
+                    case 'KeyW':
+                    case 'ArrowUp':
+                        actionType = this.doControl(DirectionType.Up, 0, -1);
+                        isPushing = actionType === ActionType.Push;
+                        isMoving = actionType === ActionType.Walk;
+                        break;
+                    case 'KeyS':
+                    case 'ArrowDown':
+                        actionType = this.doControl(DirectionType.Down, 0, 1);
+                        isPushing = actionType === ActionType.Push;
+                        isMoving = actionType === ActionType.Walk;
+                        break;
+                    case 'KeyA':
+                    case 'ArrowLeft':
+                        actionType = this.doControl(DirectionType.Left, -1, 0);
+                        isPushing = actionType === ActionType.Push;
+                        isMoving = actionType === ActionType.Walk;
+                        break;
+                    case 'KeyD':
+                    case 'ArrowRight':
+                        actionType = this.doControl(DirectionType.Right, 1, 0);
+                        isPushing = actionType === ActionType.Push;
+                        isMoving = actionType === ActionType.Walk;
+                        break;
+                }
+
+                if (isMoving) {
+                    this.moves++;
+                }
+                if (isPushing) {
+                    this.pushes++;
+                }
+            }
+        });
+    };
+
+    private doControl = (directionType: DirectionType, columnOffset: number, rowOffset: number): ActionType => {
+        let actionType;
+
+        const playerCoordinates = this.player.getCoordinates();
+        if (
+            this.level.isTileTypeAt(
+                playerCoordinates[0] + columnOffset,
+                playerCoordinates[1] + rowOffset,
+                TileType.Floor
+            )
+        ) {
+            let canPush = false;
+            for (let boxIndex = 0; boxIndex < this.boxList.length; boxIndex++) {
+                const boxCoordinates = this.boxList[boxIndex].getCoordinates();
+                if (
+                    boxCoordinates[0] === playerCoordinates[0] + columnOffset &&
+                    boxCoordinates[1] === playerCoordinates[1] + rowOffset
+                ) {
+                    canPush = true;
+                    this.boxList[boxIndex].setAction(ActionType.Walk, directionType);
+                    break;
+                }
+            }
+            actionType = canPush ? ActionType.Push : ActionType.Walk;
+        } else {
+            actionType = ActionType.Stand;
+        }
+
+        this.player.setAction(actionType, directionType);
+
+        return actionType;
     };
 
     /**

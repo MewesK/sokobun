@@ -196,20 +196,6 @@ export default class Sprite {
     };
 
     /**
-     * Calculates the collision box based on the given coordinates.
-     * @param x
-     * @param y
-     */
-    public createCollisionBox = (x: number, y: number): CollisionBox => {
-        return new CollisionBox(
-            x + this.collisionOffset.left,
-            x + this.collisionOffset.right,
-            y + this.collisionOffset.top,
-            y + this.collisionOffset.bottom
-        );
-    };
-
-    /**
      * Return the current action.
      */
     protected getAction = (): Action => {
