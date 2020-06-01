@@ -25,6 +25,7 @@ Bitmap font based on:
 
 ## Next steps
 
+ - move level state into level class to allow easy level switching
  - implement bitmap font mechanics
  - implement scenes & panels mechanics
  - implement menu (level select, character select, options, credits)

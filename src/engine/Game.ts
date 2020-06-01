@@ -229,21 +229,16 @@ export default class Game {
     private loop = (): void => {
         let now = Date.now();
         let dt = (now - this.lastTime) / 1000.0;
-        this.time += dt;
 
-        // Set sprite actions
-        if (this.player.actionType === ActionType.Stand && !this.won && !this.lost) {
-            this.control();
-        }
+        if (!this.won && !this.lost) {
+            this.time += dt;
 
-        // Update sprites
-        this.player.update(dt);
-        this.boxList.forEach((box) => {
-            box.update(dt);
-        });
+            // Set sprite actions
+            if (this.player.actionType === ActionType.Stand) {
+                this.control();
+            }
 
-        // Check win condition
-        if (!this.lost) {
+            // Check win condition
             let destination: Destination;
             this.won = this.boxList
                 .map((box) => {
@@ -256,10 +251,8 @@ export default class Game {
                     return false;
                 })
                 .reduce((won: boolean, isAtDestination) => won && isAtDestination, true);
-        }
 
-        // Check lose condition
-        if (!this.won) {
+            // Check lose condition
             let coordinates: [number, number];
             this.lost = this.boxList
                 .map((box) => {
@@ -280,6 +273,12 @@ export default class Game {
                 })
                 .reduce((lost: boolean, canBePushed) => lost && !canBePushed, true);
         }
+
+        // Update sprites
+        this.player.update(dt);
+        this.boxList.forEach((box) => {
+            box.update(dt);
+        });
 
         // Draw level and sprites
         this.draw();
