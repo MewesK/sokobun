@@ -239,12 +239,14 @@ export default class Game {
             }
 
             // Check win condition
-            let destination: Destination;
+            let boxCoordinates: [number, number];
+            let destinationCoordinates: [number, number];
             this.won = this.boxList
                 .map((box) => {
+                    boxCoordinates = box.getCoordinates();
                     for (let destinationIndex = 0; destinationIndex < this.destinationList.length; destinationIndex++) {
-                        destination = this.destinationList[destinationIndex];
-                        if (box.x === destination.x && box.y === destination.y) {
+                        destinationCoordinates = this.destinationList[destinationIndex].getCoordinates();
+                        if (boxCoordinates[0] === destinationCoordinates[0] && boxCoordinates[1] === destinationCoordinates[1]) {
                             return true;
                         }
                     }
@@ -254,21 +256,21 @@ export default class Game {
 
             // Check lose condition
             if (!this.won) {
-                let coordinates: [number, number];
+                let boxCoordinates: [number, number];
                 this.lost = this.boxList
                     .map((box) => {
-                        coordinates = box.getCoordinates();
+                        boxCoordinates = box.getCoordinates();
                         return (
                             (
-                                this.level.isTileTypeAt(coordinates[0] + 1, coordinates[1], TileType.Floor) &&
-                                this.isBoxAt(coordinates[0] + 1, coordinates[1]) === undefined &&
-                                this.level.isTileTypeAt(coordinates[0] - 1, coordinates[1], TileType.Floor) &&
-                                this.isBoxAt(coordinates[0] - 1, coordinates[1]) === undefined
+                                this.level.isTileTypeAt(boxCoordinates[0] + 1, boxCoordinates[1], TileType.Floor) &&
+                                this.isBoxAt(boxCoordinates[0] + 1, boxCoordinates[1]) === undefined &&
+                                this.level.isTileTypeAt(boxCoordinates[0] - 1, boxCoordinates[1], TileType.Floor) &&
+                                this.isBoxAt(boxCoordinates[0] - 1, boxCoordinates[1]) === undefined
                             ) || (
-                                this.level.isTileTypeAt(coordinates[0], coordinates[1] + 1, TileType.Floor) &&
-                                this.isBoxAt(coordinates[0], coordinates[1] + 1) === undefined &&
-                                this.level.isTileTypeAt(coordinates[0], coordinates[1] - 1, TileType.Floor) &&
-                                this.isBoxAt(coordinates[0], coordinates[1] - 1) === undefined
+                                this.level.isTileTypeAt(boxCoordinates[0], boxCoordinates[1] + 1, TileType.Floor) &&
+                                this.isBoxAt(boxCoordinates[0], boxCoordinates[1] + 1) === undefined &&
+                                this.level.isTileTypeAt(boxCoordinates[0], boxCoordinates[1] - 1, TileType.Floor) &&
+                                this.isBoxAt(boxCoordinates[0], boxCoordinates[1] - 1) === undefined
                             )
                         );
                     })
@@ -456,6 +458,7 @@ export default class Game {
             );
         }
         if (this.lost) {
+            console.log(this.won, this.lost);
             this.bufferContext.textAlign = 'center';
             this.bufferContext.fillText(
                 'You lose!',

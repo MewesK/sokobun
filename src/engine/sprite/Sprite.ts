@@ -179,7 +179,7 @@ export default class Sprite {
      * Converts the internal X and Y to coordinates.
      */
     public getCoordinates = (): [number, number] => {
-        return [this.endX / Game.TILE_WIDTH, this.endY / Game.TILE_HEIGHT];
+        return [Math.floor(this.x / Game.TILE_WIDTH), Math.floor(this.y / Game.TILE_HEIGHT)];
     };
 
     /**
