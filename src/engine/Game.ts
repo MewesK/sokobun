@@ -253,25 +253,27 @@ export default class Game {
                 .reduce((won: boolean, isAtDestination) => won && isAtDestination, true);
 
             // Check lose condition
-            let coordinates: [number, number];
-            this.lost = this.boxList
-                .map((box) => {
-                    coordinates = box.getCoordinates();
-                    return (
-                        (
-                            this.level.isTileTypeAt(coordinates[0] + 1, coordinates[1], TileType.Floor) &&
-                            this.isBoxAt(coordinates[0] + 1, coordinates[1]) === undefined &&
-                            this.level.isTileTypeAt(coordinates[0] - 1, coordinates[1], TileType.Floor) &&
-                            this.isBoxAt(coordinates[0] - 1, coordinates[1]) === undefined
-                        ) || (
-                            this.level.isTileTypeAt(coordinates[0], coordinates[1] + 1, TileType.Floor) &&
-                            this.isBoxAt(coordinates[0], coordinates[1] + 1) === undefined &&
-                            this.level.isTileTypeAt(coordinates[0], coordinates[1] - 1, TileType.Floor) &&
-                            this.isBoxAt(coordinates[0], coordinates[1] - 1) === undefined
-                        )
-                    );
-                })
-                .reduce((lost: boolean, canBePushed) => lost && !canBePushed, true);
+            if (!this.won) {
+                let coordinates: [number, number];
+                this.lost = this.boxList
+                    .map((box) => {
+                        coordinates = box.getCoordinates();
+                        return (
+                            (
+                                this.level.isTileTypeAt(coordinates[0] + 1, coordinates[1], TileType.Floor) &&
+                                this.isBoxAt(coordinates[0] + 1, coordinates[1]) === undefined &&
+                                this.level.isTileTypeAt(coordinates[0] - 1, coordinates[1], TileType.Floor) &&
+                                this.isBoxAt(coordinates[0] - 1, coordinates[1]) === undefined
+                            ) || (
+                                this.level.isTileTypeAt(coordinates[0], coordinates[1] + 1, TileType.Floor) &&
+                                this.isBoxAt(coordinates[0], coordinates[1] + 1) === undefined &&
+                                this.level.isTileTypeAt(coordinates[0], coordinates[1] - 1, TileType.Floor) &&
+                                this.isBoxAt(coordinates[0], coordinates[1] - 1) === undefined
+                            )
+                        );
+                    })
+                    .reduce((lost: boolean, canBePushed) => lost && !canBePushed, true);
+            }
         }
 
         // Update sprites
