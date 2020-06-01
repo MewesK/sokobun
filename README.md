@@ -1,6 +1,6 @@
 # SokoBun
 
-A Sokoban clone featuring [buunnie](https://www.twitch.tv/buunnie)!
+A cute Sokoban clone featuring [buunnie](https://www.twitch.tv/buunnie)!
 
 ## Stuff I've used
 

@@ -1,12 +1,9 @@
 {
   "name": "@mewesk/sokobun",
   "version": "0.0.5",
-  "description": "A cute Sokoban clone featuring rabbits!",
+  "description": "A cute Sokoban clone featuring buunnie!",
   "license": "MIT",
   "author": "MewesK (https://github.com/MewesK)",
-  "contributors": [
-    "Buch (https://opengameart.org/users/buch)"
-  ],
   "repository": "github:MewesK/sokobun",
   "scripts": {
     "build:types": "tsc --emitDeclarationOnly",
