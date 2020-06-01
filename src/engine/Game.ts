@@ -308,28 +308,28 @@ export default class Game {
                         // Check up
                         actionType = this.controlDirection(DirectionType.Up, 0, -1);
                         isPushing = actionType === ActionType.Push;
-                        isMoving = actionType === ActionType.Walk;
+                        isMoving = actionType === ActionType.Walk || actionType === ActionType.Push ;
                         break;
                     case 'KeyS':
                     case 'ArrowDown':
                         // Check down
                         actionType = this.controlDirection(DirectionType.Down, 0, 1);
                         isPushing = actionType === ActionType.Push;
-                        isMoving = actionType === ActionType.Walk;
+                        isMoving = actionType === ActionType.Walk || actionType === ActionType.Push;
                         break;
                     case 'KeyA':
                     case 'ArrowLeft':
                         // Check left
                         actionType = this.controlDirection(DirectionType.Left, -1, 0);
                         isPushing = actionType === ActionType.Push;
-                        isMoving = actionType === ActionType.Walk;
+                        isMoving = actionType === ActionType.Walk || actionType === ActionType.Push;
                         break;
                     case 'KeyD':
                     case 'ArrowRight':
                         // Check right
                         actionType = this.controlDirection(DirectionType.Right, 1, 0);
                         isPushing = actionType === ActionType.Push;
-                        isMoving = actionType === ActionType.Walk;
+                        isMoving = actionType === ActionType.Walk || actionType === ActionType.Push;
                         break;
                 }
 
