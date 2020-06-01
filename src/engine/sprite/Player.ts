@@ -1,6 +1,6 @@
 import Sprite, { Action, ActionType, Direction, DirectionType } from './Sprite';
 import TileMap from '../tile/TileMap';
-import CollisionBox from '../CollisionBox';
+import CollisionBox from './CollisionBox';
 
 export default class Player extends Sprite {
     public constructor(tileMap: TileMap) {

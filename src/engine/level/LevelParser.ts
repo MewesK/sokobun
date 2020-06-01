@@ -13,28 +13,32 @@ export default class LevelParser {
      * Parses the level file and returns a level instance.
      * @param resource
      */
-    public parse = (resource: Resource): Level => {
-        this.doParse(resource);
-        this.fillRows();
-        this.floodFillFloor();
-        this.removeWalls();
-        this.removeEmptyRows();
-        this.removeEmptyColumns();
-        this.addBorder();
-        if (Game.RENDER_PONDS) {
-            this.floodFillVoid();
-            this.floodFillPonds();
-        } else {
-            this.fillVoid();
-        }
+    public parse = (resource: Resource): Promise<Level> => {
+        return new Promise((resolve) => {
+            this.doParse(resource);
+            this.fillRows();
+            this.floodFillFloor();
+            this.removeWalls();
+            this.removeEmptyRows();
+            this.removeEmptyColumns();
+            this.addBorder();
+            if (Game.RENDER_PONDS) {
+                this.floodFillVoid();
+                this.floodFillPonds();
+            } else {
+                this.fillVoid();
+            }
 
-        return new Level(
-            resource.src,
-            this.tileTypeMap,
-            this.getPlayerPosition(),
-            this.boxPositionList,
-            this.destinationPositionList
-        );
+            resolve(
+                new Level(
+                    resource.src,
+                    this.tileTypeMap,
+                    this.getPlayerPosition(),
+                    this.boxPositionList,
+                    this.destinationPositionList
+                )
+            );
+        });
     };
 
     /**

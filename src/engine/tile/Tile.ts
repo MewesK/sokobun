@@ -5,8 +5,7 @@ export enum TileType {
     Wall,
     Floor,
     Void,
-    Water,
-    Sprite
+    Water
 }
 
 export default class Tile {

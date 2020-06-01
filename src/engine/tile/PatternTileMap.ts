@@ -24,6 +24,9 @@ export default class PatternTileMap extends TileMap {
         [/....1.1./, [[15, [8, 8]]]]
     ];
 
+    /**
+     * [pattern, [[tile index, [tile offset X, tile offset Y]]]]
+     */
     public static PILLAR_PATTERN_TILE_DEFINITION_LIST: Array<[RegExp, Array<[number, [number, number]]>]> = [
         [
             /...00.0./,
@@ -74,13 +77,14 @@ export default class PatternTileMap extends TileMap {
      * @param pattern
      */
     public getTileListByPattern = (pattern: string): Array<[Tile, [number, number]]> => {
+        // Find pattern-tile-definitions matching the pattern
         const patternTileDefinitionList = this.patternTileDefinitionList.filter((value) => pattern.match(value[0]));
         if (patternTileDefinitionList.length === 0) {
             throw new Error(`Invalid pattern '${pattern}'`);
         }
 
+        // Return tiles and tile offsets for the given pattern-tile-definitions
         const tileDefinitionList: Array<[Tile, [number, number]]> = [];
-
         patternTileDefinitionList.forEach((patternTileDefinition) => {
             tileDefinitionList.push(
                 ...patternTileDefinition[1].map<[Tile, [number, number]]>((tileDefinition) => [
@@ -89,7 +93,6 @@ export default class PatternTileMap extends TileMap {
                 ])
             );
         });
-
         return tileDefinitionList;
     };
 }

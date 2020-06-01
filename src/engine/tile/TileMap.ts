@@ -11,7 +11,6 @@ export default class TileMap {
      * @param offsetColumns
      * @param tileWidth
      * @param tileHeight
-     * @param tileType
      */
     public static createTileTable(
         input: Resource,

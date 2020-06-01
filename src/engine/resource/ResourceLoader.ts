@@ -4,7 +4,7 @@ export default class ResourceLoader {
     private readonly cache: Array<Resource> = [];
 
     /**
-     * Load an array of data URLs.
+     * Loads resources from a list of data URLs.
      * @param srcList
      */
     public load = (srcList: Array<string>): Promise<Array<Resource>> => {
@@ -48,7 +48,7 @@ export default class ResourceLoader {
     };
 
     /**
-     * Returns the resource corresponding to the  given src.
+     * Returns the resource with the given data URL.
      * @param src
      */
     public get = (src: string): Resource => {

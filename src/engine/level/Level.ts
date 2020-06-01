@@ -34,6 +34,7 @@ export default class Level {
      * @param tileType
      */
     public getPatternAt = (columnIndex: number, rowIndex: number, tileType: TileType): string => {
+        // Check all 8 neighboring cells and create pattern describing if they have the given tile type
         return [
             [columnIndex - 1, rowIndex - 1],
             [columnIndex, rowIndex - 1],
@@ -45,10 +46,7 @@ export default class Level {
             [columnIndex + 1, rowIndex + 1]
         ]
             .map((coordinates) => this.isTileTypeAt(coordinates[0], coordinates[1], tileType))
-            .reduce((previousValue: string, currentValue: boolean) => {
-                previousValue += currentValue ? '1' : '0';
-                return previousValue;
-            }, '');
+            .reduce((pattern: string, isGivenTileType: boolean) => pattern.concat(isGivenTileType ? '1' : '0'), '');
     };
 
     /**
@@ -58,6 +56,7 @@ export default class Level {
      * @param tileType
      */
     public isTileTypeAt = (columnIndex: number, rowIndex: number, tileType: TileType): boolean => {
+        // Check if coordinates are valid
         if (
             columnIndex < 0 ||
             columnIndex >= this.tileTypeMap[0].length ||
@@ -67,6 +66,7 @@ export default class Level {
             return false;
         }
 
+        // Check if cell has the given tile type
         return this.tileTypeMap[rowIndex][columnIndex] === tileType;
     };
 }

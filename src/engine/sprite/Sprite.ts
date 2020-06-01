@@ -1,5 +1,5 @@
 import TileMap from '../tile/TileMap';
-import CollisionBox from '../CollisionBox';
+import CollisionBox from './CollisionBox';
 import Game from '../Game';
 
 export enum ActionType {
@@ -101,6 +101,7 @@ export default class Sprite {
         this.animationIndex = 0;
         this.animationTimer = 0;
 
+        // Set destination coordinates based on direction
         if (this.actionType !== ActionType.Stand) {
             switch (directionType) {
                 case DirectionType.Up:
@@ -164,11 +165,13 @@ export default class Sprite {
      */
     public move = (dt: number): void => {
         const distance = 16 / (this.getDirection().duration / dt);
+
         if (this.x > this.endX) {
             this.x -= distance;
         } else if (this.x < this.endX) {
             this.x += distance;
         }
+
         if (this.y > this.endY) {
             this.y -= distance;
         } else if (this.y < this.endY) {

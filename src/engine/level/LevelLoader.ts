@@ -6,25 +6,33 @@ export default class LevelLoader {
     private cache: Array<Level> = [];
 
     /**
-     * Loads the given levels using the the given world tile map.
+     * Loads levels from a list of resources.
      * @param resourceList
      */
     public load = (resourceList: Array<Resource>): Promise<Array<Level>> => {
         return new Promise((resolve) => {
+            let counter = resourceList.length;
+
+            const decreaseCounter = () => {
+                if (--counter === 0) {
+                    console.log('Levels finished loading...');
+                    resolve(this.cache);
+                }
+            };
+
             resourceList.forEach((resource) => {
                 console.debug(`Loading level ${resource.src}...`);
 
-                this.cache.push(new LevelParser().parse(resource));
+                new LevelParser().parse(resource).then((level) => {
+                    this.cache.push(level);
+                    decreaseCounter();
+                });
             });
-
-            console.log('Levels finished loading...');
-            resolve(this.cache);
         });
     };
 
     /**
-     * Returns the level with the given src.
-     *
+     * Returns the level with the given data URL.
      * @param src
      */
     public get = (src: string): Level => {
