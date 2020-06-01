@@ -15,7 +15,7 @@ canvas {
 }
 
 .heart {
-    color: #e25555;
+    color: lightpink;
     font-size: 100%;
 }
 
@@ -23,7 +23,7 @@ canvas {
     border: 0;
     width: 80px;
     height: 80px;
-    fill: #252230;
+    fill: lightpink;
     color:#fff;
     position: absolute;
     top: 0;
