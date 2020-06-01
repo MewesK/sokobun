@@ -1,5 +1,6 @@
 import { ActionType, DirectionType } from './sprite/Sprite';
 import Box from './sprite/Box';
+import Destination from './sprite/Destination';
 import Level from './level/Level';
 import LevelLoader from './level/LevelLoader';
 import Player from './sprite/Player';
@@ -10,6 +11,7 @@ import Tile, { TileType } from './tile/Tile';
 import TileMap from './tile/TileMap';
 
 import boxSprites from '../images/bun.png';
+import destinationSprites from '../images/pillow.png';
 import playerSprites from '../images/bunnie.png';
 import tilesFloor from '../images/tiles_floor.png';
 import tilesMoon from '../images/moon.png';
@@ -19,7 +21,7 @@ import tilesVoid from '../images/tiles_void.png';
 import tilesVoidBorder from '../images/tiles_void_border.png';
 import tilesWater from '../images/tiles_water.png';
 import tilesWaterBorder from '../images/tiles_water_border.png';
-import level from '../levels/1.txt';
+import level from '../levels/2.txt';
 
 export default class Game {
     public static readonly BACKGROUND_COLOR = '#252230';
@@ -52,6 +54,7 @@ export default class Game {
 
     private player!: Player;
     private boxList!: Array<Box>;
+    private destinationList!: Array<Destination>;
     private level!: Level;
 
     private moves: number = 0;
@@ -116,6 +119,7 @@ export default class Game {
             .load([
                 playerSprites,
                 boxSprites,
+                destinationSprites,
                 tilesFloor,
                 tilesMoon,
                 tilesPillar,
@@ -177,6 +181,15 @@ export default class Game {
                         let box = new Box(boxTileMap);
                         box.setCoordinates(boxPosition[0], boxPosition[1]);
                         return box;
+                    });
+
+                    const destinationTileMap = new TileMap(
+                        TileMap.createTileTable(this.resourceLoader.get(destinationSprites), 1, 1, 0, 0, 16, 16)
+                    );
+                    this.destinationList = this.level.destinationPositionList.map((destinationPosition) => {
+                        let destination = new Destination(destinationTileMap);
+                        destination.setCoordinates(destinationPosition[0], destinationPosition[1]);
+                        return destination;
                     });
 
                     // Start game loop
@@ -334,6 +347,7 @@ export default class Game {
         const columnMax = this.bufferCanvas.width / Game.TILE_WIDTH;
         const xOffset = ((columnMax - this.level.columns) / 2) * Game.TILE_WIDTH;
         const yOffset = ((rowMax - this.level.rows) / 2) * Game.TILE_HEIGHT;
+        const spriteList = [...this.destinationList, ...this.boxList, this.player];
 
         if (!this.levelBuffered) {
             this.drawLevelToBuffer();
@@ -346,17 +360,18 @@ export default class Game {
 
         // Draw shadows
         if (Game.RENDER_SHADOWS) {
-            [...this.boxList, this.player].forEach((sprite) => {
+            spriteList.forEach((sprite) => {
                 this.shadowTileMap.get(0, 0).draw(xOffset + sprite.x, yOffset + sprite.y, this.bufferContext);
             });
         }
 
         // Draw sprites
-        [...this.boxList, this.player].forEach((sprite) => {
+        spriteList.forEach((sprite) => {
             sprite.draw(xOffset, yOffset, this.bufferContext);
         });
 
         // Draw status
+        // TODO: use bitmap fonts
         this.bufferContext.font = '11px serif';
         this.bufferContext.fillStyle = 'white';
         this.bufferContext.fillText('Moves:', 16, 256);
