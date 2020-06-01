@@ -245,30 +245,40 @@ export default class Game {
         // Check win condition
         if (!this.lost) {
             let destination: Destination;
-            this.won = this.boxList.map((box) => {
-                for (let destinationIndex = 0; destinationIndex < this.destinationList.length; destinationIndex++) {
-                    destination = this.destinationList[destinationIndex];
-                    if (box.x === destination.x && box.y === destination.y) {
-                        return true;
+            this.won = this.boxList
+                .map((box) => {
+                    for (let destinationIndex = 0; destinationIndex < this.destinationList.length; destinationIndex++) {
+                        destination = this.destinationList[destinationIndex];
+                        if (box.x === destination.x && box.y === destination.y) {
+                            return true;
+                        }
                     }
-                }
-                return false;
-            }).reduce((won: boolean, isAtDestination) => won && isAtDestination, true);
+                    return false;
+                })
+                .reduce((won: boolean, isAtDestination) => won && isAtDestination, true);
         }
 
         // Check lose condition
         if (!this.won) {
             let coordinates: [number, number];
-            this.lost = this.boxList.map((box) => {
-                coordinates = box.getCoordinates();
-                return (
-                    this.level.isTileTypeAt(coordinates[0] + 1, coordinates[1], TileType.Floor) &&
-                    this.level.isTileTypeAt(coordinates[0] - 1, coordinates[1], TileType.Floor)
-                ) || (
-                    this.level.isTileTypeAt(coordinates[0], coordinates[1] + 1, TileType.Floor) &&
-                    this.level.isTileTypeAt(coordinates[0], coordinates[1] - 1, TileType.Floor)
-                );
-            }).reduce((lost: boolean, canBePushed) => lost && !canBePushed, true);
+            this.lost = this.boxList
+                .map((box) => {
+                    coordinates = box.getCoordinates();
+                    return (
+                        (
+                            this.level.isTileTypeAt(coordinates[0] + 1, coordinates[1], TileType.Floor) &&
+                            this.isBoxAt(coordinates[0] + 1, coordinates[1]) === undefined &&
+                            this.level.isTileTypeAt(coordinates[0] - 1, coordinates[1], TileType.Floor) &&
+                            this.isBoxAt(coordinates[0] - 1, coordinates[1]) === undefined
+                        ) || (
+                            this.level.isTileTypeAt(coordinates[0], coordinates[1] + 1, TileType.Floor) &&
+                            this.isBoxAt(coordinates[0], coordinates[1] + 1) === undefined &&
+                            this.level.isTileTypeAt(coordinates[0], coordinates[1] - 1, TileType.Floor) &&
+                            this.isBoxAt(coordinates[0], coordinates[1] - 1) === undefined
+                        )
+                    );
+                })
+                .reduce((lost: boolean, canBePushed) => lost && !canBePushed, true);
         }
 
         // Draw level and sprites
@@ -337,45 +347,33 @@ export default class Game {
      * @param rowOffset
      */
     private controlDirection = (directionType: DirectionType, columnOffset: number, rowOffset: number): ActionType => {
-        const playerCoordinates = this.player.getCoordinates();
         let actionType: ActionType | undefined = undefined;
 
+        const playerCoordinates = this.player.getCoordinates();
+        const neighborColumnIndex = playerCoordinates[0] + columnOffset;
+        const neighborRowIndex = playerCoordinates[1] + rowOffset;
+
         // Check if neighboring tile of player is floor
-        if (
-            this.level.isTileTypeAt(
-                playerCoordinates[0] + columnOffset,
-                playerCoordinates[1] + rowOffset,
-                TileType.Floor
-            )
-        ) {
+        if (this.level.isTileTypeAt(neighborColumnIndex, neighborRowIndex, TileType.Floor)) {
             // Check if neighboring tile contains a box
-            for (let boxIndex = 0; boxIndex < this.boxList.length; boxIndex++) {
-                const boxCoordinates = this.boxList[boxIndex].getCoordinates();
+            const box = this.isBoxAt(neighborColumnIndex, neighborRowIndex);
+            if (box !== undefined) {
+                const nextNeighborColumnIndex = neighborColumnIndex + columnOffset;
+                const nextNeighborRowIndex = neighborRowIndex + rowOffset;
+
+                // Check if next neighboring tile is floor or contains another box
                 if (
-                    boxCoordinates[0] === playerCoordinates[0] + columnOffset &&
-                    boxCoordinates[1] === playerCoordinates[1] + rowOffset
+                    this.level.isTileTypeAt(nextNeighborColumnIndex, nextNeighborRowIndex, TileType.Floor) &&
+                    this.isBoxAt(nextNeighborColumnIndex, nextNeighborRowIndex) === undefined
                 ) {
-                    // Check if neighboring tile of box is floor
-                    if (
-                        this.level.isTileTypeAt(
-                            playerCoordinates[0] + 2 * columnOffset,
-                            playerCoordinates[1] + 2 * rowOffset,
-                            TileType.Floor
-                        )
-                    ) {
-                        // Can push
-                        actionType = ActionType.Push;
-                        this.boxList[boxIndex].setAction(ActionType.Walk, directionType);
-                    } else {
-                        // Cannot push
-                        actionType = ActionType.Stand;
-                    }
-
-                    break;
+                    // Can push
+                    actionType = ActionType.Push;
+                    box.setAction(ActionType.Walk, directionType);
+                } else {
+                    // Cannot push
+                    actionType = ActionType.Stand;
                 }
-            }
-
-            if (actionType === undefined) {
+            } else {
                 // Can walk
                 actionType = ActionType.Walk;
             }
@@ -387,6 +385,22 @@ export default class Game {
         this.player.setAction(actionType, directionType);
 
         return actionType;
+    };
+
+    /**
+     * Checks if a box is at the given coordinates.
+     * @param columnIndex
+     * @param rowIndex
+     */
+    private isBoxAt = (columnIndex: number, rowIndex: number): Box | undefined => {
+        let boxCoordinates: [number, number];
+        for (let boxIndex = 0; boxIndex < this.boxList.length; boxIndex++) {
+            boxCoordinates = this.boxList[boxIndex].getCoordinates();
+            if (boxCoordinates[0] === columnIndex && boxCoordinates[1] === rowIndex) {
+                return this.boxList[boxIndex];
+            }
+        }
+        return undefined;
     };
 
     /**
@@ -437,7 +451,7 @@ export default class Game {
             this.bufferContext.fillText(
                 'You win!',
                 this.bufferContext.canvas.width / 2,
-                this.bufferContext.canvas.height / 2,
+                this.bufferContext.canvas.height / 2
             );
         }
         if (this.lost) {
@@ -445,7 +459,7 @@ export default class Game {
             this.bufferContext.fillText(
                 'You lose!',
                 this.bufferContext.canvas.width / 2,
-                this.bufferContext.canvas.height / 2,
+                this.bufferContext.canvas.height / 2
             );
         }
 
