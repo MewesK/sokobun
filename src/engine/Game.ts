@@ -33,6 +33,7 @@ export default class Game {
     public static readonly TILE_WIDTH = 16;
     public static readonly TILE_HEIGHT = 16;
 
+    // Game state
     private readonly resourceLoader: ResourceLoader = new ResourceLoader();
     private readonly levelLoader: LevelLoader = new LevelLoader();
 
@@ -52,14 +53,17 @@ export default class Game {
     private waterTileMap!: RandomTileMap;
     private waterBorderTileMap!: PatternTileMap;
 
+    // Level state
+    private level!: Level;
     private player!: Player;
     private boxList!: Array<Box>;
     private destinationList!: Array<Destination>;
-    private level!: Level;
 
     private moves: number = 0;
     private pushes: number = 0;
     private time: number = 0;
+    private won: boolean = false;
+    private lost: boolean = false;
 
     private lastTime: number = 0;
     private levelBuffered: boolean = false;
@@ -165,39 +169,58 @@ export default class Game {
 
                 // Prepare levels
                 this.levelLoader.load([this.resourceLoader.get(level)]).then(() => {
-                    this.level = this.levelLoader.get(level);
-
-                    // Create sprites and set initial position
-                    const playerTileMap = new TileMap(
-                        TileMap.createTileTable(this.resourceLoader.get(playerSprites), 4, 6, 0, 0, 16, 32)
-                    );
-                    this.player = new Player(playerTileMap);
-                    this.player.setCoordinates(this.level.playerPosition[0], this.level.playerPosition[1]);
-
-                    const boxTileMap = new TileMap(
-                        TileMap.createTileTable(this.resourceLoader.get(boxSprites), 1, 1, 0, 0, 16, 16)
-                    );
-                    this.boxList = this.level.boxPositionList.map((boxPosition) => {
-                        let box = new Box(boxTileMap);
-                        box.setCoordinates(boxPosition[0], boxPosition[1]);
-                        return box;
-                    });
-
-                    const destinationTileMap = new TileMap(
-                        TileMap.createTileTable(this.resourceLoader.get(destinationSprites), 1, 1, 0, 0, 16, 16)
-                    );
-                    this.destinationList = this.level.destinationPositionList.map((destinationPosition) => {
-                        let destination = new Destination(destinationTileMap);
-                        destination.setCoordinates(destinationPosition[0], destinationPosition[1]);
-                        return destination;
-                    });
-
-                    // Start game loop
-                    console.log('Starting game loop...');
-                    this.lastTime = Date.now();
-                    this.loop();
+                    this.load(this.levelLoader.get(level));
                 });
             });
+    };
+
+    /**
+     * Load level.
+     * @param level
+     */
+    private load = (level: Level): void => {
+        this.level = level;
+
+        // Create sprites and set initial position
+        const playerTileMap = new TileMap(
+            TileMap.createTileTable(this.resourceLoader.get(playerSprites), 4, 6, 0, 0, 16, 32)
+        );
+        this.player = new Player(playerTileMap);
+        this.player.setCoordinates(this.level.playerPosition[0], this.level.playerPosition[1]);
+
+        const boxTileMap = new TileMap(
+            TileMap.createTileTable(this.resourceLoader.get(boxSprites), 1, 1, 0, 0, 16, 16)
+        );
+        this.boxList = this.level.boxPositionList.map((boxPosition) => {
+            let box = new Box(boxTileMap);
+            box.setCoordinates(boxPosition[0], boxPosition[1]);
+            return box;
+        });
+
+        const destinationTileMap = new TileMap(
+            TileMap.createTileTable(this.resourceLoader.get(destinationSprites), 1, 1, 0, 0, 16, 16)
+        );
+        this.destinationList = this.level.destinationPositionList.map((destinationPosition) => {
+            let destination = new Destination(destinationTileMap);
+            destination.setCoordinates(destinationPosition[0], destinationPosition[1]);
+            return destination;
+        });
+
+        // Reset level state
+        this.moves = 0;
+        this.pushes = 0;
+        this.time = 0;
+        this.won = false;
+        this.lost = false;
+
+        this.lastTime = 0;
+        this.levelBuffered = false;
+        this.pressedKeyList = {};
+
+        // Start game loop
+        console.log('Starting game loop...');
+        this.lastTime = Date.now();
+        this.loop();
     };
 
     /**
@@ -209,17 +232,44 @@ export default class Game {
         this.time += dt;
 
         // Set sprite actions
-        if (this.player.actionType === ActionType.Stand) {
+        if (this.player.actionType === ActionType.Stand && !this.won && !this.lost) {
             this.control();
         }
 
-        // Move and update sprites
-        this.player.move(dt);
+        // Update sprites
         this.player.update(dt);
         this.boxList.forEach((box) => {
-            box.move(dt);
             box.update(dt);
         });
+
+        // Check win condition
+        if (!this.lost) {
+            let destination: Destination;
+            this.won = this.boxList.map((box) => {
+                for (let destinationIndex = 0; destinationIndex < this.destinationList.length; destinationIndex++) {
+                    destination = this.destinationList[destinationIndex];
+                    if (box.x === destination.x && box.y === destination.y) {
+                        return true;
+                    }
+                }
+                return false;
+            }).reduce((won: boolean, isAtDestination) => won && isAtDestination, true);
+        }
+
+        // Check lose condition
+        if (!this.won) {
+            let coordinates: [number, number];
+            this.lost = this.boxList.map((box) => {
+                coordinates = box.getCoordinates();
+                return (
+                    this.level.isTileTypeAt(coordinates[0] + 1, coordinates[1], TileType.Floor) &&
+                    this.level.isTileTypeAt(coordinates[0] - 1, coordinates[1], TileType.Floor)
+                ) || (
+                    this.level.isTileTypeAt(coordinates[0], coordinates[1] + 1, TileType.Floor) &&
+                    this.level.isTileTypeAt(coordinates[0], coordinates[1] - 1, TileType.Floor)
+                );
+            }).reduce((lost: boolean, canBePushed) => lost && !canBePushed, true);
+        }
 
         // Draw level and sprites
         this.draw();
@@ -374,12 +424,30 @@ export default class Game {
         // TODO: use bitmap fonts
         this.bufferContext.font = '11px serif';
         this.bufferContext.fillStyle = 'white';
+        this.bufferContext.textAlign = 'left';
+        this.bufferContext.textBaseline = 'middle';
         this.bufferContext.fillText('Moves:', 16, 256);
         this.bufferContext.fillText(String(this.moves), 60, 256);
-        this.bufferContext.fillText('Pushes:', 16, 272);
-        this.bufferContext.fillText(String(this.pushes), 60, 272);
-        this.bufferContext.fillText('Time:', 16, 288);
-        this.bufferContext.fillText(String(Math.floor(this.time)), 60, 288);
+        this.bufferContext.fillText('Pushes:', 16, 270);
+        this.bufferContext.fillText(String(this.pushes), 60, 270);
+        this.bufferContext.fillText('Time:', 16, 284);
+        this.bufferContext.fillText(String(Math.floor(this.time)), 60, 284);
+        if (this.won) {
+            this.bufferContext.textAlign = 'center';
+            this.bufferContext.fillText(
+                'You win!',
+                this.bufferContext.canvas.width / 2,
+                this.bufferContext.canvas.height / 2,
+            );
+        }
+        if (this.lost) {
+            this.bufferContext.textAlign = 'center';
+            this.bufferContext.fillText(
+                'You lose!',
+                this.bufferContext.canvas.width / 2,
+                this.bufferContext.canvas.height / 2,
+            );
+        }
 
         // Draw buffer canvas
         this.outputContext.imageSmoothingEnabled = Game.SMOOTHING;

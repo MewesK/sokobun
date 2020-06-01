@@ -25,7 +25,6 @@ Bitmap font based on:
 
 ## Next steps
 
- - implement win/lose condition
  - implement bitmap font mechanics
  - implement scenes & panels mechanics
  - implement menu (level select, character select, options, credits)

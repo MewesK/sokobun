@@ -121,10 +121,26 @@ export default class Sprite {
     };
 
     /**
-     * Updates the internal sprite timer.
+     * Updates the internal sprite timer and the internal X and Y coordinates based on the end coordinates.
      * @param dt
      */
     public update = (dt: number): void => {
+        // Update coordinates
+        const distance = 16 / (this.getDirection().duration / dt);
+
+        if (this.x > this.endX) {
+            this.x -= distance;
+        } else if (this.x < this.endX) {
+            this.x += distance;
+        }
+
+        if (this.y > this.endY) {
+            this.y -= distance;
+        } else if (this.y < this.endY) {
+            this.y += distance;
+        }
+
+        // Update animation
         this.actionTimer += dt;
         this.animationTimer += dt;
 
@@ -157,26 +173,6 @@ export default class Sprite {
         const tileCoordinates = this.getDirection().tileCoordinatesList[this.animationIndex];
         const tile = this.tileMap.get(tileCoordinates[0], tileCoordinates[1]);
         tile.draw(xOffset + this.x - this.collisionOffset.left, yOffset + this.y - this.collisionOffset.top, context);
-    };
-
-    /**
-     * Updates the internal X and Y coordinates based on the end coordinates.
-     * @param dt
-     */
-    public move = (dt: number): void => {
-        const distance = 16 / (this.getDirection().duration / dt);
-
-        if (this.x > this.endX) {
-            this.x -= distance;
-        } else if (this.x < this.endX) {
-            this.x += distance;
-        }
-
-        if (this.y > this.endY) {
-            this.y -= distance;
-        } else if (this.y < this.endY) {
-            this.y += distance;
-        }
     };
 
     /**
