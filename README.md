@@ -6,6 +6,7 @@ A Sokoban clone featuring [buunnie](https://www.twitch.tv/buunnie)!
 
  - [Babel](https://babeljs.io/)
  - [Bootstrap](https://getbootstrap.com/)
+ - [GitHub Corners](https://github.com/tholman/github-corners)
  - [TypeScript](https://www.typescriptlang.org/)
  - [Webpack](https://webpack.js.org/)
 

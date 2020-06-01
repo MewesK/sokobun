@@ -14,6 +14,22 @@ canvas {
     border-radius: 8px;
 }
 
+.heart {
+    color: #e25555;
+    font-size: 100%;
+}
+
+.github-corner svg {
+    border: 0;
+    width: 80px;
+    height: 80px;
+    fill: #252230;
+    color:#fff;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
 .github-corner:hover .octo-arm {
     animation: octocat-wave 560ms ease-in-out;
 }
