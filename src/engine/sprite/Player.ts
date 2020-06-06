@@ -90,7 +90,7 @@ export default class Player extends Sprite {
                     )
                 })
             },
-            new CollisionBox(2, 18, 12, 24)
+            new CollisionBox(1, 18, 12, 24)
         );
     }
 }
