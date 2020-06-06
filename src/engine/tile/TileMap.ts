@@ -11,6 +11,7 @@ export default class TileMap {
      * @param offsetColumns
      * @param tileWidth
      * @param tileHeight
+     * @param grid
      */
     public static createTileTable(
         input: Resource,
@@ -18,8 +19,9 @@ export default class TileMap {
         columns: number,
         offsetRows: number,
         offsetColumns: number,
-        tileWidth: number,
-        tileHeight: number
+        tileWidth: number = 16,
+        tileHeight: number = 16,
+        grid: number = 0
     ) {
         // Create individual tiles
         const tileTable: Array<Array<Tile>> = [];
@@ -28,8 +30,8 @@ export default class TileMap {
             for (let column = 0; column < columns; column++) {
                 tileTable[row][column] = new Tile(
                     input,
-                    (column + offsetColumns) * tileWidth,
-                    (row + offsetRows) * tileHeight,
+                    (column + offsetColumns) * (tileWidth + grid),
+                    (row + offsetRows) * (tileHeight + grid),
                     tileWidth,
                     tileHeight
                 );

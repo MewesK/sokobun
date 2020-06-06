@@ -12,7 +12,7 @@ import TileMap from './tile/TileMap';
 
 import boxSprites from '../images/bun.png';
 import destinationSprites from '../images/pillow.png';
-import playerSprites from '../images/bunnie.png';
+import playerSprites from '../images/player_base.png';
 import tilesFloor from '../images/tiles_floor.png';
 import tilesMoon from '../images/moon.png';
 import tilesPillar from '../images/tiles_pillar.png';
@@ -183,7 +183,7 @@ export default class Game {
 
         // Create sprites and set initial position
         const playerTileMap = new TileMap(
-            TileMap.createTileTable(this.resourceLoader.get(playerSprites), 4, 6, 0, 0, 16, 32)
+            TileMap.createTileTable(this.resourceLoader.get(playerSprites), 4, 6, 0, 0, 18, 24, 1)
         );
         this.player = new Player(playerTileMap);
         this.player.setCoordinates(this.level.playerPosition[0], this.level.playerPosition[1]);
