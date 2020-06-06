@@ -23,8 +23,8 @@ export default abstract class Scene {
 
     /**
      * Draws the scene.
-     * @param bufferCanvas
-     * @param bufferContext
+     * @param canvas
+     * @param context
      */
-    public abstract draw(bufferCanvas: HTMLCanvasElement, bufferContext: CanvasRenderingContext2D): void;
+    public abstract draw(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D): void;
 }

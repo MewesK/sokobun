@@ -20,6 +20,9 @@ import tilesWater from '../../images/tiles_water.png';
 import tilesWaterBorder from '../../images/tiles_water_border.png';
 import ResourceLoader from '../resource/ResourceLoader';
 import Scene from '../Scene';
+import YosterIsland8 from '../font/YosterIsland8';
+import tilesYosterIsland8 from '../../images/yoster_island_8_white.png';
+import Font from '../font/Font';
 
 export default class Level extends Scene {
     public readonly src: string;
@@ -46,6 +49,8 @@ export default class Level extends Scene {
     private voidBorderTileMap!: PatternTileMap;
     private waterTileMap!: RandomTileMap;
     private waterBorderTileMap!: PatternTileMap;
+
+    private font8!: Font;
 
     private player!: Player;
     private boxList!: Array<Box>;
@@ -154,6 +159,9 @@ export default class Level extends Scene {
             destination.setCoordinates(destinationPosition[0], destinationPosition[1]);
             return destination;
         });
+
+        // Create bitmap fonts
+        this.font8 = new YosterIsland8(resourceLoader.get(tilesYosterIsland8));
 
         // Reset level state
         this.moves = 0;
@@ -282,23 +290,19 @@ export default class Level extends Scene {
         });
 
         // Draw status
-        // TODO: use bitmap fonts
-        bufferContext.font = '11px serif';
-        bufferContext.fillStyle = 'white';
-        bufferContext.textAlign = 'left';
-        bufferContext.textBaseline = 'middle';
-        bufferContext.fillText('Moves:', 16, 256);
-        bufferContext.fillText(String(this.moves), 60, 256);
-        bufferContext.fillText('Pushes:', 16, 270);
-        bufferContext.fillText(String(this.pushes), 60, 270);
-        bufferContext.fillText('Time:', 16, 284);
-        bufferContext.fillText(String(Math.floor(this.time)), 60, 284);
+        this.font8.draw('Moves:', 10, 256, bufferContext);
+        this.font8.draw(String(this.moves), 60, 256, bufferContext);
+        this.font8.draw('Pushes:', 10, 270, bufferContext);
+        this.font8.draw(String(this.pushes), 60, 270, bufferContext);
+        this.font8.draw('Time:', 10, 284, bufferContext);
+        this.font8.draw(String(Math.floor(this.time)), 60, 284, bufferContext);
+
         if (this.won) {
-            bufferContext.textAlign = 'center';
-            bufferContext.fillText(
+            this.font8.draw(
                 'You win!',
                 bufferContext.canvas.width / 2,
-                bufferContext.canvas.height / 2
+                bufferContext.canvas.height / 2,
+                bufferContext
             );
         }
     };

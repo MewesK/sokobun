@@ -1,5 +1,6 @@
 import LevelLoader from './level/LevelLoader';
 import ResourceLoader from './resource/ResourceLoader';
+import Scene from './Scene';
 
 import boxSprites from '../images/bun.png';
 import destinationSprites from '../images/pillow.png';
@@ -12,8 +13,9 @@ import tilesVoid from '../images/tiles_void.png';
 import tilesVoidBorder from '../images/tiles_void_border.png';
 import tilesWater from '../images/tiles_water.png';
 import tilesWaterBorder from '../images/tiles_water_border.png';
+import tilesYosterIsland8 from '../images/yoster_island_8_white.png';
+
 import level from '../levels/2.txt';
-import Scene from './Scene';
 
 export default class Game {
     public static readonly BACKGROUND_COLOR = '#252230';
@@ -89,6 +91,7 @@ export default class Game {
                 tilesVoidBorder,
                 tilesWater,
                 tilesWaterBorder,
+                tilesYosterIsland8,
                 level
             ])
             .then(() => {

@@ -1,8 +1,10 @@
-{
-    "family": "Yoster Island",
-    "height": 12,
-    "size": 8,
-    "chars": {
+import Font from './Font';
+
+export default class YosterIsland8 extends Font {
+    public readonly family = 'Yoster Island';
+    public readonly height = 12;
+    public readonly size = 8;
+    public readonly chars = {
         " ": { "width": 4, "x": 1, "y": 9, "w": 0, "h": 0, "ox": 0, "oy": 0 },
         "!": { "width": 5, "x": 2, "y": 2, "w": 3, "h": 7, "ox": 1, "oy": 7 },
         "\"": { "width": 8, "x": 6, "y": 1, "w": 6, "h": 2, "ox": 1, "oy": 8 },
@@ -20,8 +22,8 @@
         "7": { "width": 8, "x": 77, "y": 2, "w": 6, "h": 7, "ox": 1, "oy": 7 },
         "8": { "width": 8, "x": 84, "y": 2, "w": 6, "h": 7, "ox": 1, "oy": 7 },
         "9": { "width": 8, "x": 91, "y": 2, "w": 6, "h": 7, "ox": 1, "oy": 7 },
-        ":": { "width": 5, "x": 98, "y": 2, "w": 2, "h": 5, "ox": 2, "oy": 7 },
-        ";": { "width": 5, "x": 101, "y": 2, "w": 2, "h": 7, "ox": 2, "oy": 7 },
+        ":": { "width": 5, "x": 98, "y": 2, "w": 2, "h": 5, "ox": 2, "oy": 5 },
+        ";": { "width": 5, "x": 101, "y": 2, "w": 2, "h": 7, "ox": 2, "oy": 5 },
         "?": { "width": 7, "x": 104, "y": 2, "w": 5, "h": 7, "ox": 1, "oy": 7 },
         "A": { "width": 8, "x": 110, "y": 2, "w": 6, "h": 7, "ox": 1, "oy": 7 },
         "B": { "width": 8, "x": 117, "y": 2, "w": 6, "h": 7, "ox": 1, "oy": 7 },
@@ -76,5 +78,5 @@
         "y": { "width": 8, "x": 100, "y": 35, "w": 7, "h": 7, "ox": 0, "oy": 5 },
         "z": { "width": 7, "x": 108, "y": 35, "w": 8, "h": 6, "ox": 0, "oy": 5 },
         "~": { "width": 7, "x": 117, "y": 36, "w": 8, "h": 3, "ox": 0, "oy": 4 }
-    }
+    };
 }
