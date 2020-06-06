@@ -49,7 +49,7 @@ export default abstract class Font {
      * Calculates the size of the given text.
      * @param text
      */
-    public size = (text: string): [number, number] => {
+    public calculateSize = (text: string): [number, number] => {
         let charDefinition: any;
         let width = 0;
         let height = this.height;
