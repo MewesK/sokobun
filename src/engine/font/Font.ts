@@ -44,4 +44,23 @@ export default abstract class Font {
             }
         });
     }
+
+    /**
+     * Calculates the size of the given text.
+     * @param text
+     */
+    public size = (text: string): [number, number] => {
+        let charDefinition: any;
+        let width = 0;
+        let height = this.height;
+
+        [...text].forEach((char) => {
+            charDefinition = this.chars[char];
+            if (charDefinition !== undefined) {
+                width += charDefinition.width - charDefinition.ox;
+            }
+        });
+
+        return [width, height];
+    }
 }
