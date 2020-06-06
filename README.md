@@ -27,7 +27,7 @@ Bitmap font based on:
 
  - move level state into level class to allow easy level switching
  - implement bitmap font mechanics
- - implement scenes & panels mechanics
+ - implement panels mechanics
  - implement menu (level select, character select, options, credits)
  - implement pause screen & win/lose screen
  - implement intro
