@@ -23,7 +23,7 @@ export default class FontLoader {
                         input[0].family,
                         input[0].size,
                         input[0].height,
-                        input[0].chars
+                        input[0].characterDefinitionList
                     )
                 );
             });

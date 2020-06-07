@@ -14,7 +14,7 @@ export interface FontDefinition {
     family: string;
     size: number;
     height: number;
-    chars: Record<string, CharacterDefinition>;
+    characterDefinitionList: Record<string, CharacterDefinition>;
 }
 
 export enum FontColor {
@@ -22,13 +22,13 @@ export enum FontColor {
     Dark
 }
 
-export default class Font {
+export default class Font implements FontDefinition {
     public readonly resource: Resource;
     public readonly color: FontColor;
     public readonly family: string;
     public readonly size: number;
-    protected readonly height: number;
-    protected readonly characterDefinitionList: Record<string, CharacterDefinition>;
+    public readonly height: number;
+    public readonly characterDefinitionList: Record<string, CharacterDefinition>;
 
     constructor(
         resource: Resource,

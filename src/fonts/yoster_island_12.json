@@ -2,7 +2,7 @@
     "family": "Yoster Island",
     "size": 12,
     "height": 17,
-    "chars": {
+    "characterDefinitionList": {
         " ": { "width": 5, "x": 1, "y": 14, "w": 0, "h": 0, "ox": 0, "oy": 0 },
         "!": { "width": 6, "x": 2, "y": 3, "w": 4, "h": 12, "ox": 1, "oy": 11 },
         "\"": { "width": 10, "x": 7, "y": 2, "w": 6, "h": 5, "ox": 1, "oy": 12 },

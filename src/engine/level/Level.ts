@@ -18,9 +18,8 @@ import Box from '../sprite/Box';
 import Destination from '../sprite/Destination';
 import Player from '../sprite/Player';
 import { ActionType, DirectionType } from '../sprite/Sprite';
-import PatternTileMap from '../tile/PatternTileMap';
-import RandomTileMap from '../tile/RandomTileMap';
-import Tile, { TileType } from '../tile/Tile';
+import { TileType } from '../tile/Tile';
+import { TileOffsetDefinition } from '../tile/TileMap';
 import TileMapLoader from '../tile/TileMapLoader';
 
 export default class Level extends Scene {
@@ -363,7 +362,7 @@ export default class Level extends Scene {
         this.levelContext.fillRect(0, 0, this.levelContext.canvas.width, this.levelContext.canvas.height);
 
         // Draw background
-        const voidTileMap = <RandomTileMap>this.tileMapLoader.get(tilesVoid);
+        const voidTileMap = this.tileMapLoader.get(tilesVoid);
         for (let rowIndex = 0; rowIndex < rowMax; rowIndex++) {
             for (let columnIndex = 0; columnIndex < columnMax; columnIndex++) {
                 const tile = voidTileMap.getRandomTile();
@@ -376,15 +375,15 @@ export default class Level extends Scene {
         moonTile.draw(Game.MOON_OFFSET, Game.MOON_OFFSET, this.levelContext);
 
         // Draw level
-        const floorTileMap = <RandomTileMap>this.tileMapLoader.get(tilesFloor);
-        const waterTileMap = <RandomTileMap>this.tileMapLoader.get(tilesWater);
-        const pillarTileMap = <PatternTileMap>this.tileMapLoader.get(tilesPillar);
-        const voidBorderTileMap = <PatternTileMap>this.tileMapLoader.get(tilesVoidBorder);
-        const waterBorderTileMap = <PatternTileMap>this.tileMapLoader.get(tilesWaterBorder);
+        const floorTileMap = this.tileMapLoader.get(tilesFloor);
+        const waterTileMap = this.tileMapLoader.get(tilesWater);
+        const pillarTileMap = this.tileMapLoader.get(tilesPillar);
+        const voidBorderTileMap = this.tileMapLoader.get(tilesVoidBorder);
+        const waterBorderTileMap = this.tileMapLoader.get(tilesWaterBorder);
 
         let pattern: string;
-        let tileDefinitionList: Array<[Tile, [number, number]]>;
-        let borderTileDefinitionList: Array<[Tile, [number, number]]>;
+        let tileDefinitionList: Array<TileOffsetDefinition>;
+        let borderTileDefinitionList: Array<TileOffsetDefinition>;
         for (let rowIndex = 0; rowIndex < this.rows; rowIndex++) {
             for (let columnIndex = 0; columnIndex < this.columns; columnIndex++) {
                 tileDefinitionList = [];
@@ -392,7 +391,7 @@ export default class Level extends Scene {
                 switch (this.tileTypeMap[rowIndex][columnIndex]) {
                     case TileType.Floor:
                         // Add random floor tile
-                        tileDefinitionList.push([floorTileMap.getRandomTile(), [0, 0]]);
+                        tileDefinitionList.push({ tile: floorTileMap.getRandomTile(), offset: { x: 0, y: 0 } });
 
                         // Add pillar
                         if (Game.RENDER_PILLARS) {
@@ -425,12 +424,13 @@ export default class Level extends Scene {
                         // Add tiles
                         tileDefinitionList.push(
                             // Add random water tile if no border tiles exists or default tile otherwise
-                            [
-                                borderTileDefinitionList.length === 0
-                                    ? waterTileMap.getRandomTile()
-                                    : waterTileMap.get(0, 0),
-                                [0, 0]
-                            ],
+                            {
+                                tile:
+                                    borderTileDefinitionList.length === 0
+                                        ? waterTileMap.getRandomTile()
+                                        : waterTileMap.get(0, 0),
+                                offset: { x: 0, y: 0 }
+                            },
                             // Add border tiles
                             ...borderTileDefinitionList
                         );
@@ -439,9 +439,9 @@ export default class Level extends Scene {
 
                 // Draw tiles
                 tileDefinitionList.forEach((tileDefinition) =>
-                    tileDefinition[0].draw(
-                        tileDefinition[1][0] + xOffset + columnIndex * Game.TILE_WIDTH,
-                        tileDefinition[1][1] + yOffset + rowIndex * Game.TILE_HEIGHT,
+                    tileDefinition.tile.draw(
+                        tileDefinition.offset.x + xOffset + columnIndex * Game.TILE_WIDTH,
+                        tileDefinition.offset.y + yOffset + rowIndex * Game.TILE_HEIGHT,
                         this.levelContext
                     )
                 );
