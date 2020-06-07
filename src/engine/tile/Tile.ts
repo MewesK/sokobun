@@ -31,6 +31,16 @@ export default class Tile {
      */
     public draw = (x: number, y: number, context: CanvasRenderingContext2D): void => {
         context.imageSmoothingEnabled = false;
-        context.drawImage(<CanvasImageSource>this.resource.data, this.x, this.y, this.width, this.height, x, y, this.width, this.height);
+        context.drawImage(
+            <CanvasImageSource>this.resource.data,
+            this.x,
+            this.y,
+            this.width,
+            this.height,
+            x,
+            y,
+            this.width,
+            this.height
+        );
     };
 }
