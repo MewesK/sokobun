@@ -25,8 +25,7 @@ Bitmap font based on:
 
 ## Next steps
 
- - implement bitmap font mechanics
  - implement panels mechanics
  - implement menu (level select, character select, options, credits)
- - implement pause screen & win/lose screen
+ - implement pause screen
  - implement intro
