@@ -19,26 +19,26 @@ export default class ResourceLoader {
             };
 
             // Create and load resources
-            inputList.forEach((src) => {
+            inputList.forEach((input) => {
                 // Image data handling
-                if (src.match(/^.*\.png$/)) {
+                if (input.match(/^.*\.png$/)) {
                     const image = new Image();
                     image.addEventListener(
                         'load',
                         () => {
-                            this.cache.push(new Resource(src, image));
+                            this.cache.push(new Resource(input, image));
                             decreaseCounter();
                         },
                         false
                     );
-                    image.src = src;
+                    image.src = input;
                 }
 
                 // Other data handling
                 else {
-                    fetch(src).then((response) => {
+                    fetch(input).then((response) => {
                         response.text().then((value) => {
-                            this.cache.push(new Resource(src, value));
+                            this.cache.push(new Resource(input, value));
                             decreaseCounter();
                         });
                     });

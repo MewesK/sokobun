@@ -1,14 +1,26 @@
 import Resource from '../resource/Resource';
 
+export enum FontColor {
+    Bright,
+    Dark
+}
+
 export default class Font {
     public readonly resource: Resource;
-    public readonly color: string;
+    public readonly color: FontColor;
     public readonly family: string;
     public readonly size: number;
     protected readonly height: number;
     protected readonly chars: Record<string, any>;
 
-    constructor(resource: Resource, color: string, family: string, size: number, height: number, chars: Record<string, any>) {
+    constructor(
+        resource: Resource,
+        color: FontColor,
+        family: string,
+        size: number,
+        height: number,
+        chars: Record<string, any>
+    ) {
         this.resource = resource;
         this.color = color;
         this.family = family;

@@ -1,11 +1,11 @@
-import Tile, { TileType } from '../tile/Tile';
+import Tile, {TileType} from '../tile/Tile';
 import Player from '../sprite/Player';
 import Box from '../sprite/Box';
 import Destination from '../sprite/Destination';
 import playerSprites from '../../images/player_base.png';
 import boxSprites from '../../images/bun.png';
 import destinationSprites from '../../images/pillow.png';
-import { ActionType, DirectionType } from '../sprite/Sprite';
+import {ActionType, DirectionType} from '../sprite/Sprite';
 import Game from '../Game';
 import RandomTileMap from '../tile/RandomTileMap';
 import PatternTileMap from '../tile/PatternTileMap';
@@ -21,6 +21,7 @@ import ResourceLoader from '../resource/ResourceLoader';
 import Scene from '../Scene';
 import FontLoader from '../font/FontLoader';
 import TileMapLoader from '../tile/TileMapLoader';
+import {FontColor} from '../font/Font';
 
 export default class Level extends Scene {
     public readonly name: string;
@@ -262,7 +263,7 @@ export default class Level extends Scene {
         });
 
         // Draw status
-        const font = this.fontLoader.get('Yoster Island', 10, 'bright');
+        const font = this.fontLoader.get('Yoster Island', 10, FontColor.Bright);
         font.draw('Moves', 10, 256, bufferContext)
             .draw(String(this.moves), 64, 256, bufferContext)
             .draw('Pushes', 10, 270, bufferContext)
@@ -271,7 +272,7 @@ export default class Level extends Scene {
             .draw(String(Math.floor(this.time)), 64, 284, bufferContext);
 
         if (this.won) {
-            const bigFont = this.fontLoader.get('Yoster Island', 14, 'bright');
+            const bigFont = this.fontLoader.get('Yoster Island', 14, FontColor.Bright);
             const text1 = 'You win!';
             const textSize1 = bigFont.calculateSize(text1);
             bigFont.draw(
@@ -290,7 +291,7 @@ export default class Level extends Scene {
                 bufferContext
             );
         } else if (this.paused) {
-            const bigFont = this.fontLoader.get('Yoster Island', 14, 'bright');
+            const bigFont = this.fontLoader.get('Yoster Island', 14, FontColor.Bright);
             const text1 = 'Pause!';
             const textSize1 = bigFont.calculateSize(text1);
             bigFont.draw(

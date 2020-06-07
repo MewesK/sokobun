@@ -1,42 +1,14 @@
 import FontLoader from './font/FontLoader';
 import Level from './level/Level';
 import LevelLoader from './level/LevelLoader';
-import PatternTileMap from './tile/PatternTileMap';
-import RandomTileMap from './tile/RandomTileMap';
 import ResourceLoader from './resource/ResourceLoader';
 import Scene from './Scene';
-import TileMap from './tile/TileMap';
 import TileMapLoader from './tile/TileMapLoader';
 
-import boxSprites from '../images/bun.png';
-import destinationSprites from '../images/pillow.png';
-import playerSprites from '../images/player_base.png';
-import tilesFloor from '../images/tiles_floor.png';
-import tilesMoon from '../images/moon.png';
-import tilesPillar from '../images/tiles_pillar.png';
-import tilesShadow from '../images/shadow.png';
-import tilesVoid from '../images/tiles_void.png';
-import tilesVoidBorder from '../images/tiles_void_border.png';
-import tilesWater from '../images/tiles_water.png';
-import tilesWaterBorder from '../images/tiles_water_border.png';
-
-import definitionYosterIsland8 from '../fonts/yoster_island_8.json';
-import tilesYosterIsland8Bright from '../fonts/yoster_island_8_bright.png';
-import tilesYosterIsland8Dark from '../fonts/yoster_island_8_dark.png';
-
-import definitionYosterIsland10 from '../fonts/yoster_island_10.json';
-import tilesYosterIsland10Bright from '../fonts/yoster_island_10_bright.png';
-import tilesYosterIsland10Dark from '../fonts/yoster_island_10_dark.png';
-
-import definitionYosterIsland12 from '../fonts/yoster_island_12.json';
-import tilesYosterIsland12Bright from '../fonts/yoster_island_12_bright.png';
-import tilesYosterIsland12Dark from '../fonts/yoster_island_12_dark.png';
-
-import definitionYosterIsland14 from '../fonts/yoster_island_14.json';
-import tilesYosterIsland14Bright from '../fonts/yoster_island_14_bright.png';
-import tilesYosterIsland14Dark from '../fonts/yoster_island_14_dark.png';
-
-import level from '../levels/Original.txt';
+import { fontList } from './font/FontList';
+import { levelList } from './level/LevelList';
+import { resourceList } from './resource/ResourceList';
+import { tileMapList } from './tile/TileMapList';
 
 export default class Game {
     public static readonly BACKGROUND_COLOR = '#252230';
@@ -49,9 +21,9 @@ export default class Game {
     public static readonly TILE_HEIGHT = 16;
 
     private readonly resourceLoader: ResourceLoader = new ResourceLoader();
-    private readonly tileMapLoader: TileMapLoader = new TileMapLoader();
-    private readonly fontLoader: FontLoader = new FontLoader();
-    private readonly levelLoader: LevelLoader = new LevelLoader();
+    private readonly tileMapLoader: TileMapLoader = new TileMapLoader(this.resourceLoader);
+    private readonly fontLoader: FontLoader = new FontLoader(this.resourceLoader);
+    private readonly levelLoader: LevelLoader = new LevelLoader(this.resourceLoader);
 
     private readonly bufferCanvas: HTMLCanvasElement;
     private readonly bufferContext: CanvasRenderingContext2D;
@@ -101,104 +73,19 @@ export default class Game {
         console.log('Initializing game...');
 
         // Load resources
-        this.resourceLoader
-            .load([
-                playerSprites,
-                boxSprites,
-                destinationSprites,
-                tilesFloor,
-                tilesMoon,
-                tilesPillar,
-                tilesShadow,
-                tilesVoid,
-                tilesVoidBorder,
-                tilesWater,
-                tilesWaterBorder,
-                tilesYosterIsland8Bright,
-                tilesYosterIsland10Bright,
-                tilesYosterIsland12Bright,
-                tilesYosterIsland14Bright,
-                tilesYosterIsland8Dark,
-                tilesYosterIsland10Dark,
-                tilesYosterIsland12Dark,
-                tilesYosterIsland14Dark,
-                level
-            ])
-            .then(() => {
-                Promise.all([
-                    this.tileMapLoader.load([
-                        // Sprite tiles
-                        new TileMap(
-                            TileMap.createTileTable(this.resourceLoader.get(playerSprites), 4, 6, 0, 0, 18, 24, 1),
-                            this.resourceLoader.get(playerSprites)
-                        ),
-                        new TileMap(
-                            TileMap.createTileTable(this.resourceLoader.get(boxSprites), 1, 1, 0, 0, 16, 16),
-                            this.resourceLoader.get(boxSprites)
-                        ),
-                        new TileMap(
-                            TileMap.createTileTable(this.resourceLoader.get(destinationSprites), 1, 1, 0, 0, 16, 16),
-                            this.resourceLoader.get(destinationSprites)
-                        ),
-                        // Level tiles
-                        new RandomTileMap(
-                            TileMap.createTileTable(this.resourceLoader.get(tilesFloor), 2, 2, 0, 0, 16, 16),
-                            this.resourceLoader.get(tilesFloor),
-                            RandomTileMap.FLOOR_WEIGHTED_TILE_LIST
-                        ),
-                        new TileMap(
-                            TileMap.createTileTable(this.resourceLoader.get(tilesMoon), 1, 1, 0, 0, 32, 32),
-                            this.resourceLoader.get(tilesMoon)
-                        ),
-                        new TileMap(
-                            TileMap.createTileTable(this.resourceLoader.get(tilesShadow), 1, 1, 0, 0, 16, 16),
-                            this.resourceLoader.get(tilesShadow)
-                        ),
-                        new PatternTileMap(
-                            TileMap.createTileTable(this.resourceLoader.get(tilesPillar), 3, 4, 0, 0, 16, 16),
-                            this.resourceLoader.get(tilesPillar),
-                            PatternTileMap.PILLAR_PATTERN_TILE_DEFINITION_LIST
-                        ),
-                        new RandomTileMap(
-                            TileMap.createTileTable(this.resourceLoader.get(tilesVoid), 3, 2, 0, 0, 16, 16),
-                            this.resourceLoader.get(tilesVoid),
-                            RandomTileMap.VOID_WEIGHTED_TILE_LIST
-                        ),
-                        new PatternTileMap(
-                            TileMap.createTileTable(this.resourceLoader.get(tilesVoidBorder), 4, 4, 0, 0, 8, 8),
-                            this.resourceLoader.get(tilesVoidBorder),
-                            PatternTileMap.BORDER_PATTERN_TILE_DEFINITION_LIST
-                        ),
-                        new RandomTileMap(
-                            TileMap.createTileTable(this.resourceLoader.get(tilesWater), 2, 2, 0, 0, 16, 16),
-                            this.resourceLoader.get(tilesWater),
-                            RandomTileMap.WATER_WEIGHTED_TILE_LIST
-                        ),
-                        new PatternTileMap(
-                            TileMap.createTileTable(this.resourceLoader.get(tilesWaterBorder), 4, 4, 0, 0, 8, 8),
-                            this.resourceLoader.get(tilesWaterBorder),
-                            PatternTileMap.BORDER_PATTERN_TILE_DEFINITION_LIST
-                        )
-                    ]),
-                    this.fontLoader.load([
-                        [definitionYosterIsland8, 'bright', this.resourceLoader.get(tilesYosterIsland8Bright)],
-                        [definitionYosterIsland8, 'dark', this.resourceLoader.get(tilesYosterIsland8Dark)],
-                        [definitionYosterIsland10, 'bright', this.resourceLoader.get(tilesYosterIsland10Bright)],
-                        [definitionYosterIsland10, 'dark', this.resourceLoader.get(tilesYosterIsland10Dark)],
-                        [definitionYosterIsland12, 'bright', this.resourceLoader.get(tilesYosterIsland12Bright)],
-                        [definitionYosterIsland12, 'dark', this.resourceLoader.get(tilesYosterIsland12Dark)],
-                        [definitionYosterIsland14, 'bright', this.resourceLoader.get(tilesYosterIsland14Bright)],
-                        [definitionYosterIsland14, 'dark', this.resourceLoader.get(tilesYosterIsland14Dark)],
-                    ]),
-                    this.levelLoader.load([this.resourceLoader.get(level)])
-                ]).then(() => {
-                    this.load(this.levelLoader.first());
-                });
+        this.resourceLoader.load(resourceList).then(() => {
+            Promise.all([
+                this.tileMapLoader.load(tileMapList),
+                this.fontLoader.load(fontList),
+                this.levelLoader.load(levelList)
+            ]).then(() => {
+                this.load(this.levelLoader.first());
             });
+        });
     };
 
     /**
-     * Load level.
+     * Load scene.
      * @param scene
      */
     private load = (scene: Scene): void => {

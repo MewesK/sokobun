@@ -1,15 +1,20 @@
-import Resource from '../resource/Resource';
 import Level from './Level';
 import LevelParser from './LevelParser';
+import ResourceLoader from '../resource/ResourceLoader';
 
 export default class LevelLoader {
-    private cache: Array<Level> = [];
+    private readonly resourceLoader: ResourceLoader;
+    private readonly cache: Array<Level> = [];
+
+    constructor(resourceLoader: ResourceLoader) {
+        this.resourceLoader = resourceLoader;
+    }
 
     /**
-     * Loads levels from a list of resources.
+     * Loads levels from a list of level URLs.
      * @param inputList
      */
-    public load = (inputList: Array<Resource>): Promise<Array<Level>> => {
+    public load = (inputList: Array<string>): Promise<Array<Level>> => {
         return new Promise((resolve) => {
             let counter = inputList.length;
 
@@ -20,10 +25,10 @@ export default class LevelLoader {
                 }
             };
 
-            inputList.forEach((resource) => {
-                console.debug(`Loading level ${resource.src}...`);
+            inputList.forEach((input) => {
+                console.debug(`Loading level ${input}...`);
 
-                new LevelParser().parse(resource).then((levelList) => {
+                new LevelParser().parse(this.resourceLoader.get(input)).then((levelList) => {
                     this.cache.push(...levelList);
                     decreaseCounter();
                 });

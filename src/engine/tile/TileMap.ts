@@ -4,7 +4,7 @@ import Tile from './Tile';
 export default class TileMap {
     /**
      * Creates a tile table based on the given resource.
-     * @param input
+     * @param resource
      * @param rows
      * @param columns
      * @param offsetRows
