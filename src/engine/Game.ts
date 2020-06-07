@@ -32,7 +32,7 @@ export default class Game {
     private scene!: Scene;
 
     private lastTime = 0;
-    private pressedKeyList: Record<string, boolean> = {};
+    private pressedKeyList: Record<string, { pressed: boolean; startTime: number }> = {};
 
     public constructor(canvas: HTMLCanvasElement, width = 400, height = 304, zoom = 1) {
         // Buffer canvas
@@ -61,10 +61,17 @@ export default class Game {
 
         // Register event listener
         document.addEventListener('keydown', (event: KeyboardEvent): void => {
-            this.pressedKeyList[event.code] = true;
+            if (this.pressedKeyList[event.code]) {
+                this.pressedKeyList[event.code].pressed = true;
+            } else {
+                this.pressedKeyList[event.code] = { pressed: true, startTime: 0 };
+            }
         });
         document.addEventListener('keyup', (event: KeyboardEvent): void => {
-            this.pressedKeyList[event.code] = false;
+            this.pressedKeyList[event.code] = { pressed: false, startTime: 0 };
+        });
+        window.addEventListener('blur', (): void => {
+            this.pressedKeyList = {};
         });
     }
 
@@ -110,10 +117,10 @@ export default class Game {
      * The game loop.
      */
     private loop = (): void => {
-        const now = Date.now();
-        const dt = (now - this.lastTime) / 1000.0;
+        const currentTime = Date.now();
+        const dt = (currentTime - this.lastTime) / 1000.0;
 
-        this.control();
+        this.control(currentTime);
         this.scene.update(dt);
         this.draw();
 
@@ -126,18 +133,22 @@ export default class Game {
             }
         }
 
-        this.lastTime = now;
+        this.lastTime = currentTime;
         window.requestAnimationFrame(this.loop);
     };
 
     /**
      * Controls the player based on the user input.
+     * @param currentTime
      */
-    private control = (): void => {
+    private control = (currentTime: number): void => {
         // Check pressed keys
+        let pressedKeyData: { pressed: boolean; startTime: number };
         Object.keys(this.pressedKeyList).forEach((pressedKey) => {
-            if (this.pressedKeyList[pressedKey]) {
-                this.scene.control(pressedKey);
+            pressedKeyData = this.pressedKeyList[pressedKey];
+            if (pressedKeyData.pressed) {
+                this.scene.control(pressedKey, currentTime - pressedKeyData.startTime);
+                this.pressedKeyList[pressedKey].startTime = currentTime;
             }
         });
     };

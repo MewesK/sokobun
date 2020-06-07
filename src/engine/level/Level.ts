@@ -127,8 +127,10 @@ export default class Level extends Scene {
 
     /**
      * Controls the player based on the user input.
+     * @param pressedKey
+     * @param lastTime
      */
-    public control = (pressedKey: string): void => {
+    public control = (pressedKey: string, lastTime: number): void => {
         let actionType;
         let isMoving = false;
         let isPushing = false;
@@ -173,10 +175,13 @@ export default class Level extends Scene {
             case 'Space':
             case 'Enter':
             case 'Escape':
-                if (this.won) {
-                    this.finished = true;
-                } else {
-                    this.paused = !this.paused;
+                // Debounce
+                if (lastTime >= 200) {
+                    if (this.won) {
+                        this.finished = true;
+                    } else {
+                        this.paused = !this.paused;
+                    }
                 }
 
                 break;

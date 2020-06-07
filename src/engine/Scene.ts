@@ -24,8 +24,9 @@ export default abstract class Scene {
     /**
      * Controls the scene.
      * @param pressedKey
+     * @param lastTime
      */
-    public abstract control(pressedKey: string): void;
+    public abstract control(pressedKey: string, lastTime: number): void;
 
     /**
      * Updates the scene.
