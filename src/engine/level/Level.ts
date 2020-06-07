@@ -45,6 +45,7 @@ export default class Level extends Scene {
     private moves: number = 0;
     private pushes: number = 0;
     private time: number = 0;
+    private paused: boolean = false;
     private won: boolean = false;
 
     private levelBuffered: boolean = false;
@@ -119,6 +120,7 @@ export default class Level extends Scene {
         this.moves = 0;
         this.pushes = 0;
         this.time = 0;
+        this.paused = false;
         this.won = false;
 
         this.levelBuffered = false;
@@ -135,7 +137,7 @@ export default class Level extends Scene {
         switch (pressedKey) {
             case 'KeyW':
             case 'ArrowUp':
-                if (this.player.actionType === ActionType.Stand && !this.won) {
+                if (this.player.actionType === ActionType.Stand && !this.won && !this.paused) {
                     // Check up
                     actionType = this.controlDirection(DirectionType.Up, 0, -1);
                     isPushing = actionType === ActionType.Push;
@@ -144,7 +146,7 @@ export default class Level extends Scene {
                 break;
             case 'KeyS':
             case 'ArrowDown':
-                if (this.player.actionType === ActionType.Stand && !this.won) {
+                if (this.player.actionType === ActionType.Stand && !this.won && !this.paused) {
                     // Check down
                     actionType = this.controlDirection(DirectionType.Down, 0, 1);
                     isPushing = actionType === ActionType.Push;
@@ -153,7 +155,7 @@ export default class Level extends Scene {
                 break;
             case 'KeyA':
             case 'ArrowLeft':
-                if (this.player.actionType === ActionType.Stand && !this.won) {
+                if (this.player.actionType === ActionType.Stand && !this.won && !this.paused) {
                     // Check left
                     actionType = this.controlDirection(DirectionType.Left, -1, 0);
                     isPushing = actionType === ActionType.Push;
@@ -162,7 +164,7 @@ export default class Level extends Scene {
                 break;
             case 'KeyD':
             case 'ArrowRight':
-                if (this.player.actionType === ActionType.Stand && !this.won) {
+                if (this.player.actionType === ActionType.Stand && !this.won && !this.paused) {
                     // Check right
                     actionType = this.controlDirection(DirectionType.Right, 1, 0);
                     isPushing = actionType === ActionType.Push;
@@ -171,9 +173,13 @@ export default class Level extends Scene {
                 break;
             case 'Space':
             case 'Enter':
+            case 'Escape':
                 if (this.won) {
                     this.finished = true;
+                } else {
+                    this.paused = !this.paused;
                 }
+
                 break;
         }
 
@@ -191,7 +197,7 @@ export default class Level extends Scene {
      * @param dt
      */
     public update = (dt: number): void => {
-        if (!this.won) {
+        if (!this.won && !this.paused) {
             this.time += dt;
 
             // Check win condition
@@ -281,6 +287,16 @@ export default class Level extends Scene {
                 text2,
                 (bufferContext.canvas.width - textSize2[0]) / 2,
                 (bufferContext.canvas.height - textSize2[1]) / 2 + 10,
+                bufferContext
+            );
+        } else if (this.paused) {
+            const bigFont = this.fontLoader.get('Yoster Island', 14, 'bright');
+            const text1 = 'Pause!';
+            const textSize1 = bigFont.calculateSize(text1);
+            bigFont.draw(
+                text1,
+                (bufferContext.canvas.width - textSize1[0]) / 2,
+                (bufferContext.canvas.height - textSize1[1]) / 2,
                 bufferContext
             );
         }

@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
@@ -52,10 +53,19 @@ module.exports = (env, argv) => {
 
     optimization: {
       minimize: argv.mode === 'production',
-      minimizer: [new TerserPlugin(), new OptimizeCSSAssetsPlugin({})],
+      minimizer: [
+        new TerserPlugin({
+          extractComments: false,
+        }),
+        new OptimizeCSSAssetsPlugin({})],
     },
 
     plugins: [
+      new webpack.BannerPlugin(
+        'SokoBun v' + process.env.npm_package_version + ' (' + process.env.npm_package_homepage + ')\n' +
+        'Copyright 2020 ' + process.env.npm_package_author_name + '\n' +
+        'Licensed under ' + process.env.npm_package_license
+      ),
       new CleanWebpackPlugin(),
       new ForkTsCheckerWebpackPlugin(),
       new HtmlWebpackPlugin({
