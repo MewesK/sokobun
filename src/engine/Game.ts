@@ -24,10 +24,11 @@ import tilesYosterIsland10 from '../images/yoster_island_10_white.png';
 import tilesYosterIsland12 from '../images/yoster_island_12_white.png';
 import tilesYosterIsland14 from '../images/yoster_island_14_white.png';
 
-import level from '../levels/3.txt';
+import level from '../levels/Original.txt';
 import TileMap from './tile/TileMap';
 import RandomTileMap from './tile/RandomTileMap';
 import PatternTileMap from './tile/PatternTileMap';
+import Level from './level/Level';
 
 export default class Game {
     public static readonly BACKGROUND_COLOR = '#252230';
@@ -177,7 +178,7 @@ export default class Game {
                         this.resourceLoader.get(level)
                     ])
                 ]).then(() => {
-                    this.load(this.levelLoader.get(level));
+                    this.load(this.levelLoader.first());
                 });
             });
     };
@@ -215,6 +216,15 @@ export default class Game {
         this.control();
         this.scene.update(dt);
         this.draw();
+
+        if (this.scene.finished) {
+            if (this.scene instanceof Level) {
+                const nextLevel = this.levelLoader.next(this.scene)
+                if (nextLevel) {
+                    this.load(nextLevel);
+                }
+            }
+        }
 
         this.lastTime = now;
         window.requestAnimationFrame(this.loop);

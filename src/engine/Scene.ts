@@ -3,6 +3,8 @@ import FontLoader from './font/FontLoader';
 import TileMapLoader from './tile/TileMapLoader';
 
 export default abstract class Scene {
+    public finished: boolean = false;
+
     /**
      * Loads the scene.
      * @param resourceLoader

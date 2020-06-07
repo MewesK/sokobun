@@ -23,8 +23,8 @@ export default class LevelLoader {
             inputList.forEach((resource) => {
                 console.debug(`Loading level ${resource.src}...`);
 
-                new LevelParser().parse(resource).then((level) => {
-                    this.cache.push(level);
+                new LevelParser().parse(resource).then((levelList) => {
+                    this.cache.push(...levelList);
                     decreaseCounter();
                 });
             });
@@ -32,14 +32,33 @@ export default class LevelLoader {
     };
 
     /**
-     * Returns the level with the given data URL.
-     * @param src
+     * Returns the first level;
      */
-    public get = (src: string): Level => {
-        let result = this.cache.find((value) => value.src === src);
+    public first = (): Level => {
+        return this.cache[0];
+    };
+
+    /**
+     * Returns the level with the given data URL.
+     * @param name
+     */
+    public get = (name: string): Level => {
+        let result = this.cache.find((level) => level.name === name);
         if (result === undefined) {
             throw new Error();
         }
         return result;
     };
+
+    /**
+     * Returns the next level;
+     */
+    public next = (currentLevel: Level): Level | undefined => {
+        const currentIndex = this.cache.indexOf(currentLevel);
+        if (currentIndex >= 0 && currentIndex < this.cache.length) {
+            return this.cache[currentIndex + 1];
+        }
+        return undefined;
+    };
+
 }

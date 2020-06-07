@@ -23,7 +23,7 @@ import FontLoader from '../font/FontLoader';
 import TileMapLoader from '../tile/TileMapLoader';
 
 export default class Level extends Scene {
-    public readonly src: string;
+    public readonly name: string;
     public readonly tileTypeMap: Array<Array<TileType>> = [[]];
     public readonly playerPosition: [number, number];
     public readonly boxPositionList: Array<[number, number]>;
@@ -50,7 +50,7 @@ export default class Level extends Scene {
     private levelBuffered: boolean = false;
 
     constructor(
-        src: string,
+        name: string,
         tileTypeMap: Array<Array<TileType>>,
         playerPosition: [number, number],
         boxPositionList: Array<[number, number]>,
@@ -58,7 +58,7 @@ export default class Level extends Scene {
     ) {
         super();
 
-        this.src = src;
+        this.name = name;
         this.tileTypeMap = tileTypeMap;
         this.playerPosition = playerPosition;
         this.boxPositionList = boxPositionList;
@@ -128,10 +128,6 @@ export default class Level extends Scene {
      * Controls the player based on the user input.
      */
     public control = (pressedKey: string): void => {
-        if (this.player.actionType !== ActionType.Stand || this.won) {
-            return;
-        }
-
         let actionType;
         let isMoving = false;
         let isPushing = false;
@@ -139,31 +135,45 @@ export default class Level extends Scene {
         switch (pressedKey) {
             case 'KeyW':
             case 'ArrowUp':
-                // Check up
-                actionType = this.controlDirection(DirectionType.Up, 0, -1);
-                isPushing = actionType === ActionType.Push;
-                isMoving = actionType === ActionType.Walk || actionType === ActionType.Push ;
+                if (this.player.actionType === ActionType.Stand && !this.won) {
+                    // Check up
+                    actionType = this.controlDirection(DirectionType.Up, 0, -1);
+                    isPushing = actionType === ActionType.Push;
+                    isMoving = actionType === ActionType.Walk || actionType === ActionType.Push;
+                }
                 break;
             case 'KeyS':
             case 'ArrowDown':
-                // Check down
-                actionType = this.controlDirection(DirectionType.Down, 0, 1);
-                isPushing = actionType === ActionType.Push;
-                isMoving = actionType === ActionType.Walk || actionType === ActionType.Push;
+                if (this.player.actionType === ActionType.Stand && !this.won) {
+                    // Check down
+                    actionType = this.controlDirection(DirectionType.Down, 0, 1);
+                    isPushing = actionType === ActionType.Push;
+                    isMoving = actionType === ActionType.Walk || actionType === ActionType.Push;
+                }
                 break;
             case 'KeyA':
             case 'ArrowLeft':
-                // Check left
-                actionType = this.controlDirection(DirectionType.Left, -1, 0);
-                isPushing = actionType === ActionType.Push;
-                isMoving = actionType === ActionType.Walk || actionType === ActionType.Push;
+                if (this.player.actionType === ActionType.Stand && !this.won) {
+                    // Check left
+                    actionType = this.controlDirection(DirectionType.Left, -1, 0);
+                    isPushing = actionType === ActionType.Push;
+                    isMoving = actionType === ActionType.Walk || actionType === ActionType.Push;
+                }
                 break;
             case 'KeyD':
             case 'ArrowRight':
-                // Check right
-                actionType = this.controlDirection(DirectionType.Right, 1, 0);
-                isPushing = actionType === ActionType.Push;
-                isMoving = actionType === ActionType.Walk || actionType === ActionType.Push;
+                if (this.player.actionType === ActionType.Stand && !this.won) {
+                    // Check right
+                    actionType = this.controlDirection(DirectionType.Right, 1, 0);
+                    isPushing = actionType === ActionType.Push;
+                    isMoving = actionType === ActionType.Walk || actionType === ActionType.Push;
+                }
+                break;
+            case 'Space':
+            case 'Enter':
+                if (this.won) {
+                    this.finished = true;
+                }
                 break;
         }
 
@@ -254,12 +264,21 @@ export default class Level extends Scene {
 
         if (this.won) {
             const bigFont = this.fontLoader.get('Yoster Island', 14);
-            const text = 'You win!';
-            const textSize = bigFont.calculateSize(text);
+            const text1 = 'You win!';
+            const textSize1 = bigFont.calculateSize(text1);
             bigFont.draw(
-                text,
-                (bufferContext.canvas.width - textSize[0]) / 2,
-                (bufferContext.canvas.height - textSize[1]) / 2,
+                text1,
+                (bufferContext.canvas.width - textSize1[0]) / 2,
+                ((bufferContext.canvas.height - textSize1[1]) / 2) - 10,
+                bufferContext
+            );
+
+            const text2 = 'Press space for the next level';
+            const textSize2 = font.calculateSize(text2);
+            font.draw(
+                text2,
+                (bufferContext.canvas.width - textSize2[0]) / 2,
+                ((bufferContext.canvas.height - textSize2[1]) / 2) + 10,
                 bufferContext
             );
         }

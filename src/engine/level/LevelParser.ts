@@ -13,43 +13,50 @@ export default class LevelParser {
      * Parses the level file and returns a level instance.
      * @param resource
      */
-    public parse = (resource: Resource): Promise<Level> => {
+    public parse = (resource: Resource): Promise<Array<Level>> => {
         return new Promise((resolve) => {
-            this.doParse(resource);
-            this.fillRows();
-            this.floodFillFloor();
-            this.removeWalls();
-            this.removeEmptyRows();
-            this.removeEmptyColumns();
-            this.addBorder();
-            if (Game.RENDER_PONDS) {
-                this.floodFillVoid();
-                this.floodFillPonds();
-            } else {
-                this.fillVoid();
-            }
-
             resolve(
-                new Level(
-                    resource.src,
-                    this.tileTypeMap,
-                    this.getPlayerPosition(),
-                    this.boxPositionList,
-                    this.destinationPositionList
-                )
+                [...(<string>resource.data).matchAll(/[\r\n]*([ #$@*.\r\n]*); *(.+)/g)].map((match) => {
+                    this.tileTypeMap = [[]];
+                    this.playerPosition = undefined;
+                    this.boxPositionList = [];
+                    this.destinationPositionList = [];
+
+                    this.doParse(match[1]);
+                    this.fillRows();
+                    this.floodFillFloor();
+                    this.removeWalls();
+                    this.removeEmptyRows();
+                    this.removeEmptyColumns();
+                    this.addBorder();
+                    if (Game.RENDER_PONDS) {
+                        this.floodFillVoid();
+                        this.floodFillPonds();
+                    } else {
+                        this.fillVoid();
+                    }
+
+                    return new Level(
+                        match[2],
+                        this.tileTypeMap,
+                        this.getPlayerPosition(),
+                        this.boxPositionList,
+                        this.destinationPositionList
+                    );
+                })
             );
         });
     };
 
     /**
      * Parses the level file and creates an two dimensional array.
-     * @param resource
+     * @param source
      */
-    private doParse = (resource: Resource): void => {
+    private doParse = (source: string): void => {
         let columnIndex = 0;
         let rowIndex = 0;
 
-        [...resource.data].forEach((character) => {
+        [...source].forEach((character) => {
             switch (character) {
                 case '\n':
                     columnIndex = 0;
@@ -80,6 +87,13 @@ export default class LevelParser {
                 case '.':
                     console.debug(`Destination found at [${columnIndex}, ${rowIndex}]`);
 
+                    this.destinationPositionList.push([columnIndex, rowIndex]);
+                    this.tileTypeMap[rowIndex][columnIndex++] = TileType.Undefined;
+                    break;
+                case '*':
+                    console.debug(`Box on destination found at [${columnIndex}, ${rowIndex}]`);
+
+                    this.boxPositionList.push([columnIndex, rowIndex]);
                     this.destinationPositionList.push([columnIndex, rowIndex]);
                     this.tileTypeMap[rowIndex][columnIndex++] = TileType.Undefined;
                     break;
