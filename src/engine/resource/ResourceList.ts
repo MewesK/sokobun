@@ -12,6 +12,7 @@ import destinationSprites from '../../images/pillow.png';
 import playerSprites from '../../images/player_base.png';
 import tilesShadow from '../../images/shadow.png';
 import tilesFloor from '../../images/tiles_floor.png';
+import tilesPanel from '../../images/tiles_panel.png';
 import tilesPillar from '../../images/tiles_pillar.png';
 import tilesVoidBorder from '../../images/tiles_void_border.png';
 import tilesVoid from '../../images/tiles_void.png';
@@ -25,6 +26,7 @@ export const resourceList: Array<string> = [
     destinationSprites,
     tilesFloor,
     tilesMoon,
+    tilesPanel,
     tilesPillar,
     tilesShadow,
     tilesVoid,

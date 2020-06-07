@@ -82,6 +82,24 @@ export default class Font implements FontDefinition {
     };
 
     /**
+     * Draws the given text.
+     * @param text
+     * @param offsetX
+     * @param offsetY
+     * @param context
+     */
+    public drawCentered = (text: string, offsetX: number, offsetY: number, context: CanvasRenderingContext2D): Font => {
+        const size = this.calculateSize(text);
+        this.draw(
+            text,
+            (context.canvas.width - size[0]) / 2 + offsetX,
+            (context.canvas.height - size[1]) / 2 + offsetY,
+            context
+        );
+        return this;
+    };
+
+    /**
      * Calculates the size of the given text.
      * @param text
      */

@@ -4,6 +4,7 @@ import destinationSprites from '../../images/pillow.png';
 import playerSprites from '../../images/player_base.png';
 import tilesShadow from '../../images/shadow.png';
 import tilesFloor from '../../images/tiles_floor.png';
+import tilesPanel from '../../images/tiles_panel.png';
 import tilesPillar from '../../images/tiles_pillar.png';
 import tilesVoidBorder from '../../images/tiles_void_border.png';
 import tilesVoid from '../../images/tiles_void.png';
@@ -12,6 +13,7 @@ import tilesWater from '../../images/tiles_water.png';
 import { FontColor } from '../font/Font';
 import FontLoader from '../font/FontLoader';
 import Game from '../Game';
+import Panel from '../panel/Panel';
 import ResourceLoader from '../resource/ResourceLoader';
 import Scene from '../Scene';
 import Box from '../sprite/Box';
@@ -37,6 +39,9 @@ export default class Level extends Scene {
 
     private levelCanvas!: HTMLCanvasElement;
     private levelContext!: CanvasRenderingContext2D;
+
+    private pausePanel!: Panel;
+    private winPanel!: Panel;
 
     private player!: Player;
     private boxList!: Array<Box>;
@@ -86,6 +91,10 @@ export default class Level extends Scene {
     ): void => {
         this.fontLoader = fontLoader;
         this.tileMapLoader = tileMapLoader;
+
+        // panels
+        this.pausePanel = new Panel(this.tileMapLoader.get(tilesPanel), 6, 3);
+        this.winPanel = new Panel(this.tileMapLoader.get(tilesPanel), 14, 5);
 
         // Level canvas
         this.levelCanvas = document.createElement('canvas');
@@ -266,8 +275,9 @@ export default class Level extends Scene {
         });
 
         // Draw status
-        const font = this.fontLoader.get('Yoster Island', 10, FontColor.Bright);
-        font.draw('Moves', 10, 256, bufferContext)
+        this.fontLoader
+            .get('Yoster Island', 10, FontColor.Bright)
+            .draw('Moves', 10, 256, bufferContext)
             .draw(String(this.moves), 64, 256, bufferContext)
             .draw('Pushes', 10, 270, bufferContext)
             .draw(String(this.pushes), 64, 270, bufferContext)
@@ -275,34 +285,20 @@ export default class Level extends Scene {
             .draw(String(Math.floor(this.time)), 64, 284, bufferContext);
 
         if (this.won) {
-            const bigFont = this.fontLoader.get('Yoster Island', 14, FontColor.Bright);
-            const text1 = 'You win!';
-            const textSize1 = bigFont.calculateSize(text1);
-            bigFont.draw(
-                text1,
-                (bufferContext.canvas.width - textSize1[0]) / 2,
-                (bufferContext.canvas.height - textSize1[1]) / 2 - 10,
-                bufferContext
-            );
+            // Draw panel
+            this.winPanel.drawCentered(0, 0, bufferContext);
 
-            const text2 = 'Press space for the next level';
-            const textSize2 = font.calculateSize(text2);
-            font.draw(
-                text2,
-                (bufferContext.canvas.width - textSize2[0]) / 2,
-                (bufferContext.canvas.height - textSize2[1]) / 2 + 10,
-                bufferContext
-            );
+            // Draw text
+            this.fontLoader.get('Yoster Island', 14, FontColor.Dark).drawCentered('You win!', 0, -10, bufferContext);
+            this.fontLoader
+                .get('Yoster Island', 10, FontColor.Dark)
+                .drawCentered('Press space for the next level', 0, 10, bufferContext);
         } else if (this.paused) {
-            const bigFont = this.fontLoader.get('Yoster Island', 14, FontColor.Bright);
-            const text1 = 'Pause!';
-            const textSize1 = bigFont.calculateSize(text1);
-            bigFont.draw(
-                text1,
-                (bufferContext.canvas.width - textSize1[0]) / 2,
-                (bufferContext.canvas.height - textSize1[1]) / 2,
-                bufferContext
-            );
+            // Draw panel
+            this.pausePanel.drawCentered(0, 0, bufferContext);
+
+            // Draw text
+            this.fontLoader.get('Yoster Island', 14, FontColor.Dark).drawCentered('Pause!', 0, 0, bufferContext);
         }
     };
 

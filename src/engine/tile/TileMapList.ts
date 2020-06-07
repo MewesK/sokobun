@@ -4,6 +4,7 @@ import destinationSprites from '../../images/pillow.png';
 import playerSprites from '../../images/player_base.png';
 import tilesShadow from '../../images/shadow.png';
 import tilesFloor from '../../images/tiles_floor.png';
+import tilesPanel from '../../images/tiles_panel.png';
 import tilesPillar from '../../images/tiles_pillar.png';
 import tilesVoidBorder from '../../images/tiles_void_border.png';
 import tilesVoid from '../../images/tiles_void.png';
@@ -69,6 +70,18 @@ export const tileMapList: Array<TileMapDefinition> = [
         patternTileDefinitionList: undefined
     },
     // Level tiles
+    {
+        src: tilesPanel,
+        rows: 3,
+        columns: 3,
+        offsetRows: 0,
+        offsetColumns: 0,
+        tileWidth: 16,
+        tileHeight: 16,
+        grid: 0,
+        weightedTileDefinitionList: undefined,
+        patternTileDefinitionList: undefined
+    },
     {
         src: tilesFloor,
         rows: 2,
