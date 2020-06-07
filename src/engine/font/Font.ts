@@ -19,7 +19,7 @@ export default abstract class Font {
      * @param text
      * @param context
      */
-    public draw = (text: string, x: number, y: number, context: CanvasRenderingContext2D): void => {
+    public draw = (text: string, x: number, y: number, context: CanvasRenderingContext2D): Font => {
         let charDefinition: any;
         let charX = x;
         let charY = y;
@@ -43,6 +43,8 @@ export default abstract class Font {
                 charX += charDefinition.width - charDefinition.ox;
             }
         });
+
+        return this;
     }
 
     /**
@@ -52,7 +54,6 @@ export default abstract class Font {
     public calculateSize = (text: string): [number, number] => {
         let charDefinition: any;
         let width = 0;
-        let height = this.height;
 
         [...text].forEach((char) => {
             charDefinition = this.chars[char];
@@ -61,6 +62,6 @@ export default abstract class Font {
             }
         });
 
-        return [width, height];
+        return [width, this.height];
     }
 }

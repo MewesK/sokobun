@@ -52,7 +52,7 @@ export default class ResourceLoader {
      * @param src
      */
     public get = (src: string): Resource => {
-        let result = this.cache.find((value) => value.src === src);
+        let result = this.cache.find((resource) => resource.src === src);
         if (result === undefined) {
             throw new Error('Invalid src.');
         }

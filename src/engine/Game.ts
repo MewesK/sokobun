@@ -1,6 +1,11 @@
 import LevelLoader from './level/LevelLoader';
 import ResourceLoader from './resource/ResourceLoader';
+import FontLoader from './font/FontLoader';
 import Scene from './Scene';
+import YosterIsland8 from './font/YosterIsland8';
+import YosterIsland10 from './font/YosterIsland10';
+import YosterIsland12 from './font/YosterIsland12';
+import YosterIsland14 from './font/YosterIsland14';
 
 import boxSprites from '../images/bun.png';
 import destinationSprites from '../images/pillow.png';
@@ -14,8 +19,11 @@ import tilesVoidBorder from '../images/tiles_void_border.png';
 import tilesWater from '../images/tiles_water.png';
 import tilesWaterBorder from '../images/tiles_water_border.png';
 import tilesYosterIsland8 from '../images/yoster_island_8_white.png';
+import tilesYosterIsland10 from '../images/yoster_island_10_white.png';
+import tilesYosterIsland12 from '../images/yoster_island_12_white.png';
+import tilesYosterIsland14 from '../images/yoster_island_14_white.png';
 
-import level from '../levels/2.txt';
+import level from '../levels/3.txt';
 
 export default class Game {
     public static readonly BACKGROUND_COLOR = '#252230';
@@ -29,6 +37,7 @@ export default class Game {
 
     private readonly resourceLoader: ResourceLoader = new ResourceLoader();
     private readonly levelLoader: LevelLoader = new LevelLoader();
+    private readonly fontLoader: FontLoader = new FontLoader();
 
     private readonly bufferCanvas: HTMLCanvasElement;
     private readonly bufferContext: CanvasRenderingContext2D;
@@ -77,7 +86,7 @@ export default class Game {
     public initialize = () => {
         console.log('Initializing game...');
 
-        // Prepare resources
+        // Load resources
         this.resourceLoader
             .load([
                 playerSprites,
@@ -92,13 +101,25 @@ export default class Game {
                 tilesWater,
                 tilesWaterBorder,
                 tilesYosterIsland8,
+                tilesYosterIsland10,
+                tilesYosterIsland12,
+                tilesYosterIsland14,
                 level
             ])
             .then(() => {
-                // Prepare levels
-                this.levelLoader.load([this.resourceLoader.get(level)]).then(() => {
-                    this.load(this.levelLoader.get(level));
-                });
+                // Load fonts
+                this.fontLoader
+                    .load([
+                        new YosterIsland8(this.resourceLoader.get(tilesYosterIsland8)),
+                        new YosterIsland10(this.resourceLoader.get(tilesYosterIsland10)),
+                        new YosterIsland12(this.resourceLoader.get(tilesYosterIsland12)),
+                        new YosterIsland14(this.resourceLoader.get(tilesYosterIsland14))
+                    ]).then(() => {
+                        // Load levels
+                        this.levelLoader.load([this.resourceLoader.get(level)]).then(() => {
+                            this.load(this.levelLoader.get(level));
+                        });
+                    });
             });
     };
 
@@ -108,7 +129,7 @@ export default class Game {
      */
     private load = (scene: Scene): void => {
         this.scene = scene;
-        this.scene.load(this.resourceLoader, this.bufferCanvas.width, this.bufferCanvas.height);
+        this.scene.load(this.resourceLoader, this.fontLoader, this.bufferCanvas.width, this.bufferCanvas.height);
 
         this.lastTime = 0;
         this.pressedKeyList = {};

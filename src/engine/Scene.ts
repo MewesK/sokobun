@@ -1,13 +1,15 @@
 import ResourceLoader from './resource/ResourceLoader';
+import FontLoader from './font/FontLoader';
 
 export default abstract class Scene {
     /**
      * Loads the scene.
      * @param resourceLoader
+     * @param fontLoader
      * @param width
      * @param height
      */
-    public abstract load(resourceLoader: ResourceLoader, width: number, height: number): void;
+    public abstract load(resourceLoader: ResourceLoader, fontLoader: FontLoader, width: number, height: number): void;
 
     /**
      * Controls the scene.

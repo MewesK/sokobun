@@ -20,9 +20,7 @@ import tilesWater from '../../images/tiles_water.png';
 import tilesWaterBorder from '../../images/tiles_water_border.png';
 import ResourceLoader from '../resource/ResourceLoader';
 import Scene from '../Scene';
-import YosterIsland8 from '../font/YosterIsland8';
-import tilesYosterIsland8 from '../../images/yoster_island_8_white.png';
-import Font from '../font/Font';
+import FontLoader from '../font/FontLoader';
 
 export default class Level extends Scene {
     public readonly src: string;
@@ -33,6 +31,8 @@ export default class Level extends Scene {
 
     public readonly rows: number;
     public readonly columns: number;
+
+    private fontLoader!: FontLoader;
 
     private levelCanvas!: HTMLCanvasElement;
     private levelContext!: CanvasRenderingContext2D;
@@ -49,8 +49,6 @@ export default class Level extends Scene {
     private voidBorderTileMap!: PatternTileMap;
     private waterTileMap!: RandomTileMap;
     private waterBorderTileMap!: PatternTileMap;
-
-    private font8!: Font;
 
     private player!: Player;
     private boxList!: Array<Box>;
@@ -85,10 +83,13 @@ export default class Level extends Scene {
     /**
      * Loads the level.
      * @param resourceLoader
+     * @param fontLoader
      * @param width
      * @param height
      */
-    public load = (resourceLoader: ResourceLoader, width: number, height: number): void => {
+    public load = (resourceLoader: ResourceLoader, fontLoader: FontLoader, width: number, height: number): void => {
+        this.fontLoader = fontLoader;
+
         // Level canvas
         this.levelCanvas = document.createElement('canvas');
         this.levelCanvas.width = width;
@@ -160,9 +161,6 @@ export default class Level extends Scene {
             return destination;
         });
 
-        // Create bitmap fonts
-        this.font8 = new YosterIsland8(resourceLoader.get(tilesYosterIsland8));
-
         // Reset level state
         this.moves = 0;
         this.pushes = 0;
@@ -176,7 +174,7 @@ export default class Level extends Scene {
      * Controls the player based on the user input.
      */
     public control = (pressedKey: string): void => {
-        if (this.player.actionType !== ActionType.Stand) {
+        if (this.player.actionType !== ActionType.Stand || this.won) {
             return;
         }
 
@@ -290,18 +288,23 @@ export default class Level extends Scene {
         });
 
         // Draw status
-        this.font8.draw('Moves:', 10, 256, bufferContext);
-        this.font8.draw(String(this.moves), 60, 256, bufferContext);
-        this.font8.draw('Pushes:', 10, 270, bufferContext);
-        this.font8.draw(String(this.pushes), 60, 270, bufferContext);
-        this.font8.draw('Time:', 10, 284, bufferContext);
-        this.font8.draw(String(Math.floor(this.time)), 60, 284, bufferContext);
+        const font = this.fontLoader.get('Yoster Island', 10);
+        font
+            .draw('Moves', 10, 256, bufferContext)
+            .draw(String(this.moves), 64, 256, bufferContext)
+            .draw('Pushes', 10, 270, bufferContext)
+            .draw(String(this.pushes), 64, 270, bufferContext)
+            .draw('Time', 10, 284, bufferContext)
+            .draw(String(Math.floor(this.time)), 64, 284, bufferContext);
 
         if (this.won) {
-            this.font8.draw(
-                'You win!',
-                bufferContext.canvas.width / 2,
-                bufferContext.canvas.height / 2,
+            const bigFont = this.fontLoader.get('Yoster Island', 14);
+            const text = 'You win!';
+            const textSize = bigFont.calculateSize(text);
+            bigFont.draw(
+                text,
+                (bufferContext.canvas.width - textSize[0]) / 2,
+                (bufferContext.canvas.height - textSize[1]) / 2,
                 bufferContext
             );
         }
