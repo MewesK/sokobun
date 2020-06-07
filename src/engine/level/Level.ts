@@ -5,7 +5,7 @@ import Destination from '../sprite/Destination';
 import playerSprites from '../../images/player_base.png';
 import boxSprites from '../../images/bun.png';
 import destinationSprites from '../../images/pillow.png';
-import {ActionType, DirectionType} from '../sprite/Sprite';
+import { ActionType, DirectionType } from '../sprite/Sprite';
 import Game from '../Game';
 import RandomTileMap from '../tile/RandomTileMap';
 import PatternTileMap from '../tile/PatternTileMap';
@@ -202,7 +202,10 @@ export default class Level extends Scene {
                     boxCoordinates = box.getCoordinates();
                     for (let destinationIndex = 0; destinationIndex < this.destinationList.length; destinationIndex++) {
                         destinationCoordinates = this.destinationList[destinationIndex].getCoordinates();
-                        if (boxCoordinates[0] === destinationCoordinates[0] && boxCoordinates[1] === destinationCoordinates[1]) {
+                        if (
+                            boxCoordinates[0] === destinationCoordinates[0] &&
+                            boxCoordinates[1] === destinationCoordinates[1]
+                        ) {
                             return true;
                         }
                     }
@@ -254,8 +257,7 @@ export default class Level extends Scene {
 
         // Draw status
         const font = this.fontLoader.get('Yoster Island', 10);
-        font
-            .draw('Moves', 10, 256, bufferContext)
+        font.draw('Moves', 10, 256, bufferContext)
             .draw(String(this.moves), 64, 256, bufferContext)
             .draw('Pushes', 10, 270, bufferContext)
             .draw(String(this.pushes), 64, 270, bufferContext)
@@ -269,7 +271,7 @@ export default class Level extends Scene {
             bigFont.draw(
                 text1,
                 (bufferContext.canvas.width - textSize1[0]) / 2,
-                ((bufferContext.canvas.height - textSize1[1]) / 2) - 10,
+                (bufferContext.canvas.height - textSize1[1]) / 2 - 10,
                 bufferContext
             );
 
@@ -278,7 +280,7 @@ export default class Level extends Scene {
             font.draw(
                 text2,
                 (bufferContext.canvas.width - textSize2[0]) / 2,
-                ((bufferContext.canvas.height - textSize2[1]) / 2) + 10,
+                (bufferContext.canvas.height - textSize2[1]) / 2 + 10,
                 bufferContext
             );
         }

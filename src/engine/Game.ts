@@ -1,7 +1,11 @@
 import FontLoader from './font/FontLoader';
+import Level from './level/Level';
 import LevelLoader from './level/LevelLoader';
+import PatternTileMap from './tile/PatternTileMap';
+import RandomTileMap from './tile/RandomTileMap';
 import ResourceLoader from './resource/ResourceLoader';
 import Scene from './Scene';
+import TileMap from './tile/TileMap';
 import TileMapLoader from './tile/TileMapLoader';
 import YosterIsland8 from './font/YosterIsland8';
 import YosterIsland10 from './font/YosterIsland10';
@@ -25,10 +29,6 @@ import tilesYosterIsland12 from '../images/yoster_island_12_white.png';
 import tilesYosterIsland14 from '../images/yoster_island_14_white.png';
 
 import level from '../levels/Original.txt';
-import TileMap from './tile/TileMap';
-import RandomTileMap from './tile/RandomTileMap';
-import PatternTileMap from './tile/PatternTileMap';
-import Level from './level/Level';
 
 export default class Game {
     public static readonly BACKGROUND_COLOR = '#252230';
@@ -174,9 +174,7 @@ export default class Game {
                         new YosterIsland12(this.resourceLoader.get(tilesYosterIsland12)),
                         new YosterIsland14(this.resourceLoader.get(tilesYosterIsland14))
                     ]),
-                    this.levelLoader.load([
-                        this.resourceLoader.get(level)
-                    ])
+                    this.levelLoader.load([this.resourceLoader.get(level)])
                 ]).then(() => {
                     this.load(this.levelLoader.first());
                 });
@@ -219,7 +217,7 @@ export default class Game {
 
         if (this.scene.finished) {
             if (this.scene instanceof Level) {
-                const nextLevel = this.levelLoader.next(this.scene)
+                const nextLevel = this.levelLoader.next(this.scene);
                 if (nextLevel) {
                     this.load(nextLevel);
                 }

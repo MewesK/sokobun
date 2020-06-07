@@ -3,10 +3,10 @@ import Resource from '../resource/Resource';
 export default abstract class Font {
     public readonly resource: Resource;
 
-    public readonly abstract family: string;
-    public readonly abstract height: number;
-    public readonly abstract size: number;
-    public readonly abstract chars: Record<string, any>;
+    public abstract readonly family: string;
+    public abstract readonly height: number;
+    public abstract readonly size: number;
+    public abstract readonly chars: Record<string, any>;
 
     constructor(resource: Resource) {
         this.resource = resource;
@@ -45,7 +45,7 @@ export default abstract class Font {
         });
 
         return this;
-    }
+    };
 
     /**
      * Calculates the size of the given text.
@@ -63,5 +63,5 @@ export default abstract class Font {
         });
 
         return [width, this.height];
-    }
+    };
 }

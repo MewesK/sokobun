@@ -1,6 +1,6 @@
 import Font from './Font';
 
-export default class FontLoader{
+export default class FontLoader {
     private readonly cache: Array<Font> = [];
 
     /**

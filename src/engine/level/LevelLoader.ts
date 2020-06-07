@@ -60,5 +60,4 @@ export default class LevelLoader {
         }
         return undefined;
     };
-
 }
