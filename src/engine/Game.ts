@@ -7,10 +7,6 @@ import ResourceLoader from './resource/ResourceLoader';
 import Scene from './Scene';
 import TileMap from './tile/TileMap';
 import TileMapLoader from './tile/TileMapLoader';
-import YosterIsland8 from './font/YosterIsland8';
-import YosterIsland10 from './font/YosterIsland10';
-import YosterIsland12 from './font/YosterIsland12';
-import YosterIsland14 from './font/YosterIsland14';
 
 import boxSprites from '../images/bun.png';
 import destinationSprites from '../images/pillow.png';
@@ -23,10 +19,22 @@ import tilesVoid from '../images/tiles_void.png';
 import tilesVoidBorder from '../images/tiles_void_border.png';
 import tilesWater from '../images/tiles_water.png';
 import tilesWaterBorder from '../images/tiles_water_border.png';
-import tilesYosterIsland8 from '../images/yoster_island_8_white.png';
-import tilesYosterIsland10 from '../images/yoster_island_10_white.png';
-import tilesYosterIsland12 from '../images/yoster_island_12_white.png';
-import tilesYosterIsland14 from '../images/yoster_island_14_white.png';
+
+import definitionYosterIsland8 from '../fonts/yoster_island_8.json';
+import tilesYosterIsland8Bright from '../fonts/yoster_island_8_bright.png';
+import tilesYosterIsland8Dark from '../fonts/yoster_island_8_dark.png';
+
+import definitionYosterIsland10 from '../fonts/yoster_island_10.json';
+import tilesYosterIsland10Bright from '../fonts/yoster_island_10_bright.png';
+import tilesYosterIsland10Dark from '../fonts/yoster_island_10_dark.png';
+
+import definitionYosterIsland12 from '../fonts/yoster_island_12.json';
+import tilesYosterIsland12Bright from '../fonts/yoster_island_12_bright.png';
+import tilesYosterIsland12Dark from '../fonts/yoster_island_12_dark.png';
+
+import definitionYosterIsland14 from '../fonts/yoster_island_14.json';
+import tilesYosterIsland14Bright from '../fonts/yoster_island_14_bright.png';
+import tilesYosterIsland14Dark from '../fonts/yoster_island_14_dark.png';
 
 import level from '../levels/Original.txt';
 
@@ -106,10 +114,14 @@ export default class Game {
                 tilesVoidBorder,
                 tilesWater,
                 tilesWaterBorder,
-                tilesYosterIsland8,
-                tilesYosterIsland10,
-                tilesYosterIsland12,
-                tilesYosterIsland14,
+                tilesYosterIsland8Bright,
+                tilesYosterIsland10Bright,
+                tilesYosterIsland12Bright,
+                tilesYosterIsland14Bright,
+                tilesYosterIsland8Dark,
+                tilesYosterIsland10Dark,
+                tilesYosterIsland12Dark,
+                tilesYosterIsland14Dark,
                 level
             ])
             .then(() => {
@@ -169,10 +181,14 @@ export default class Game {
                         )
                     ]),
                     this.fontLoader.load([
-                        new YosterIsland8(this.resourceLoader.get(tilesYosterIsland8)),
-                        new YosterIsland10(this.resourceLoader.get(tilesYosterIsland10)),
-                        new YosterIsland12(this.resourceLoader.get(tilesYosterIsland12)),
-                        new YosterIsland14(this.resourceLoader.get(tilesYosterIsland14))
+                        [definitionYosterIsland8, 'bright', this.resourceLoader.get(tilesYosterIsland8Bright)],
+                        [definitionYosterIsland8, 'dark', this.resourceLoader.get(tilesYosterIsland8Dark)],
+                        [definitionYosterIsland10, 'bright', this.resourceLoader.get(tilesYosterIsland10Bright)],
+                        [definitionYosterIsland10, 'dark', this.resourceLoader.get(tilesYosterIsland10Dark)],
+                        [definitionYosterIsland12, 'bright', this.resourceLoader.get(tilesYosterIsland12Bright)],
+                        [definitionYosterIsland12, 'dark', this.resourceLoader.get(tilesYosterIsland12Dark)],
+                        [definitionYosterIsland14, 'bright', this.resourceLoader.get(tilesYosterIsland14Bright)],
+                        [definitionYosterIsland14, 'dark', this.resourceLoader.get(tilesYosterIsland14Dark)],
                     ]),
                     this.levelLoader.load([this.resourceLoader.get(level)])
                 ]).then(() => {

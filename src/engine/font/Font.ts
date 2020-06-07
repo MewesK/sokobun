@@ -1,15 +1,20 @@
 import Resource from '../resource/Resource';
 
-export default abstract class Font {
+export default class Font {
     public readonly resource: Resource;
+    public readonly color: string;
+    public readonly family: string;
+    public readonly size: number;
+    protected readonly height: number;
+    protected readonly chars: Record<string, any>;
 
-    public abstract readonly family: string;
-    public abstract readonly height: number;
-    public abstract readonly size: number;
-    public abstract readonly chars: Record<string, any>;
-
-    constructor(resource: Resource) {
+    constructor(resource: Resource, color: string, family: string, size: number, height: number, chars: Record<string, any>) {
         this.resource = resource;
+        this.color = color;
+        this.family = family;
+        this.size = size;
+        this.height = height;
+        this.chars = chars;
     }
 
     /**

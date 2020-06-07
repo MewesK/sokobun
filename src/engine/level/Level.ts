@@ -256,7 +256,7 @@ export default class Level extends Scene {
         });
 
         // Draw status
-        const font = this.fontLoader.get('Yoster Island', 10);
+        const font = this.fontLoader.get('Yoster Island', 10, 'bright');
         font.draw('Moves', 10, 256, bufferContext)
             .draw(String(this.moves), 64, 256, bufferContext)
             .draw('Pushes', 10, 270, bufferContext)
@@ -265,7 +265,7 @@ export default class Level extends Scene {
             .draw(String(Math.floor(this.time)), 64, 284, bufferContext);
 
         if (this.won) {
-            const bigFont = this.fontLoader.get('Yoster Island', 14);
+            const bigFont = this.fontLoader.get('Yoster Island', 14, 'bright');
             const text1 = 'You win!';
             const textSize1 = bigFont.calculateSize(text1);
             bigFont.draw(
