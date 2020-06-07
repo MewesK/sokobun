@@ -1,19 +1,18 @@
-import { FontColor } from './Font';
-
-import definitionYosterIsland8 from '../../fonts/yoster_island_8.json';
 import tilesYosterIsland8Bright from '../../fonts/yoster_island_8_bright.png';
 import tilesYosterIsland8Dark from '../../fonts/yoster_island_8_dark.png';
-import definitionYosterIsland10 from '../../fonts/yoster_island_10.json';
+import definitionYosterIsland8 from '../../fonts/yoster_island_8.json';
 import tilesYosterIsland10Bright from '../../fonts/yoster_island_10_bright.png';
 import tilesYosterIsland10Dark from '../../fonts/yoster_island_10_dark.png';
-import definitionYosterIsland12 from '../../fonts/yoster_island_12.json';
+import definitionYosterIsland10 from '../../fonts/yoster_island_10.json';
 import tilesYosterIsland12Bright from '../../fonts/yoster_island_12_bright.png';
 import tilesYosterIsland12Dark from '../../fonts/yoster_island_12_dark.png';
-import definitionYosterIsland14 from '../../fonts/yoster_island_14.json';
+import definitionYosterIsland12 from '../../fonts/yoster_island_12.json';
 import tilesYosterIsland14Bright from '../../fonts/yoster_island_14_bright.png';
 import tilesYosterIsland14Dark from '../../fonts/yoster_island_14_dark.png';
+import definitionYosterIsland14 from '../../fonts/yoster_island_14.json';
+import { FontColor, FontDefinition } from './Font';
 
-export const fontList: Array<[any, FontColor, string]> = [
+export const fontList: Array<[FontDefinition, FontColor, string]> = [
     [definitionYosterIsland8, FontColor.Bright, tilesYosterIsland8Bright],
     [definitionYosterIsland8, FontColor.Dark, tilesYosterIsland8Dark],
     [definitionYosterIsland10, FontColor.Bright, tilesYosterIsland10Bright],

@@ -1,6 +1,17 @@
 import Resource from '../resource/Resource';
 import Tile from './Tile';
 
+export interface TileMapDefinition {
+    src: string;
+    rows: number;
+    columns: number;
+    offsetRows: number;
+    offsetColumns: number;
+    tileWidth: number;
+    tileHeight: number;
+    grid: number;
+}
+
 export default class TileMap {
     /**
      * Creates a tile table based on the given resource.

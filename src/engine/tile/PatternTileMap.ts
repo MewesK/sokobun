@@ -1,6 +1,10 @@
-import Tile from './Tile';
-import TileMap from './TileMap';
 import Resource from '../resource/Resource';
+import Tile from './Tile';
+import TileMap, { TileMapDefinition } from './TileMap';
+
+export interface PatternTileMapDefinition extends TileMapDefinition {
+    patternTileDefinitionList: Array<[RegExp, Array<[number, [number, number]]>]>;
+}
 
 export default class PatternTileMap extends TileMap {
     /**

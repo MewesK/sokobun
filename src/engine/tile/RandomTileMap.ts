@@ -1,6 +1,10 @@
-import Tile from './Tile';
-import TileMap from './TileMap';
 import Resource from '../resource/Resource';
+import Tile from './Tile';
+import TileMap, { TileMapDefinition } from './TileMap';
+
+export interface RandomTileMapDefinition extends TileMapDefinition {
+    weightedTileDefinitionList: Array<[number, number]>;
+}
 
 export default class RandomTileMap extends TileMap {
     /**
@@ -35,12 +39,16 @@ export default class RandomTileMap extends TileMap {
         [5, 0.1]
     ];
 
-    private readonly weightedTileList: Array<[number, number]> = [];
+    private readonly weightedTileDefinitionList: Array<[number, number]> = [];
 
-    public constructor(tileTable: Array<Array<Tile>>, resource: Resource, weightedTileList: Array<[number, number]>) {
+    public constructor(
+        tileTable: Array<Array<Tile>>,
+        resource: Resource,
+        weightedTileDefinitionList: Array<[number, number]>
+    ) {
         super(tileTable, resource);
 
-        this.weightedTileList = weightedTileList;
+        this.weightedTileDefinitionList = weightedTileDefinitionList;
     }
 
     /**
@@ -48,21 +56,25 @@ export default class RandomTileMap extends TileMap {
      */
     public getRandomTile = (): Tile => {
         let sum = 0;
-        let tileIndex = this.weightedTileList[0][0];
+        let tileIndex = this.weightedTileDefinitionList[0][0];
 
         // Get random number from 0 to the sum of probabilities
         const random =
             Math.random() *
-            this.weightedTileList.reduce(
+            this.weightedTileDefinitionList.reduce(
                 (previousValue, currentValue) => previousValue + currentValue[1],
-                this.weightedTileList[0][1]
+                this.weightedTileDefinitionList[0][1]
             );
 
         // Get tile index
-        for (let weightedTileIndex = 0; weightedTileIndex < this.weightedTileList.length; weightedTileIndex++) {
-            sum += this.weightedTileList[weightedTileIndex][1];
+        for (
+            let weightedTileIndex = 0;
+            weightedTileIndex < this.weightedTileDefinitionList.length;
+            weightedTileIndex++
+        ) {
+            sum += this.weightedTileDefinitionList[weightedTileIndex][1];
             if (random <= sum) {
-                tileIndex = this.weightedTileList[weightedTileIndex][0];
+                tileIndex = this.weightedTileDefinitionList[weightedTileIndex][0];
                 break;
             }
         }

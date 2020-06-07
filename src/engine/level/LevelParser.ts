@@ -1,7 +1,7 @@
-import Resource from '../resource/Resource';
-import Level from './Level';
-import { TileType } from '../tile/Tile';
 import Game from '../Game';
+import Resource from '../resource/Resource';
+import { TileType } from '../tile/Tile';
+import Level from './Level';
 
 export default class LevelParser {
     private tileTypeMap: Array<Array<TileType>> = [[]];

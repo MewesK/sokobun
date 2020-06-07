@@ -1,7 +1,7 @@
-import Game from './engine/Game';
-
 import './css/corner.css';
 import './css/main.css';
+
+import Game from './engine/Game';
 
 const canvas = <HTMLCanvasElement>document.getElementById('game');
 

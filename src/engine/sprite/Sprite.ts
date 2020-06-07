@@ -1,6 +1,6 @@
+import Game from '../Game';
 import TileMap from '../tile/TileMap';
 import CollisionBox from './CollisionBox';
-import Game from '../Game';
 
 export enum ActionType {
     Walk,

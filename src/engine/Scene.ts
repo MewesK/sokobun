@@ -1,5 +1,5 @@
-import ResourceLoader from './resource/ResourceLoader';
 import FontLoader from './font/FontLoader';
+import ResourceLoader from './resource/ResourceLoader';
 import TileMapLoader from './tile/TileMapLoader';
 
 export default abstract class Scene {

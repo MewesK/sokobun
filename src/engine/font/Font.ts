@@ -1,5 +1,22 @@
 import Resource from '../resource/Resource';
 
+export interface CharacterDefinition {
+    width: number;
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    ox: number;
+    oy: number;
+}
+
+export interface FontDefinition {
+    family: string;
+    size: number;
+    height: number;
+    chars: Record<string, CharacterDefinition>;
+}
+
 export enum FontColor {
     Bright,
     Dark
@@ -11,7 +28,7 @@ export default class Font {
     public readonly family: string;
     public readonly size: number;
     protected readonly height: number;
-    protected readonly chars: Record<string, any>;
+    protected readonly characterDefinitionList: Record<string, CharacterDefinition>;
 
     constructor(
         resource: Resource,
@@ -19,14 +36,14 @@ export default class Font {
         family: string,
         size: number,
         height: number,
-        chars: Record<string, any>
+        characterDefinitionList: Record<string, CharacterDefinition>
     ) {
         this.resource = resource;
         this.color = color;
         this.family = family;
         this.size = size;
         this.height = height;
-        this.chars = chars;
+        this.characterDefinitionList = characterDefinitionList;
     }
 
     /**
@@ -37,27 +54,27 @@ export default class Font {
      * @param context
      */
     public draw = (text: string, x: number, y: number, context: CanvasRenderingContext2D): Font => {
-        let charDefinition: any;
+        let characterDefinition: CharacterDefinition;
         let charX = x;
         const charY = y;
 
         [...text].forEach((char) => {
-            charDefinition = this.chars[char];
-            if (charDefinition !== undefined) {
+            characterDefinition = this.characterDefinitionList[char];
+            if (characterDefinition !== undefined) {
                 context.imageSmoothingEnabled = false;
                 context.drawImage(
-                    this.resource.data,
-                    charDefinition.x,
-                    charDefinition.y,
-                    charDefinition.w,
-                    charDefinition.h,
+                    <CanvasImageSource>this.resource.data,
+                    characterDefinition.x,
+                    characterDefinition.y,
+                    characterDefinition.w,
+                    characterDefinition.h,
                     charX,
-                    charY + (this.size - charDefinition.oy),
-                    charDefinition.w,
-                    charDefinition.h
+                    charY + (this.size - characterDefinition.oy),
+                    characterDefinition.w,
+                    characterDefinition.h
                 );
 
-                charX += charDefinition.width - charDefinition.ox;
+                charX += characterDefinition.width - characterDefinition.ox;
             }
         });
 
@@ -69,13 +86,13 @@ export default class Font {
      * @param text
      */
     public calculateSize = (text: string): [number, number] => {
-        let charDefinition: any;
+        let characterDefinition: CharacterDefinition;
         let width = 0;
 
         [...text].forEach((char) => {
-            charDefinition = this.chars[char];
-            if (charDefinition !== undefined) {
-                width += charDefinition.width - charDefinition.ox;
+            characterDefinition = this.characterDefinitionList[char];
+            if (characterDefinition !== undefined) {
+                width += characterDefinition.width - characterDefinition.ox;
             }
         });
 

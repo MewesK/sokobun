@@ -1,14 +1,14 @@
-import * as path from 'path';
-import * as webpack from 'webpack';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin';
+import path from 'path';
 import TerserPlugin from 'terser-webpack-plugin';
+import webpack from 'webpack';
 
-const config = (_env: string, argv: any): webpack.Configuration => {
-    console.log('MODE: ' + argv.mode);
+const config = (_env: string, args: webpack.CliConfigOptions): webpack.Configuration => {
+    console.log('MODE: ' + args.mode);
     return {
         entry: path.resolve(__dirname, 'src'),
 
@@ -45,7 +45,7 @@ const config = (_env: string, argv: any): webpack.Configuration => {
         },
 
         optimization: {
-            minimize: argv.mode === 'production',
+            minimize: args.mode === 'production',
             minimizer: [
                 new TerserPlugin({
                     extractComments: false
@@ -79,7 +79,7 @@ const config = (_env: string, argv: any): webpack.Configuration => {
             })
         ],
 
-        devtool: argv.mode === 'production' ? false : 'inline-source-map',
+        devtool: args.mode === 'production' ? false : 'inline-source-map',
         devServer: {
             contentBase: path.join(__dirname, 'dist'),
             port: 9000

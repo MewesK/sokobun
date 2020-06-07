@@ -1,14 +1,13 @@
+import { fontList } from './font/FontList';
 import FontLoader from './font/FontLoader';
 import Level from './level/Level';
+import { levelList } from './level/LevelList';
 import LevelLoader from './level/LevelLoader';
+import { resourceList } from './resource/ResourceList';
 import ResourceLoader from './resource/ResourceLoader';
 import Scene from './Scene';
-import TileMapLoader from './tile/TileMapLoader';
-
-import { fontList } from './font/FontList';
-import { levelList } from './level/LevelList';
-import { resourceList } from './resource/ResourceList';
 import { tileMapList } from './tile/TileMapList';
+import TileMapLoader from './tile/TileMapLoader';
 
 export default class Game {
     public static readonly BACKGROUND_COLOR = '#252230';

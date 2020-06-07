@@ -1,7 +1,9 @@
-import TileMap from './TileMap';
-import ResourceLoader from '../resource/ResourceLoader';
 import Resource from '../resource/Resource';
+import ResourceLoader from '../resource/ResourceLoader';
+import PatternTileMap, { PatternTileMapDefinition } from './PatternTileMap';
+import RandomTileMap, { RandomTileMapDefinition } from './RandomTileMap';
 import Tile from './Tile';
+import TileMap, { TileMapDefinition } from './TileMap';
 
 export default class TileMapLoader {
     private readonly resourceLoader: ResourceLoader;
@@ -15,42 +17,41 @@ export default class TileMapLoader {
      * Loads tile maps from a list of data URLs.
      * @param inputList [[tile map constructor, tile map URL, rows, columns, row offset, column offset, tile width, tile height, grid, optional argument]]
      */
-    public load = (
-        inputList: Array<
-            [
-                new (...args: [Array<Array<Tile>>, Resource, any]) => TileMap,
-                string,
-                number,
-                number,
-                number,
-                number,
-                number,
-                number,
-                number,
-                any
-            ]
-        >
-    ): Promise<Array<TileMap>> => {
+    public load = (inputList: Array<TileMapDefinition>): Promise<Array<TileMap>> => {
         return new Promise((resolve) => {
             let resource: Resource;
+            let tileTable: Array<Array<Tile>>;
             inputList.forEach((input) => {
-                resource = this.resourceLoader.get(input[1]);
-                this.cache.push(
-                    new input[0](
-                        TileMap.createTileTable(
-                            resource,
-                            input[2],
-                            input[3],
-                            input[4],
-                            input[5],
-                            input[6],
-                            input[7],
-                            input[8]
-                        ),
-                        resource,
-                        input[9] // Optional
-                    )
+                resource = this.resourceLoader.get(input.src);
+                tileTable = TileMap.createTileTable(
+                    resource,
+                    input.rows,
+                    input.columns,
+                    input.offsetRows,
+                    input.offsetColumns,
+                    input.tileWidth,
+                    input.tileHeight,
+                    input.grid
                 );
+                if ((<PatternTileMapDefinition>input).patternTileDefinitionList) {
+                    this.cache.push(
+                        new PatternTileMap(
+                            tileTable,
+                            resource,
+                            (<PatternTileMapDefinition>input).patternTileDefinitionList
+                        )
+                    );
+                } else if ((<RandomTileMapDefinition>input).weightedTileDefinitionList) {
+                    this.cache.push(
+                        new RandomTileMap(
+                            tileTable,
+                            resource,
+                            (<RandomTileMapDefinition>input).weightedTileDefinitionList
+                        )
+                    );
+                } else {
+                    this.cache.push(new TileMap(tileTable, resource));
+                }
             });
             resolve();
         });

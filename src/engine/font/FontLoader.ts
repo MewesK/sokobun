@@ -1,5 +1,5 @@
-import Font, { FontColor } from './Font';
 import ResourceLoader from '../resource/ResourceLoader';
+import Font, { FontColor, FontDefinition } from './Font';
 
 export default class FontLoader {
     private readonly resourceLoader: ResourceLoader;
@@ -13,7 +13,7 @@ export default class FontLoader {
      * Loads fonts from a list of font URLs.
      * @param inputList [font definition, font color, font URL]
      */
-    public load = (inputList: Array<[any, FontColor, string]>): Promise<Array<Font>> => {
+    public load = (inputList: Array<[FontDefinition, FontColor, string]>): Promise<Array<Font>> => {
         return new Promise((resolve) => {
             inputList.forEach((input) => {
                 this.cache.push(

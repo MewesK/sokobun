@@ -1,6 +1,6 @@
+import ResourceLoader from '../resource/ResourceLoader';
 import Level from './Level';
 import LevelParser from './LevelParser';
-import ResourceLoader from '../resource/ResourceLoader';
 
 export default class LevelLoader {
     private readonly resourceLoader: ResourceLoader;
