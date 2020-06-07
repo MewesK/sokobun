@@ -26,6 +26,9 @@ Bitmap font based on:
 ## Next steps
 
  - implement panels mechanics
- - implement menu (level select, character select, options, credits)
- - implement pause screen
- - implement intro
+ - add menu (level select, character select, options, credits)
+ - add pause screen
+ - add intro
+ - add sounds/music
+ - add retry/mute buttons
+ - add win animation
