@@ -14,7 +14,7 @@ export default class TileMap {
      * @param grid
      */
     public static createTileTable(
-        input: Resource,
+        resource: Resource,
         rows: number,
         columns: number,
         offsetRows: number,
@@ -29,7 +29,7 @@ export default class TileMap {
             tileTable[row] = [];
             for (let column = 0; column < columns; column++) {
                 tileTable[row][column] = new Tile(
-                    input,
+                    resource,
                     (column + offsetColumns) * (tileWidth + grid),
                     (row + offsetRows) * (tileHeight + grid),
                     tileWidth,
@@ -42,12 +42,13 @@ export default class TileMap {
 
     protected readonly tileTable: Array<Array<Tile>>;
 
+    public readonly resource: Resource;
     public readonly rows: number;
     public readonly columns: number;
     public readonly tileWidth: number;
     public readonly tileHeight: number;
 
-    public constructor(tileTable: Array<Array<Tile>>) {
+    public constructor(tileTable: Array<Array<Tile>>, resource: Resource) {
         if (tileTable.length === 0) {
             throw new Error('Invalid tile table (no rows)');
         }
@@ -60,6 +61,7 @@ export default class TileMap {
 
         this.tileTable = tileTable;
 
+        this.resource = resource;
         this.rows = tileTable.length;
         this.columns = tileTable[0].length;
         this.tileWidth = tileTable[0][0].width;

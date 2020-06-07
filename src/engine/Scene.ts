@@ -1,15 +1,23 @@
 import ResourceLoader from './resource/ResourceLoader';
 import FontLoader from './font/FontLoader';
+import TileMapLoader from './tile/TileMapLoader';
 
 export default abstract class Scene {
     /**
      * Loads the scene.
      * @param resourceLoader
+     * @param tileMapLoader
      * @param fontLoader
      * @param width
      * @param height
      */
-    public abstract load(resourceLoader: ResourceLoader, fontLoader: FontLoader, width: number, height: number): void;
+    public abstract load(
+        resourceLoader: ResourceLoader,
+        tileMapLoader: TileMapLoader,
+        fontLoader: FontLoader,
+        width: number,
+        height: number
+    ): void;
 
     /**
      * Controls the scene.

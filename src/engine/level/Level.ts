@@ -2,7 +2,6 @@ import Tile, { TileType } from '../tile/Tile';
 import Player from '../sprite/Player';
 import Box from '../sprite/Box';
 import Destination from '../sprite/Destination';
-import TileMap from '../tile/TileMap';
 import playerSprites from '../../images/player_base.png';
 import boxSprites from '../../images/bun.png';
 import destinationSprites from '../../images/pillow.png';
@@ -21,6 +20,7 @@ import tilesWaterBorder from '../../images/tiles_water_border.png';
 import ResourceLoader from '../resource/ResourceLoader';
 import Scene from '../Scene';
 import FontLoader from '../font/FontLoader';
+import TileMapLoader from '../tile/TileMapLoader';
 
 export default class Level extends Scene {
     public readonly src: string;
@@ -33,22 +33,10 @@ export default class Level extends Scene {
     public readonly columns: number;
 
     private fontLoader!: FontLoader;
+    private tileMapLoader!: TileMapLoader;
 
     private levelCanvas!: HTMLCanvasElement;
     private levelContext!: CanvasRenderingContext2D;
-
-    private playerTileMap!: TileMap;
-    private boxTileMap!: TileMap;
-    private destinationTileMap!: TileMap;
-
-    private floorTileMap!: RandomTileMap;
-    private moonTileMap!: TileMap;
-    private pillarTileMap!: PatternTileMap;
-    private shadowTileMap!: TileMap;
-    private voidTileMap!: RandomTileMap;
-    private voidBorderTileMap!: PatternTileMap;
-    private waterTileMap!: RandomTileMap;
-    private waterBorderTileMap!: PatternTileMap;
 
     private player!: Player;
     private boxList!: Array<Box>;
@@ -83,12 +71,21 @@ export default class Level extends Scene {
     /**
      * Loads the level.
      * @param resourceLoader
+     * @param tileMapLoader
      * @param fontLoader
      * @param width
      * @param height
      */
-    public load = (resourceLoader: ResourceLoader, fontLoader: FontLoader, width: number, height: number): void => {
+    public load = (
+        // @ts-ignore
+        resourceLoader: ResourceLoader,
+        tileMapLoader: TileMapLoader,
+        fontLoader: FontLoader,
+        width: number,
+        height: number
+    ): void => {
         this.fontLoader = fontLoader;
+        this.tileMapLoader = tileMapLoader;
 
         // Level canvas
         this.levelCanvas = document.createElement('canvas');
@@ -102,61 +99,18 @@ export default class Level extends Scene {
         }
         this.levelContext = levelContext;
 
-        // Define sprite tile maps
-        this.playerTileMap = new TileMap(
-            TileMap.createTileTable(resourceLoader.get(playerSprites), 4, 6, 0, 0, 18, 24, 1)
-        );
-        this.boxTileMap = new TileMap(
-            TileMap.createTileTable(resourceLoader.get(boxSprites), 1, 1, 0, 0, 16, 16)
-        );
-        this.destinationTileMap = new TileMap(
-            TileMap.createTileTable(resourceLoader.get(destinationSprites), 1, 1, 0, 0, 16, 16)
-        );
-
-        // Define level tile maps
-        this.floorTileMap = new RandomTileMap(
-            TileMap.createTileTable(resourceLoader.get(tilesFloor), 2, 2, 0, 0, 16, 16),
-            RandomTileMap.FLOOR_WEIGHTED_TILE_LIST
-        );
-        this.moonTileMap = new TileMap(
-            TileMap.createTileTable(resourceLoader.get(tilesMoon), 1, 1, 0, 0, 32, 32)
-        );
-        this.shadowTileMap = new TileMap(
-            TileMap.createTileTable(resourceLoader.get(tilesShadow), 1, 1, 0, 0, 16, 16)
-        );
-        this.pillarTileMap = new PatternTileMap(
-            TileMap.createTileTable(resourceLoader.get(tilesPillar), 3, 4, 0, 0, 16, 16),
-            PatternTileMap.PILLAR_PATTERN_TILE_DEFINITION_LIST
-        );
-        this.voidTileMap = new RandomTileMap(
-            TileMap.createTileTable(resourceLoader.get(tilesVoid), 3, 2, 0, 0, 16, 16),
-            RandomTileMap.VOID_WEIGHTED_TILE_LIST
-        );
-        this.voidBorderTileMap = new PatternTileMap(
-            TileMap.createTileTable(resourceLoader.get(tilesVoidBorder), 4, 4, 0, 0, 8, 8),
-            PatternTileMap.BORDER_PATTERN_TILE_DEFINITION_LIST
-        );
-        this.waterTileMap = new RandomTileMap(
-            TileMap.createTileTable(resourceLoader.get(tilesWater), 2, 2, 0, 0, 16, 16),
-            RandomTileMap.WATER_WEIGHTED_TILE_LIST
-        );
-        this.waterBorderTileMap = new PatternTileMap(
-            TileMap.createTileTable(resourceLoader.get(tilesWaterBorder), 4, 4, 0, 0, 8, 8),
-            PatternTileMap.BORDER_PATTERN_TILE_DEFINITION_LIST
-        );
-
         // Create sprites and set initial position
-        this.player = new Player(this.playerTileMap);
+        this.player = new Player(this.tileMapLoader.get(playerSprites));
         this.player.setCoordinates(this.playerPosition[0], this.playerPosition[1]);
 
         this.boxList = this.boxPositionList.map((boxPosition) => {
-            let box = new Box(this.boxTileMap);
+            let box = new Box(this.tileMapLoader.get(boxSprites));
             box.setCoordinates(boxPosition[0], boxPosition[1]);
             return box;
         });
 
         this.destinationList = this.destinationPositionList.map((destinationPosition) => {
-            let destination = new Destination(this.destinationTileMap);
+            let destination = new Destination(this.tileMapLoader.get(destinationSprites));
             destination.setCoordinates(destinationPosition[0], destinationPosition[1]);
             return destination;
         });
@@ -277,8 +231,9 @@ export default class Level extends Scene {
 
         // Draw shadows
         if (Game.RENDER_SHADOWS) {
+            const shadowTileMap = this.tileMapLoader.get(tilesShadow);
             spriteList.forEach((sprite) => {
-                this.shadowTileMap.get(0, 0).draw(xOffset + sprite.x, yOffset + sprite.y, bufferContext);
+                shadowTileMap.get(0, 0).draw(xOffset + sprite.x, yOffset + sprite.y, bufferContext);
             });
         }
 
@@ -371,18 +326,25 @@ export default class Level extends Scene {
         this.levelContext.fillRect(0, 0, this.levelContext.canvas.width, this.levelContext.canvas.height);
 
         // Draw background
+        const voidTileMap = <RandomTileMap>this.tileMapLoader.get(tilesVoid);
         for (let rowIndex = 0; rowIndex < rowMax; rowIndex++) {
             for (let columnIndex = 0; columnIndex < columnMax; columnIndex++) {
-                const tile = this.voidTileMap.getRandomTile();
+                const tile = voidTileMap.getRandomTile();
                 tile.draw(columnIndex * tile.width, rowIndex * tile.height, this.levelContext);
             }
         }
 
         // Draw moon
-        const moonTile = this.moonTileMap.get(0, 0);
+        const moonTile = this.tileMapLoader.get(tilesMoon).get(0, 0);
         moonTile.draw(Game.MOON_OFFSET, Game.MOON_OFFSET, this.levelContext);
 
         // Draw level
+        const floorTileMap = <RandomTileMap>this.tileMapLoader.get(tilesFloor);
+        const waterTileMap = <RandomTileMap>this.tileMapLoader.get(tilesWater);
+        const pillarTileMap = <PatternTileMap>this.tileMapLoader.get(tilesPillar);
+        const voidBorderTileMap = <PatternTileMap>this.tileMapLoader.get(tilesVoidBorder);
+        const waterBorderTileMap = <PatternTileMap>this.tileMapLoader.get(tilesWaterBorder);
+
         let pattern: string;
         let tileDefinitionList: Array<[Tile, [number, number]]>;
         let borderTileDefinitionList: Array<[Tile, [number, number]]>;
@@ -393,14 +355,14 @@ export default class Level extends Scene {
                 switch (this.tileTypeMap[rowIndex][columnIndex]) {
                     case TileType.Floor:
                         // Add random floor tile
-                        tileDefinitionList.push([this.floorTileMap.getRandomTile(), [0, 0]]);
+                        tileDefinitionList.push([floorTileMap.getRandomTile(), [0, 0]]);
 
                         // Add pillar
                         if (Game.RENDER_PILLARS) {
                             // Get pillar tiles
                             pattern = this.getPatternAt(columnIndex, rowIndex, TileType.Floor);
                             borderTileDefinitionList = pattern.match(/......0./)
-                                ? this.pillarTileMap.getTileListByPattern(pattern)
+                                ? pillarTileMap.getTileListByPattern(pattern)
                                 : [];
 
                             // Add pillar tiles
@@ -412,7 +374,7 @@ export default class Level extends Scene {
                         // Get border tiles
                         pattern = this.getPatternAt(columnIndex, rowIndex, TileType.Floor);
                         borderTileDefinitionList =
-                            pattern !== '00000000' ? this.voidBorderTileMap.getTileListByPattern(pattern) : [];
+                            pattern !== '00000000' ? voidBorderTileMap.getTileListByPattern(pattern) : [];
 
                         // Add border tiles
                         tileDefinitionList.push(...borderTileDefinitionList);
@@ -421,15 +383,15 @@ export default class Level extends Scene {
                         // Get border tiles
                         pattern = this.getPatternAt(columnIndex, rowIndex, TileType.Floor);
                         borderTileDefinitionList =
-                            pattern !== '00000000' ? this.waterBorderTileMap.getTileListByPattern(pattern) : [];
+                            pattern !== '00000000' ? waterBorderTileMap.getTileListByPattern(pattern) : [];
 
                         // Add tiles
                         tileDefinitionList.push(
                             // Add random water tile if no border tiles exists or default tile otherwise
                             [
                                 borderTileDefinitionList.length === 0
-                                    ? this.waterTileMap.getRandomTile()
-                                    : this.waterTileMap.get(0, 0),
+                                    ? waterTileMap.getRandomTile()
+                                    : waterTileMap.get(0, 0),
                                 [0, 0]
                             ],
                             // Add border tiles

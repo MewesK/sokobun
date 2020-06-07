@@ -5,11 +5,11 @@ export default class ResourceLoader {
 
     /**
      * Loads resources from a list of data URLs.
-     * @param srcList
+     * @param inputList
      */
-    public load = (srcList: Array<string>): Promise<Array<Resource>> => {
+    public load = (inputList: Array<string>): Promise<Array<Resource>> => {
         return new Promise((resolve) => {
-            let counter = srcList.length;
+            let counter = inputList.length;
 
             const decreaseCounter = () => {
                 if (--counter === 0) {
@@ -19,7 +19,7 @@ export default class ResourceLoader {
             };
 
             // Create and load resources
-            srcList.forEach((src) => {
+            inputList.forEach((src) => {
                 // Image data handling
                 if (src.match(/^.*\.png$/)) {
                     const image = new Image();

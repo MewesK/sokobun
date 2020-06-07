@@ -1,7 +1,8 @@
+import FontLoader from './font/FontLoader';
 import LevelLoader from './level/LevelLoader';
 import ResourceLoader from './resource/ResourceLoader';
-import FontLoader from './font/FontLoader';
 import Scene from './Scene';
+import TileMapLoader from './tile/TileMapLoader';
 import YosterIsland8 from './font/YosterIsland8';
 import YosterIsland10 from './font/YosterIsland10';
 import YosterIsland12 from './font/YosterIsland12';
@@ -24,6 +25,9 @@ import tilesYosterIsland12 from '../images/yoster_island_12_white.png';
 import tilesYosterIsland14 from '../images/yoster_island_14_white.png';
 
 import level from '../levels/3.txt';
+import TileMap from './tile/TileMap';
+import RandomTileMap from './tile/RandomTileMap';
+import PatternTileMap from './tile/PatternTileMap';
 
 export default class Game {
     public static readonly BACKGROUND_COLOR = '#252230';
@@ -36,8 +40,9 @@ export default class Game {
     public static readonly TILE_HEIGHT = 16;
 
     private readonly resourceLoader: ResourceLoader = new ResourceLoader();
-    private readonly levelLoader: LevelLoader = new LevelLoader();
+    private readonly tileMapLoader: TileMapLoader = new TileMapLoader();
     private readonly fontLoader: FontLoader = new FontLoader();
+    private readonly levelLoader: LevelLoader = new LevelLoader();
 
     private readonly bufferCanvas: HTMLCanvasElement;
     private readonly bufferContext: CanvasRenderingContext2D;
@@ -107,19 +112,73 @@ export default class Game {
                 level
             ])
             .then(() => {
-                // Load fonts
-                this.fontLoader
-                    .load([
+                Promise.all([
+                    this.tileMapLoader.load([
+                        // Sprite tiles
+                        new TileMap(
+                            TileMap.createTileTable(this.resourceLoader.get(playerSprites), 4, 6, 0, 0, 18, 24, 1),
+                            this.resourceLoader.get(playerSprites)
+                        ),
+                        new TileMap(
+                            TileMap.createTileTable(this.resourceLoader.get(boxSprites), 1, 1, 0, 0, 16, 16),
+                            this.resourceLoader.get(boxSprites)
+                        ),
+                        new TileMap(
+                            TileMap.createTileTable(this.resourceLoader.get(destinationSprites), 1, 1, 0, 0, 16, 16),
+                            this.resourceLoader.get(destinationSprites)
+                        ),
+                        // Level tiles
+                        new RandomTileMap(
+                            TileMap.createTileTable(this.resourceLoader.get(tilesFloor), 2, 2, 0, 0, 16, 16),
+                            this.resourceLoader.get(tilesFloor),
+                            RandomTileMap.FLOOR_WEIGHTED_TILE_LIST
+                        ),
+                        new TileMap(
+                            TileMap.createTileTable(this.resourceLoader.get(tilesMoon), 1, 1, 0, 0, 32, 32),
+                            this.resourceLoader.get(tilesMoon)
+                        ),
+                        new TileMap(
+                            TileMap.createTileTable(this.resourceLoader.get(tilesShadow), 1, 1, 0, 0, 16, 16),
+                            this.resourceLoader.get(tilesShadow)
+                        ),
+                        new PatternTileMap(
+                            TileMap.createTileTable(this.resourceLoader.get(tilesPillar), 3, 4, 0, 0, 16, 16),
+                            this.resourceLoader.get(tilesPillar),
+                            PatternTileMap.PILLAR_PATTERN_TILE_DEFINITION_LIST
+                        ),
+                        new RandomTileMap(
+                            TileMap.createTileTable(this.resourceLoader.get(tilesVoid), 3, 2, 0, 0, 16, 16),
+                            this.resourceLoader.get(tilesVoid),
+                            RandomTileMap.VOID_WEIGHTED_TILE_LIST
+                        ),
+                        new PatternTileMap(
+                            TileMap.createTileTable(this.resourceLoader.get(tilesVoidBorder), 4, 4, 0, 0, 8, 8),
+                            this.resourceLoader.get(tilesVoidBorder),
+                            PatternTileMap.BORDER_PATTERN_TILE_DEFINITION_LIST
+                        ),
+                        new RandomTileMap(
+                            TileMap.createTileTable(this.resourceLoader.get(tilesWater), 2, 2, 0, 0, 16, 16),
+                            this.resourceLoader.get(tilesWater),
+                            RandomTileMap.WATER_WEIGHTED_TILE_LIST
+                        ),
+                        new PatternTileMap(
+                            TileMap.createTileTable(this.resourceLoader.get(tilesWaterBorder), 4, 4, 0, 0, 8, 8),
+                            this.resourceLoader.get(tilesWaterBorder),
+                            PatternTileMap.BORDER_PATTERN_TILE_DEFINITION_LIST
+                        )
+                    ]),
+                    this.fontLoader.load([
                         new YosterIsland8(this.resourceLoader.get(tilesYosterIsland8)),
                         new YosterIsland10(this.resourceLoader.get(tilesYosterIsland10)),
                         new YosterIsland12(this.resourceLoader.get(tilesYosterIsland12)),
                         new YosterIsland14(this.resourceLoader.get(tilesYosterIsland14))
-                    ]).then(() => {
-                        // Load levels
-                        this.levelLoader.load([this.resourceLoader.get(level)]).then(() => {
-                            this.load(this.levelLoader.get(level));
-                        });
-                    });
+                    ]),
+                    this.levelLoader.load([
+                        this.resourceLoader.get(level)
+                    ])
+                ]).then(() => {
+                    this.load(this.levelLoader.get(level));
+                });
             });
     };
 
@@ -129,7 +188,13 @@ export default class Game {
      */
     private load = (scene: Scene): void => {
         this.scene = scene;
-        this.scene.load(this.resourceLoader, this.fontLoader, this.bufferCanvas.width, this.bufferCanvas.height);
+        this.scene.load(
+            this.resourceLoader,
+            this.tileMapLoader,
+            this.fontLoader,
+            this.bufferCanvas.width,
+            this.bufferCanvas.height
+        );
 
         this.lastTime = 0;
         this.pressedKeyList = {};

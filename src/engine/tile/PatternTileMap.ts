@@ -1,5 +1,6 @@
 import Tile from './Tile';
 import TileMap from './TileMap';
+import Resource from '../resource/Resource';
 
 export default class PatternTileMap extends TileMap {
     /**
@@ -66,9 +67,10 @@ export default class PatternTileMap extends TileMap {
 
     public constructor(
         tileTable: Array<Array<Tile>>,
+        resource: Resource,
         patternTileDefinitionList: Array<[RegExp, Array<[number, [number, number]]>]>
     ) {
-        super(tileTable);
+        super(tileTable, resource);
         this.patternTileDefinitionList = patternTileDefinitionList;
     }
 

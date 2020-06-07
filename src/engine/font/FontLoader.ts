@@ -5,11 +5,11 @@ export default class FontLoader{
 
     /**
      * Loads fonts from a list of data URLs.
-     * @param fontList
+     * @param inputList
      */
-    public load = (fontList: Array<Font>): Promise<Array<Font>> => {
+    public load = (inputList: Array<Font>): Promise<Array<Font>> => {
         return new Promise((resolve) => {
-            this.cache.push(...fontList);
+            this.cache.push(...inputList);
             resolve();
         });
     };

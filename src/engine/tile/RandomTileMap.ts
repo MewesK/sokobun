@@ -1,5 +1,6 @@
 import Tile from './Tile';
 import TileMap from './TileMap';
+import Resource from '../resource/Resource';
 
 export default class RandomTileMap extends TileMap {
     /**
@@ -36,8 +37,8 @@ export default class RandomTileMap extends TileMap {
 
     private readonly weightedTileList: Array<[number, number]> = [];
 
-    public constructor(tileTable: Array<Array<Tile>>, weightedTileList: Array<[number, number]>) {
-        super(tileTable);
+    public constructor(tileTable: Array<Array<Tile>>, resource: Resource, weightedTileList: Array<[number, number]>) {
+        super(tileTable, resource);
 
         this.weightedTileList = weightedTileList;
     }

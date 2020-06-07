@@ -7,11 +7,11 @@ export default class LevelLoader {
 
     /**
      * Loads levels from a list of resources.
-     * @param resourceList
+     * @param inputList
      */
-    public load = (resourceList: Array<Resource>): Promise<Array<Level>> => {
+    public load = (inputList: Array<Resource>): Promise<Array<Level>> => {
         return new Promise((resolve) => {
-            let counter = resourceList.length;
+            let counter = inputList.length;
 
             const decreaseCounter = () => {
                 if (--counter === 0) {
@@ -20,7 +20,7 @@ export default class LevelLoader {
                 }
             };
 
-            resourceList.forEach((resource) => {
+            inputList.forEach((resource) => {
                 console.debug(`Loading level ${resource.src}...`);
 
                 new LevelParser().parse(resource).then((level) => {
