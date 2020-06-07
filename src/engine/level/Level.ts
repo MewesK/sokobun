@@ -2,13 +2,19 @@ import Tile, {TileType} from '../tile/Tile';
 import Player from '../sprite/Player';
 import Box from '../sprite/Box';
 import Destination from '../sprite/Destination';
-import playerSprites from '../../images/player_base.png';
-import boxSprites from '../../images/bun.png';
-import destinationSprites from '../../images/pillow.png';
 import {ActionType, DirectionType} from '../sprite/Sprite';
 import Game from '../Game';
 import RandomTileMap from '../tile/RandomTileMap';
 import PatternTileMap from '../tile/PatternTileMap';
+import ResourceLoader from '../resource/ResourceLoader';
+import Scene from '../Scene';
+import FontLoader from '../font/FontLoader';
+import TileMapLoader from '../tile/TileMapLoader';
+import {FontColor} from '../font/Font';
+
+import playerSprites from '../../images/player_base.png';
+import boxSprites from '../../images/bun.png';
+import destinationSprites from '../../images/pillow.png';
 import tilesFloor from '../../images/tiles_floor.png';
 import tilesMoon from '../../images/moon.png';
 import tilesShadow from '../../images/shadow.png';
@@ -17,11 +23,6 @@ import tilesVoid from '../../images/tiles_void.png';
 import tilesVoidBorder from '../../images/tiles_void_border.png';
 import tilesWater from '../../images/tiles_water.png';
 import tilesWaterBorder from '../../images/tiles_water_border.png';
-import ResourceLoader from '../resource/ResourceLoader';
-import Scene from '../Scene';
-import FontLoader from '../font/FontLoader';
-import TileMapLoader from '../tile/TileMapLoader';
-import {FontColor} from '../font/Font';
 
 export default class Level extends Scene {
     public readonly name: string;
