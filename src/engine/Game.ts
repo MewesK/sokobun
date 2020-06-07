@@ -32,10 +32,10 @@ export default class Game {
 
     private scene!: Scene;
 
-    private lastTime: number = 0;
+    private lastTime = 0;
     private pressedKeyList: Record<string, boolean> = {};
 
-    public constructor(canvas: HTMLCanvasElement, width: number = 400, height: number = 304, zoom: number = 1) {
+    public constructor(canvas: HTMLCanvasElement, width = 400, height = 304, zoom = 1) {
         // Buffer canvas
         this.bufferCanvas = document.createElement('canvas');
         this.bufferCanvas.width = width;
@@ -69,7 +69,7 @@ export default class Game {
         });
     }
 
-    public initialize = () => {
+    public initialize = (): void => {
         console.log('Initializing game...');
 
         // Load resources
@@ -111,8 +111,8 @@ export default class Game {
      * The game loop.
      */
     private loop = (): void => {
-        let now = Date.now();
-        let dt = (now - this.lastTime) / 1000.0;
+        const now = Date.now();
+        const dt = (now - this.lastTime) / 1000.0;
 
         this.control();
         this.scene.update(dt);

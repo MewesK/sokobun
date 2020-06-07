@@ -1,6 +1,7 @@
 import TileMap from './TileMap';
 import ResourceLoader from '../resource/ResourceLoader';
 import Resource from '../resource/Resource';
+import Tile from './Tile';
 
 export default class TileMapLoader {
     private readonly resourceLoader: ResourceLoader;
@@ -12,11 +13,22 @@ export default class TileMapLoader {
 
     /**
      * Loads tile maps from a list of data URLs.
-     * @param inputList
+     * @param inputList [[tile map constructor, tile map URL, rows, columns, row offset, column offset, tile width, tile height, grid, optional argument]]
      */
     public load = (
         inputList: Array<
-            [new (...args: any[]) => TileMap, string, number, number, number, number, number, number, number, any]
+            [
+                new (...args: [Array<Array<Tile>>, Resource, any]) => TileMap,
+                string,
+                number,
+                number,
+                number,
+                number,
+                number,
+                number,
+                number,
+                any
+            ]
         >
     ): Promise<Array<TileMap>> => {
         return new Promise((resolve) => {
@@ -49,7 +61,7 @@ export default class TileMapLoader {
      * @param src
      */
     public get = (src: string): TileMap => {
-        let result = this.cache.find((tileMap) => tileMap.resource.src === src);
+        const result = this.cache.find((tileMap) => tileMap.resource.src === src);
         if (result === undefined) {
             throw new Error('Invalid src.');
         }

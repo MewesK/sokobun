@@ -49,14 +49,14 @@ export default class Sprite {
     public actionType: ActionType;
     public directionType: DirectionType;
 
-    public x: number = 0;
-    public y: number = 0;
-    public endX: number = 0;
-    public endY: number = 0;
+    public x = 0;
+    public y = 0;
+    public endX = 0;
+    public endY = 0;
 
-    protected actionTimer: number = 0;
-    protected animationIndex: number = 0;
-    protected animationTimer: number = 0;
+    protected actionTimer = 0;
+    protected animationIndex = 0;
+    protected animationTimer = 0;
 
     public constructor(
         tileMap: TileMap,

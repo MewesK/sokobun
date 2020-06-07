@@ -1,8 +1,8 @@
-import Tile, {TileType} from '../tile/Tile';
+import Tile, { TileType } from '../tile/Tile';
 import Player from '../sprite/Player';
 import Box from '../sprite/Box';
 import Destination from '../sprite/Destination';
-import {ActionType, DirectionType} from '../sprite/Sprite';
+import { ActionType, DirectionType } from '../sprite/Sprite';
 import Game from '../Game';
 import RandomTileMap from '../tile/RandomTileMap';
 import PatternTileMap from '../tile/PatternTileMap';
@@ -10,7 +10,7 @@ import ResourceLoader from '../resource/ResourceLoader';
 import Scene from '../Scene';
 import FontLoader from '../font/FontLoader';
 import TileMapLoader from '../tile/TileMapLoader';
-import {FontColor} from '../font/Font';
+import { FontColor } from '../font/Font';
 
 import playerSprites from '../../images/player_base.png';
 import boxSprites from '../../images/bun.png';
@@ -44,13 +44,13 @@ export default class Level extends Scene {
     private boxList!: Array<Box>;
     private destinationList!: Array<Destination>;
 
-    private moves: number = 0;
-    private pushes: number = 0;
-    private time: number = 0;
-    private paused: boolean = false;
-    private won: boolean = false;
+    private moves = 0;
+    private pushes = 0;
+    private time = 0;
+    private paused = false;
+    private won = false;
 
-    private levelBuffered: boolean = false;
+    private levelBuffered = false;
 
     constructor(
         name: string,
@@ -73,15 +73,14 @@ export default class Level extends Scene {
 
     /**
      * Loads the level.
-     * @param resourceLoader
+     * @param _resourceLoader
      * @param tileMapLoader
      * @param fontLoader
      * @param width
      * @param height
      */
     public load = (
-        // @ts-ignore
-        resourceLoader: ResourceLoader,
+        _resourceLoader: ResourceLoader,
         tileMapLoader: TileMapLoader,
         fontLoader: FontLoader,
         width: number,
@@ -107,13 +106,13 @@ export default class Level extends Scene {
         this.player.setCoordinates(this.playerPosition[0], this.playerPosition[1]);
 
         this.boxList = this.boxPositionList.map((boxPosition) => {
-            let box = new Box(this.tileMapLoader.get(boxSprites));
+            const box = new Box(this.tileMapLoader.get(boxSprites));
             box.setCoordinates(boxPosition[0], boxPosition[1]);
             return box;
         });
 
         this.destinationList = this.destinationPositionList.map((destinationPosition) => {
-            let destination = new Destination(this.tileMapLoader.get(destinationSprites));
+            const destination = new Destination(this.tileMapLoader.get(destinationSprites));
             destination.setCoordinates(destinationPosition[0], destinationPosition[1]);
             return destination;
         });

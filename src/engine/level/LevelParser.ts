@@ -131,7 +131,7 @@ export default class LevelParser {
 
         // Fill all rows to match max row length
         this.tileTypeMap = this.tileTypeMap.map((row) => {
-            let missingColumns = maxRowLength - row.length;
+            const missingColumns = maxRowLength - row.length;
             if (missingColumns > 0) {
                 for (let i = 0; i < missingColumns; i++) {
                     row.push(TileType.Undefined);
@@ -282,7 +282,7 @@ export default class LevelParser {
      * Creates a row with the correct length filled with void.
      */
     private createEmptyRow = (): Array<TileType> => {
-        let row: Array<TileType> = [];
+        const row: Array<TileType> = [];
         for (let columnIndex = 0; columnIndex < this.tileTypeMap[0].length; columnIndex++) {
             row.push(TileType.Void);
         }
@@ -296,14 +296,18 @@ export default class LevelParser {
      * @param fillTile
      */
     private floodFill = (startX: number, startY: number, fillTile: TileType): void => {
-        let startTileType = this.tileTypeMap[startY][startX];
-        let levelWidth = this.tileTypeMap[0].length;
-        let levelHeight = this.tileTypeMap.length;
+        const startTileType = this.tileTypeMap[startY][startX];
+        const levelWidth = this.tileTypeMap[0].length;
+        const levelHeight = this.tileTypeMap.length;
 
-        let positionStack: Array<Array<number>> = [[startX, startY]];
+        const positionStack: Array<Array<number>> = [[startX, startY]];
         while (positionStack.length) {
-            let position = positionStack.pop()!;
-            let columnIndex = position[0];
+            const position = positionStack.pop();
+            if (!position) {
+                continue;
+            }
+
+            const columnIndex = position[0];
             let rowIndex = position[1];
 
             // Travel up

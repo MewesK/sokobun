@@ -19,10 +19,10 @@ export default class TileMap {
         columns: number,
         offsetRows: number,
         offsetColumns: number,
-        tileWidth: number = 16,
-        tileHeight: number = 16,
-        grid: number = 0
-    ) {
+        tileWidth = 16,
+        tileHeight = 16,
+        grid = 0
+    ): Array<Array<Tile>> {
         // Create individual tiles
         const tileTable: Array<Array<Tile>> = [];
         for (let row = 0; row < rows; row++) {

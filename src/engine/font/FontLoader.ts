@@ -38,7 +38,7 @@ export default class FontLoader {
      * @param color
      */
     public get = (family: string, size: number, color: FontColor): Font => {
-        let result = this.cache.find((font) => font.family === family && font.size === size && font.color === color);
+        const result = this.cache.find((font) => font.family === family && font.size === size && font.color === color);
         if (result === undefined) {
             throw new Error('Invalid family or size.');
         }

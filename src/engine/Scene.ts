@@ -3,7 +3,7 @@ import FontLoader from './font/FontLoader';
 import TileMapLoader from './tile/TileMapLoader';
 
 export default abstract class Scene {
-    public finished: boolean = false;
+    public finished = false;
 
     /**
      * Loads the scene.

@@ -39,7 +39,7 @@ export default class Font {
     public draw = (text: string, x: number, y: number, context: CanvasRenderingContext2D): Font => {
         let charDefinition: any;
         let charX = x;
-        let charY = y;
+        const charY = y;
 
         [...text].forEach((char) => {
             charDefinition = this.chars[char];

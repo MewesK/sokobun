@@ -51,7 +51,7 @@ export default class RandomTileMap extends TileMap {
         let tileIndex = this.weightedTileList[0][0];
 
         // Get random number from 0 to the sum of probabilities
-        let random =
+        const random =
             Math.random() *
             this.weightedTileList.reduce(
                 (previousValue, currentValue) => previousValue + currentValue[1],

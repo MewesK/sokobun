@@ -48,7 +48,7 @@ export default class LevelLoader {
      * @param name
      */
     public get = (name: string): Level => {
-        let result = this.cache.find((level) => level.name === name);
+        const result = this.cache.find((level) => level.name === name);
         if (result === undefined) {
             throw new Error();
         }
