@@ -1,3 +1,6 @@
+import TileOffset from '../core/TileOffset';
+import TilePosition from '../core/TilePosition';
+import TileSize from '../core/TileSize';
 import Game from '../Game';
 import Resource from '../resource/Resource';
 import { TileType } from '../tile/Tile';
@@ -5,9 +8,9 @@ import Level from './Level';
 
 export default class LevelParser {
     private tileTypeMap: Array<Array<TileType>> = [[]];
-    private playerPosition: [number, number] | undefined;
-    private boxPositionList: Array<[number, number]> = [];
-    private destinationPositionList: Array<[number, number]> = [];
+    private playerPosition: TilePosition | undefined;
+    private boxPositionList: Array<TilePosition> = [];
+    private destinationPositionList: Array<TilePosition> = [];
 
     /**
      * Parses the level file and returns a level instance.
@@ -53,49 +56,49 @@ export default class LevelParser {
      * @param source
      */
     private doParse = (source: string): void => {
-        let columnIndex = 0;
-        let rowIndex = 0;
+        let x = 0;
+        let y = 0;
 
         [...source].forEach((character) => {
             switch (character) {
                 case '\n':
-                    columnIndex = 0;
-                    this.tileTypeMap[++rowIndex] = [];
+                    x = 0;
+                    this.tileTypeMap[++y] = [];
                     break;
                 case '#':
-                    this.tileTypeMap[rowIndex][columnIndex++] = TileType.Wall;
+                    this.tileTypeMap[y][x++] = TileType.Wall;
                     break;
                 case ' ':
-                    this.tileTypeMap[rowIndex][columnIndex++] = TileType.Undefined;
+                    this.tileTypeMap[y][x++] = TileType.Undefined;
                     break;
                 case '@':
                     if (this.playerPosition !== undefined) {
                         throw new Error('Invalid level (multiple player)');
                     }
 
-                    console.debug(`Player found at [${columnIndex}, ${rowIndex}]`);
+                    console.debug(`Player found at [${x}, ${y}]`);
 
-                    this.playerPosition = [columnIndex, rowIndex];
-                    this.tileTypeMap[rowIndex][columnIndex++] = TileType.Undefined;
+                    this.playerPosition = new TilePosition(x, y);
+                    this.tileTypeMap[y][x++] = TileType.Undefined;
                     break;
                 case '$':
-                    console.debug(`Box found at [${columnIndex}, ${rowIndex}]`);
+                    console.debug(`Box found at [${x}, ${y}]`);
 
-                    this.boxPositionList.push([columnIndex, rowIndex]);
-                    this.tileTypeMap[rowIndex][columnIndex++] = TileType.Undefined;
+                    this.boxPositionList.push(new TilePosition(x, y));
+                    this.tileTypeMap[y][x++] = TileType.Undefined;
                     break;
                 case '.':
-                    console.debug(`Destination found at [${columnIndex}, ${rowIndex}]`);
+                    console.debug(`Destination found at [${x}, ${y}]`);
 
-                    this.destinationPositionList.push([columnIndex, rowIndex]);
-                    this.tileTypeMap[rowIndex][columnIndex++] = TileType.Undefined;
+                    this.destinationPositionList.push(new TilePosition(x, y));
+                    this.tileTypeMap[y][x++] = TileType.Undefined;
                     break;
                 case '*':
-                    console.debug(`Box on destination found at [${columnIndex}, ${rowIndex}]`);
+                    console.debug(`Box on destination found at [${x}, ${y}]`);
 
-                    this.boxPositionList.push([columnIndex, rowIndex]);
-                    this.destinationPositionList.push([columnIndex, rowIndex]);
-                    this.tileTypeMap[rowIndex][columnIndex++] = TileType.Undefined;
+                    this.boxPositionList.push(new TilePosition(x, y));
+                    this.destinationPositionList.push(new TilePosition(x, y));
+                    this.tileTypeMap[y][x++] = TileType.Undefined;
                     break;
             }
         });
@@ -145,16 +148,16 @@ export default class LevelParser {
      * Flood fills the floor based on the position of the player.
      */
     private floodFillFloor = (): void => {
-        this.floodFill(this.getPlayerPosition()[0], this.getPlayerPosition()[1], TileType.Floor);
+        this.floodFill(this.getPlayerPosition(), TileType.Floor);
 
         // Error checks
         this.boxPositionList.forEach((boxPosition) => {
-            if (this.tileTypeMap[boxPosition[1]][boxPosition[0]] !== TileType.Floor) {
+            if (this.tileTypeMap[boxPosition.y][boxPosition.x] !== TileType.Floor) {
                 throw new Error('Invalid level (box position not on floor)');
             }
         });
         this.destinationPositionList.forEach((destinationPosition) => {
-            if (this.tileTypeMap[destinationPosition[1]][destinationPosition[0]] !== TileType.Floor) {
+            if (this.tileTypeMap[destinationPosition.y][destinationPosition.x] !== TileType.Floor) {
                 throw new Error('Invalid level (destination position not on floor)');
             }
         });
@@ -191,7 +194,7 @@ export default class LevelParser {
                 break;
             }
         }
-        this.updatePositions(0, -leadingEmptyRowCount);
+        this.updatePositions(new TileOffset(0, -leadingEmptyRowCount));
 
         // Filter empty rows
         this.tileTypeMap = this.tileTypeMap.filter((_row, index) => emptyRowList[index]);
@@ -215,7 +218,7 @@ export default class LevelParser {
                 break;
             }
         }
-        this.updatePositions(-leadingEmptyColumnsCount, 0);
+        this.updatePositions(new TileOffset(-leadingEmptyColumnsCount, 0));
 
         // Filter empty columns
         this.tileTypeMap = this.tileTypeMap.map((row) => row.filter((_tileType, index) => emptyColumnList[index]));
@@ -236,7 +239,7 @@ export default class LevelParser {
         ]);
 
         // Update positions
-        this.updatePositions(1, 1);
+        this.updatePositions(new TileOffset(1, 1));
     };
 
     /**
@@ -244,7 +247,7 @@ export default class LevelParser {
      */
     private floodFillVoid = (): void => {
         // Flood fill void now that everything is connected
-        this.floodFill(0, 0, TileType.Void);
+        this.floodFill(new TilePosition(0, 0), TileType.Void);
     };
 
     /**
@@ -252,13 +255,13 @@ export default class LevelParser {
      */
     private floodFillPonds = (): void => {
         // Find pond
-        for (let rowIndex = 0; rowIndex < this.tileTypeMap.length; rowIndex++) {
-            for (let columnIndex = 0; columnIndex < this.tileTypeMap[0].length; columnIndex++) {
-                if (this.tileTypeMap[rowIndex][columnIndex] === TileType.Undefined) {
-                    console.debug(`Pond found at [${columnIndex}, ${rowIndex}]`);
+        for (let y = 0; y < this.tileTypeMap.length; y++) {
+            for (let x = 0; x < this.tileTypeMap[0].length; x++) {
+                if (this.tileTypeMap[y][x] === TileType.Undefined) {
+                    console.debug(`Pond found at [${x}, ${y}]`);
 
                     // Fill pond
-                    this.floodFill(columnIndex, rowIndex, TileType.Water);
+                    this.floodFill(new TilePosition(x, y), TileType.Water);
                 }
             }
         }
@@ -269,10 +272,10 @@ export default class LevelParser {
      */
     private fillVoid = (): void => {
         // Find pond
-        for (let rowIndex = 0; rowIndex < this.tileTypeMap.length; rowIndex++) {
-            for (let columnIndex = 0; columnIndex < this.tileTypeMap[0].length; columnIndex++) {
-                if (this.tileTypeMap[rowIndex][columnIndex] === TileType.Undefined) {
-                    this.tileTypeMap[rowIndex][columnIndex] = TileType.Void;
+        for (let y = 0; y < this.tileTypeMap.length; y++) {
+            for (let x = 0; x < this.tileTypeMap[0].length; x++) {
+                if (this.tileTypeMap[y][x] === TileType.Undefined) {
+                    this.tileTypeMap[y][x] = TileType.Void;
                 }
             }
         }
@@ -283,7 +286,7 @@ export default class LevelParser {
      */
     private createEmptyRow = (): Array<TileType> => {
         const row: Array<TileType> = [];
-        for (let columnIndex = 0; columnIndex < this.tileTypeMap[0].length; columnIndex++) {
+        for (let x = 0; x < this.tileTypeMap[0].length; x++) {
             row.push(TileType.Void);
         }
         return row;
@@ -291,42 +294,42 @@ export default class LevelParser {
 
     /**
      * Flood fill algorithm based on http://www.williammalone.com/articles/html5-canvas-javascript-paint-bucket-tool/
-     * @param startX
-     * @param startY
+     * @param startPosition
      * @param fillTile
      */
-    private floodFill = (startX: number, startY: number, fillTile: TileType): void => {
-        const startTileType = this.tileTypeMap[startY][startX];
-        const levelWidth = this.tileTypeMap[0].length;
-        const levelHeight = this.tileTypeMap.length;
+    private floodFill = (startPosition: TilePosition, fillTile: TileType): void => {
+        const startTileType = this.tileTypeMap[startPosition.y][startPosition.x];
+        const levelSize = new TileSize(this.tileTypeMap[0].length, this.tileTypeMap.length);
 
-        const positionStack: Array<Array<number>> = [[startX, startY]];
+        const positionStack: Array<TilePosition> = [startPosition];
         while (positionStack.length) {
             const position = positionStack.pop();
             if (!position) {
                 continue;
             }
 
-            const columnIndex = position[0];
-            let rowIndex = position[1];
+            const currentPosition = new TilePosition(position.x, position.y);
 
             // Travel up
-            while (rowIndex >= 0 && this.tileTypeMap[rowIndex][columnIndex] === startTileType) {
-                rowIndex--;
+            while (currentPosition.y >= 0 && this.tileTypeMap[currentPosition.y][currentPosition.x] === startTileType) {
+                currentPosition.y--;
             }
-            rowIndex++;
+            currentPosition.y++;
 
             // Travel down
             let reachLeft = false;
             let reachRight = false;
-            while (rowIndex < levelHeight && this.tileTypeMap[rowIndex][columnIndex] === startTileType) {
-                this.tileTypeMap[rowIndex][columnIndex] = fillTile;
+            while (
+                currentPosition.y < levelSize.height &&
+                this.tileTypeMap[currentPosition.y][currentPosition.x] === startTileType
+            ) {
+                this.tileTypeMap[currentPosition.y][currentPosition.x] = fillTile;
 
                 // Reach left
-                if (columnIndex > 0) {
-                    if (this.tileTypeMap[rowIndex][columnIndex - 1] === startTileType) {
+                if (currentPosition.x > 0) {
+                    if (this.tileTypeMap[currentPosition.y][currentPosition.x - 1] === startTileType) {
                         if (!reachLeft) {
-                            positionStack.push([columnIndex - 1, rowIndex]);
+                            positionStack.push(new TilePosition(currentPosition.x - 1, currentPosition.y));
                             reachLeft = true;
                         }
                     } else if (reachLeft) {
@@ -335,10 +338,10 @@ export default class LevelParser {
                 }
 
                 // Reach right
-                if (columnIndex < levelWidth - 1) {
-                    if (this.tileTypeMap[rowIndex][columnIndex + 1] === startTileType) {
+                if (currentPosition.x < levelSize.width - 1) {
+                    if (this.tileTypeMap[currentPosition.y][currentPosition.x + 1] === startTileType) {
                         if (!reachRight) {
-                            positionStack.push([columnIndex + 1, rowIndex]);
+                            positionStack.push(new TilePosition(currentPosition.x + 1, currentPosition.y));
                             reachRight = true;
                         }
                     } else if (reachRight) {
@@ -346,7 +349,7 @@ export default class LevelParser {
                     }
                 }
 
-                rowIndex++;
+                currentPosition.y++;
             }
         }
     };
@@ -354,7 +357,7 @@ export default class LevelParser {
     /**
      * Return the player position or throws an error.
      */
-    private getPlayerPosition = (): [number, number] => {
+    private getPlayerPosition = (): TilePosition => {
         if (this.playerPosition === undefined) {
             throw new Error('Player position is undefined');
         }
@@ -363,21 +366,20 @@ export default class LevelParser {
 
     /**
      * Updates all sprite positions by the given offset.
-     * @param offsetX
-     * @param offsetY
+     * @param offset
      */
-    private updatePositions = (offsetX: number, offsetY: number): void => {
-        this.getPlayerPosition()[0] += offsetX;
-        this.getPlayerPosition()[1] += offsetY;
+    private updatePositions = (offset: TileOffset): void => {
+        this.getPlayerPosition().x += offset.x;
+        this.getPlayerPosition().y += offset.y;
 
         this.boxPositionList.forEach((boxPosition) => {
-            boxPosition[0] += offsetX;
-            boxPosition[1] += offsetY;
+            boxPosition.x += offset.x;
+            boxPosition.y += offset.y;
         });
 
         this.destinationPositionList.forEach((destinationPosition) => {
-            destinationPosition[0] += offsetX;
-            destinationPosition[1] += offsetY;
+            destinationPosition.x += offset.x;
+            destinationPosition.y += offset.y;
         });
     };
 }

@@ -1,21 +1,8 @@
+import PixelPosition from '../core/PixelPosition';
+import PixelSize from '../core/PixelSize';
 import Resource from '../resource/Resource';
-
-export interface CharacterDefinition {
-    width: number;
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-    ox: number;
-    oy: number;
-}
-
-export interface FontDefinition {
-    family: string;
-    size: number;
-    height: number;
-    characterDefinitionList: Record<string, CharacterDefinition>;
-}
+import { CharacterDefinition } from './definition/CharacterDefinition';
+import { FontDefinition } from './definition/FontDefinition';
 
 export enum FontColor {
     Bright,
@@ -48,15 +35,14 @@ export default class Font implements FontDefinition {
 
     /**
      * Draws the given text.
-     * @param x
-     * @param y
      * @param text
+     * @param position
      * @param context
      */
-    public draw = (text: string, x: number, y: number, context: CanvasRenderingContext2D): Font => {
+    public draw = (text: string, position: PixelPosition, context: CanvasRenderingContext2D): Font => {
         let characterDefinition: CharacterDefinition;
-        let charX = x;
-        const charY = y;
+        let charX = position.x;
+        const charY = position.y;
 
         [...text].forEach((char) => {
             characterDefinition = this.characterDefinitionList[char];
@@ -84,16 +70,23 @@ export default class Font implements FontDefinition {
     /**
      * Draws the given text.
      * @param text
-     * @param offsetX
-     * @param offsetY
+     * @param position
+     * @param parentSize
      * @param context
      */
-    public drawCentered = (text: string, offsetX: number, offsetY: number, context: CanvasRenderingContext2D): Font => {
-        const size = this.calculateSize(text);
+    public drawCentered = (
+        text: string,
+        position: PixelPosition,
+        parentSize: PixelSize,
+        context: CanvasRenderingContext2D
+    ): Font => {
+        const textSize = this.measure(text);
         this.draw(
             text,
-            (context.canvas.width - size[0]) / 2 + offsetX,
-            (context.canvas.height - size[1]) / 2 + offsetY,
+            new PixelPosition(
+                position.x + (parentSize.width - textSize.width) / 2,
+                position.y + (parentSize.height - textSize.height) / 2
+            ),
             context
         );
         return this;
@@ -103,7 +96,7 @@ export default class Font implements FontDefinition {
      * Calculates the size of the given text.
      * @param text
      */
-    public calculateSize = (text: string): [number, number] => {
+    public measure = (text: string): PixelSize => {
         let characterDefinition: CharacterDefinition;
         let width = 0;
 
@@ -114,6 +107,6 @@ export default class Font implements FontDefinition {
             }
         });
 
-        return [width, this.height];
+        return new PixelSize(width, this.height);
     };
 }

@@ -10,9 +10,10 @@ import definitionYosterIsland12 from '../../fonts/yoster_island_12.json';
 import tilesYosterIsland14Bright from '../../fonts/yoster_island_14_bright.png';
 import tilesYosterIsland14Dark from '../../fonts/yoster_island_14_dark.png';
 import definitionYosterIsland14 from '../../fonts/yoster_island_14.json';
-import { FontColor, FontDefinition } from './Font';
+import { FontDefinition } from './definition/FontDefinition';
+import { FontColor } from './Font';
 
-export const fontList: Array<[FontDefinition, FontColor, string]> = [
+const list: Array<[FontDefinition, FontColor, string]> = [
     [definitionYosterIsland8, FontColor.Bright, tilesYosterIsland8Bright],
     [definitionYosterIsland8, FontColor.Dark, tilesYosterIsland8Dark],
     [definitionYosterIsland10, FontColor.Bright, tilesYosterIsland10Bright],
@@ -22,3 +23,4 @@ export const fontList: Array<[FontDefinition, FontColor, string]> = [
     [definitionYosterIsland14, FontColor.Bright, tilesYosterIsland14Bright],
     [definitionYosterIsland14, FontColor.Dark, tilesYosterIsland14Dark]
 ];
+export default list;

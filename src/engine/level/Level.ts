@@ -10,26 +10,34 @@ import tilesVoidBorder from '../../images/tiles_void_border.png';
 import tilesVoid from '../../images/tiles_void.png';
 import tilesWaterBorder from '../../images/tiles_water_border.png';
 import tilesWater from '../../images/tiles_water.png';
+import PixelOffset from '../core/PixelOffset';
+import PixelPosition from '../core/PixelPosition';
+import PixelSize from '../core/PixelSize';
+import TileOffset from '../core/TileOffset';
+import TilePosition from '../core/TilePosition';
+import TileSize from '../core/TileSize';
 import { FontColor } from '../font/Font';
 import FontLoader from '../font/FontLoader';
 import Game from '../Game';
-import Panel from '../panel/Panel';
+import Panel from '../menu/Panel';
+import Text from '../menu/Text';
 import ResourceLoader from '../resource/ResourceLoader';
 import Scene from '../Scene';
+import { ActionType } from '../sprite/ActionType';
 import Box from '../sprite/Box';
 import Destination from '../sprite/Destination';
+import { DirectionType } from '../sprite/DirectionType';
 import Player from '../sprite/Player';
-import { ActionType, DirectionType } from '../sprite/Sprite';
+import { OffsetTile } from '../tile/OffsetTile';
 import { TileType } from '../tile/Tile';
-import { TileOffsetDefinition } from '../tile/TileMap';
 import TileMapLoader from '../tile/TileMapLoader';
 
 export default class Level extends Scene {
     public readonly name: string;
     public readonly tileTypeMap: Array<Array<TileType>> = [[]];
-    public readonly playerPosition: [number, number];
-    public readonly boxPositionList: Array<[number, number]>;
-    public readonly destinationPositionList: Array<[number, number]>;
+    public readonly playerPosition: TilePosition;
+    public readonly boxPositionList: Array<TilePosition>;
+    public readonly destinationPositionList: Array<TilePosition>;
 
     public readonly rows: number;
     public readonly columns: number;
@@ -58,17 +66,17 @@ export default class Level extends Scene {
     constructor(
         name: string,
         tileTypeMap: Array<Array<TileType>>,
-        playerPosition: [number, number],
-        boxPositionList: Array<[number, number]>,
-        destinationPositionList: Array<[number, number]>
+        playerCoordinates: TilePosition,
+        boxCoordinatesList: Array<TilePosition>,
+        destinationCoordinatesList: Array<TilePosition>
     ) {
         super();
 
         this.name = name;
         this.tileTypeMap = tileTypeMap;
-        this.playerPosition = playerPosition;
-        this.boxPositionList = boxPositionList;
-        this.destinationPositionList = destinationPositionList;
+        this.playerPosition = playerCoordinates;
+        this.boxPositionList = boxCoordinatesList;
+        this.destinationPositionList = destinationCoordinatesList;
 
         this.rows = tileTypeMap.length;
         this.columns = tileTypeMap[0].length;
@@ -79,27 +87,58 @@ export default class Level extends Scene {
      * @param _resourceLoader
      * @param tileMapLoader
      * @param fontLoader
-     * @param width
-     * @param height
+     * @param size
      */
     public load = (
         _resourceLoader: ResourceLoader,
         tileMapLoader: TileMapLoader,
         fontLoader: FontLoader,
-        width: number,
-        height: number
+        size: PixelSize
     ): void => {
         this.fontLoader = fontLoader;
         this.tileMapLoader = tileMapLoader;
 
         // panels
-        this.pausePanel = new Panel(this.tileMapLoader.get(tilesPanel), 6, 3);
-        this.winPanel = new Panel(this.tileMapLoader.get(tilesPanel), 14, 5);
+        const bigFont = this.fontLoader.get('Yoster Island', 14, FontColor.Dark);
+        this.pausePanel = new Panel(
+            new PixelPosition(0, 0),
+            new PixelSize(100, 50),
+            'Pause',
+            bigFont,
+            true,
+            [
+                new Text(
+                    new PixelOffset(0, 0),
+                    new PixelSize(0, 0),
+                    'Press space to unpause',
+                    this.fontLoader.get('Yoster Island', 10, FontColor.Dark),
+                    true
+                )
+            ],
+            this.tileMapLoader.get(tilesPanel)
+        );
+        this.winPanel = new Panel(
+            new PixelPosition(0, 0),
+            new PixelSize(200, 100),
+            'You win!',
+            bigFont,
+            true,
+            [
+                new Text(
+                    new PixelOffset(0, 0),
+                    new PixelSize(0, 0),
+                    'Press space for the next level',
+                    this.fontLoader.get('Yoster Island', 10, FontColor.Dark),
+                    true
+                )
+            ],
+            this.tileMapLoader.get(tilesPanel)
+        );
 
         // Level canvas
         this.levelCanvas = document.createElement('canvas');
-        this.levelCanvas.width = width;
-        this.levelCanvas.height = height;
+        this.levelCanvas.width = size.width;
+        this.levelCanvas.height = size.height;
 
         // Create level context
         const levelContext = this.levelCanvas.getContext('2d');
@@ -110,17 +149,17 @@ export default class Level extends Scene {
 
         // Create sprites and set initial position
         this.player = new Player(this.tileMapLoader.get(playerSprites));
-        this.player.setCoordinates(this.playerPosition[0], this.playerPosition[1]);
+        this.player.setLevelPosition(this.playerPosition);
 
-        this.boxList = this.boxPositionList.map((boxPosition) => {
+        this.boxList = this.boxPositionList.map((boxCoordinates) => {
             const box = new Box(this.tileMapLoader.get(boxSprites));
-            box.setCoordinates(boxPosition[0], boxPosition[1]);
+            box.setLevelPosition(boxCoordinates);
             return box;
         });
 
-        this.destinationList = this.destinationPositionList.map((destinationPosition) => {
+        this.destinationList = this.destinationPositionList.map((destinationCoordinates) => {
             const destination = new Destination(this.tileMapLoader.get(destinationSprites));
-            destination.setCoordinates(destinationPosition[0], destinationPosition[1]);
+            destination.setLevelPosition(destinationCoordinates);
             return destination;
         });
 
@@ -149,7 +188,7 @@ export default class Level extends Scene {
             case 'ArrowUp':
                 if (this.player.actionType === ActionType.Stand && !this.won && !this.paused) {
                     // Check up
-                    actionType = this.controlDirection(DirectionType.Up, 0, -1);
+                    actionType = this.controlDirection(DirectionType.Up, new TileOffset(0, -1));
                     isPushing = actionType === ActionType.Push;
                     isMoving = actionType === ActionType.Walk || actionType === ActionType.Push;
                 }
@@ -158,7 +197,7 @@ export default class Level extends Scene {
             case 'ArrowDown':
                 if (this.player.actionType === ActionType.Stand && !this.won && !this.paused) {
                     // Check down
-                    actionType = this.controlDirection(DirectionType.Down, 0, 1);
+                    actionType = this.controlDirection(DirectionType.Down, new TileOffset(0, 1));
                     isPushing = actionType === ActionType.Push;
                     isMoving = actionType === ActionType.Walk || actionType === ActionType.Push;
                 }
@@ -167,7 +206,7 @@ export default class Level extends Scene {
             case 'ArrowLeft':
                 if (this.player.actionType === ActionType.Stand && !this.won && !this.paused) {
                     // Check left
-                    actionType = this.controlDirection(DirectionType.Left, -1, 0);
+                    actionType = this.controlDirection(DirectionType.Left, new TileOffset(-1, 0));
                     isPushing = actionType === ActionType.Push;
                     isMoving = actionType === ActionType.Walk || actionType === ActionType.Push;
                 }
@@ -176,7 +215,7 @@ export default class Level extends Scene {
             case 'ArrowRight':
                 if (this.player.actionType === ActionType.Stand && !this.won && !this.paused) {
                     // Check right
-                    actionType = this.controlDirection(DirectionType.Right, 1, 0);
+                    actionType = this.controlDirection(DirectionType.Right, new TileOffset(1, 0));
                     isPushing = actionType === ActionType.Push;
                     isMoving = actionType === ActionType.Walk || actionType === ActionType.Push;
                 }
@@ -214,17 +253,14 @@ export default class Level extends Scene {
             this.time += dt;
 
             // Check win condition
-            let boxCoordinates: [number, number];
-            let destinationCoordinates: [number, number];
+            let boxPosition: TilePosition;
+            let destinationPosition: TilePosition;
             this.won = this.boxList
                 .map((box) => {
-                    boxCoordinates = box.getCoordinates();
+                    boxPosition = box.getLevelPosition();
                     for (let destinationIndex = 0; destinationIndex < this.destinationList.length; destinationIndex++) {
-                        destinationCoordinates = this.destinationList[destinationIndex].getCoordinates();
-                        if (
-                            boxCoordinates[0] === destinationCoordinates[0] &&
-                            boxCoordinates[1] === destinationCoordinates[1]
-                        ) {
+                        destinationPosition = this.destinationList[destinationIndex].getLevelPosition();
+                        if (boxPosition.x === destinationPosition.x && boxPosition.y === destinationPosition.y) {
                             return true;
                         }
                     }
@@ -246,14 +282,18 @@ export default class Level extends Scene {
      * @param bufferContext
      */
     public draw = (bufferCanvas: HTMLCanvasElement, bufferContext: CanvasRenderingContext2D): void => {
-        const rowMax = bufferCanvas.height / Game.TILE_HEIGHT;
-        const columnMax = bufferCanvas.width / Game.TILE_WIDTH;
-        const xOffset = ((columnMax - this.columns) / 2) * Game.TILE_WIDTH;
-        const yOffset = ((rowMax - this.rows + 2) / 2) * Game.TILE_HEIGHT;
+        const levelSize = new TileSize(
+            bufferCanvas.width / Game.TILE_SIZE.width,
+            bufferCanvas.height / Game.TILE_SIZE.height
+        );
+        const screenOffset = new PixelOffset(
+            ((levelSize.width - this.columns) / 2) * Game.TILE_SIZE.width,
+            ((levelSize.height - this.rows + 2) / 2) * Game.TILE_SIZE.height
+        );
         const spriteList = [...this.destinationList, ...this.boxList, this.player];
 
         if (!this.levelBuffered) {
-            this.drawLevelToBuffer(rowMax, columnMax, xOffset, yOffset);
+            this.drawLevelToBuffer(levelSize, screenOffset);
             this.levelBuffered = true;
         }
 
@@ -265,68 +305,66 @@ export default class Level extends Scene {
         if (Game.RENDER_SHADOWS) {
             const shadowTileMap = this.tileMapLoader.get(tilesShadow);
             spriteList.forEach((sprite) => {
-                shadowTileMap.get(0, 0).draw(xOffset + sprite.x, yOffset + sprite.y, bufferContext);
+                shadowTileMap
+                    .get(new TilePosition(0, 0))
+                    .draw(
+                        new PixelPosition(screenOffset.x + sprite.position.x, screenOffset.y + sprite.position.y),
+                        bufferContext
+                    );
             });
         }
 
         // Draw sprites
         spriteList.forEach((sprite) => {
-            sprite.draw(xOffset, yOffset, bufferContext);
+            sprite.draw(screenOffset, bufferContext);
         });
 
         // Draw status
         this.fontLoader
             .get('Yoster Island', 10, FontColor.Bright)
-            .draw('Moves', 10, 256, bufferContext)
-            .draw(String(this.moves), 64, 256, bufferContext)
-            .draw('Pushes', 10, 270, bufferContext)
-            .draw(String(this.pushes), 64, 270, bufferContext)
-            .draw('Time', 10, 284, bufferContext)
-            .draw(String(Math.floor(this.time)), 64, 284, bufferContext);
+            .draw('Moves', new PixelPosition(10, 256), bufferContext)
+            .draw(String(this.moves), new PixelPosition(64, 256), bufferContext)
+            .draw('Pushes', new PixelPosition(10, 270), bufferContext)
+            .draw(String(this.pushes), new PixelPosition(64, 270), bufferContext)
+            .draw('Time', new PixelPosition(10, 284), bufferContext)
+            .draw(String(Math.floor(this.time)), new PixelPosition(64, 284), bufferContext);
 
         if (this.won) {
             // Draw panel
-            this.winPanel.drawCentered(0, 0, bufferContext);
-
-            // Draw text
-            this.fontLoader.get('Yoster Island', 14, FontColor.Dark).drawCentered('You win!', 0, -10, bufferContext);
-            this.fontLoader
-                .get('Yoster Island', 10, FontColor.Dark)
-                .drawCentered('Press space for the next level', 0, 10, bufferContext);
+            this.winPanel.center(new PixelSize(bufferContext.canvas.width, bufferContext.canvas.height));
+            this.winPanel.draw(bufferContext);
         } else if (this.paused) {
             // Draw panel
-            this.pausePanel.drawCentered(0, 0, bufferContext);
-
-            // Draw text
-            this.fontLoader.get('Yoster Island', 14, FontColor.Dark).drawCentered('Pause!', 0, 0, bufferContext);
+            this.pausePanel.center(new PixelSize(bufferContext.canvas.width, bufferContext.canvas.height));
+            this.pausePanel.draw(bufferContext);
         }
     };
 
     /**
-     * Controls the player for the given direction.
+     * Controls the player for the given directionType.
      * @param directionType
-     * @param columnOffset
-     * @param rowOffset
+     * @param offset
      */
-    private controlDirection = (directionType: DirectionType, columnOffset: number, rowOffset: number): ActionType => {
+    private controlDirection = (directionType: DirectionType, offset: TileOffset): ActionType => {
         let actionType: ActionType | undefined = undefined;
 
-        const playerCoordinates = this.player.getCoordinates();
-        const neighborColumnIndex = playerCoordinates[0] + columnOffset;
-        const neighborRowIndex = playerCoordinates[1] + rowOffset;
+        const playerPosition = this.player.getLevelPosition();
+        const neighborPosition = new TilePosition(playerPosition.x + offset.x, playerPosition.y + offset.y);
 
         // Check if neighboring tile of player is floor
-        if (this.isTileTypeAt(neighborColumnIndex, neighborRowIndex, TileType.Floor)) {
+        if (this.isTileTypeAt(neighborPosition, TileType.Floor)) {
             // Check if neighboring tile contains a box
-            const box = this.isBoxAt(neighborColumnIndex, neighborRowIndex);
+            const box = this.isBoxAt(neighborPosition);
             if (box !== undefined) {
-                const nextNeighborColumnIndex = neighborColumnIndex + columnOffset;
-                const nextNeighborRowIndex = neighborRowIndex + rowOffset;
+                const nextNeighborPosition = new TilePosition(
+                    neighborPosition.x + offset.x,
+                    neighborPosition.y + offset.y
+                );
 
                 // Check if next neighboring tile is floor or contains another box
                 if (
-                    this.isTileTypeAt(nextNeighborColumnIndex, nextNeighborRowIndex, TileType.Floor) &&
-                    this.isBoxAt(nextNeighborColumnIndex, nextNeighborRowIndex) === undefined
+                    this.isTileTypeAt(nextNeighborPosition, TileType.Floor) &&
+                    this.isBoxAt(nextNeighborPosition) === undefined
                 ) {
                     // Can push
                     actionType = ActionType.Push;
@@ -351,12 +389,10 @@ export default class Level extends Scene {
 
     /**
      * Draws the level to the level buffer.
-     * @param rowMax
-     * @param columnMax
-     * @param xOffset
-     * @param yOffset
+     * @param size
+     * @param offset
      */
-    private drawLevelToBuffer = (rowMax: number, columnMax: number, xOffset: number, yOffset: number): void => {
+    private drawLevelToBuffer = (size: TileSize, offset: PixelOffset): void => {
         // Clear with background color
         this.levelContext.imageSmoothingEnabled = false;
         this.levelContext.fillStyle = Game.BACKGROUND_COLOR;
@@ -364,16 +400,19 @@ export default class Level extends Scene {
 
         // Draw background
         const voidTileMap = this.tileMapLoader.get(tilesVoid);
-        for (let rowIndex = 0; rowIndex < rowMax; rowIndex++) {
-            for (let columnIndex = 0; columnIndex < columnMax; columnIndex++) {
+        for (let rowIndex = 0; rowIndex < size.height; rowIndex++) {
+            for (let columnIndex = 0; columnIndex < size.width; columnIndex++) {
                 const tile = voidTileMap.getRandomTile();
-                tile.draw(columnIndex * tile.width, rowIndex * tile.height, this.levelContext);
+                tile.draw(
+                    new PixelPosition(columnIndex * tile.size.width, rowIndex * tile.size.height),
+                    this.levelContext
+                );
             }
         }
 
         // Draw moon
-        const moonTile = this.tileMapLoader.get(tilesMoon).get(0, 0);
-        moonTile.draw(Game.MOON_OFFSET, Game.MOON_OFFSET, this.levelContext);
+        const moonTile = this.tileMapLoader.get(tilesMoon).get(new TilePosition(0, 0));
+        moonTile.draw(Game.MOON_POSITION, this.levelContext);
 
         // Draw level
         const floorTileMap = this.tileMapLoader.get(tilesFloor);
@@ -383,68 +422,67 @@ export default class Level extends Scene {
         const waterBorderTileMap = this.tileMapLoader.get(tilesWaterBorder);
 
         let pattern: string;
-        let tileDefinitionList: Array<TileOffsetDefinition>;
-        let borderTileDefinitionList: Array<TileOffsetDefinition>;
-        for (let rowIndex = 0; rowIndex < this.rows; rowIndex++) {
-            for (let columnIndex = 0; columnIndex < this.columns; columnIndex++) {
-                tileDefinitionList = [];
+        let offsetTileList: Array<OffsetTile>;
+        for (let y = 0; y < this.rows; y++) {
+            for (let x = 0; x < this.columns; x++) {
+                offsetTileList = [];
 
-                switch (this.tileTypeMap[rowIndex][columnIndex]) {
+                switch (this.tileTypeMap[y][x]) {
                     case TileType.Floor:
                         // Add random floor tile
-                        tileDefinitionList.push({ tile: floorTileMap.getRandomTile(), offset: { x: 0, y: 0 } });
+                        offsetTileList.push(<OffsetTile>floorTileMap.getRandomTile());
 
                         // Add pillar
                         if (Game.RENDER_PILLARS) {
-                            // Get pillar tiles
-                            pattern = this.getPatternAt(columnIndex, rowIndex, TileType.Floor);
-                            borderTileDefinitionList = pattern.match(/......0./)
-                                ? pillarTileMap.getTileListByPattern(pattern)
-                                : [];
+                            // Create pattern
+                            pattern = this.getPatternAt(new TilePosition(x, y), TileType.Floor);
 
                             // Add pillar tiles
-                            tileDefinitionList.push(...borderTileDefinitionList);
+                            offsetTileList.push(
+                                ...(pattern.match(/......0./) ? pillarTileMap.getOffsetTileListByPattern(pattern) : [])
+                            );
                         }
 
                         break;
                     case TileType.Void:
-                        // Get border tiles
-                        pattern = this.getPatternAt(columnIndex, rowIndex, TileType.Floor);
-                        borderTileDefinitionList =
-                            pattern !== '00000000' ? voidBorderTileMap.getTileListByPattern(pattern) : [];
+                        // Create pattern
+                        pattern = this.getPatternAt(new TilePosition(x, y), TileType.Floor);
 
                         // Add border tiles
-                        tileDefinitionList.push(...borderTileDefinitionList);
+                        offsetTileList.push(
+                            ...(pattern !== '00000000' ? voidBorderTileMap.getOffsetTileListByPattern(pattern) : [])
+                        );
                         break;
                     case TileType.Water:
-                        // Get border tiles
-                        pattern = this.getPatternAt(columnIndex, rowIndex, TileType.Floor);
-                        borderTileDefinitionList =
-                            pattern !== '00000000' ? waterBorderTileMap.getTileListByPattern(pattern) : [];
+                        // Create pattern
+                        pattern = this.getPatternAt(new TilePosition(x, y), TileType.Floor);
 
                         // Add tiles
-                        tileDefinitionList.push(
+                        offsetTileList.push(
                             // Add random water tile if no border tiles exists or default tile otherwise
-                            {
-                                tile:
-                                    borderTileDefinitionList.length === 0
-                                        ? waterTileMap.getRandomTile()
-                                        : waterTileMap.get(0, 0),
-                                offset: { x: 0, y: 0 }
-                            },
+                            <OffsetTile>(
+                                (pattern === '00000000'
+                                    ? waterTileMap.getRandomTile()
+                                    : waterTileMap.get(new TilePosition(0, 0)))
+                            ),
                             // Add border tiles
-                            ...borderTileDefinitionList
+                            ...(pattern !== '00000000' ? waterBorderTileMap.getOffsetTileListByPattern(pattern) : [])
                         );
                         break;
                 }
 
                 // Draw tiles
-                tileDefinitionList.forEach((tileDefinition) =>
-                    tileDefinition.tile.draw(
-                        tileDefinition.offset.x + xOffset + columnIndex * Game.TILE_WIDTH,
-                        tileDefinition.offset.y + yOffset + rowIndex * Game.TILE_HEIGHT,
+                offsetTileList.forEach((tileDefinition) => {
+                    if (!tileDefinition.offset) {
+                        tileDefinition.offset = new PixelOffset(0, 0);
+                    }
+                    tileDefinition.draw(
+                        new PixelPosition(
+                            tileDefinition.offset.x + offset.x + x * Game.TILE_SIZE.width,
+                            tileDefinition.offset.y + offset.y + y * Game.TILE_SIZE.height
+                        ),
                         this.levelContext
-                    )
+                    )}
                 );
             }
         }
@@ -452,36 +490,34 @@ export default class Level extends Scene {
 
     /**
      * Returns a pattern describing the surroundings of the given coordinates.
-     * @param columnIndex
-     * @param rowIndex
+     * @param position
      * @param tileType
      */
-    public getPatternAt = (columnIndex: number, rowIndex: number, tileType: TileType): string => {
+    public getPatternAt = (position: TilePosition, tileType: TileType): string => {
         // Check all 8 neighboring cells and create pattern describing if they have the given tile type
         return [
-            [columnIndex - 1, rowIndex - 1],
-            [columnIndex, rowIndex - 1],
-            [columnIndex + 1, rowIndex - 1],
-            [columnIndex - 1, rowIndex],
-            [columnIndex + 1, rowIndex],
-            [columnIndex - 1, rowIndex + 1],
-            [columnIndex, rowIndex + 1],
-            [columnIndex + 1, rowIndex + 1]
+            new TilePosition(position.x - 1, position.y - 1),
+            new TilePosition(position.x, position.y - 1),
+            new TilePosition(position.x + 1, position.y - 1),
+            new TilePosition(position.x - 1, position.y),
+            new TilePosition(position.x + 1, position.y),
+            new TilePosition(position.x - 1, position.y + 1),
+            new TilePosition(position.x, position.y + 1),
+            new TilePosition(position.x + 1, position.y + 1)
         ]
-            .map((coordinates) => this.isTileTypeAt(coordinates[0], coordinates[1], tileType))
+            .map((neighborPosition) => this.isTileTypeAt(neighborPosition, tileType))
             .reduce((pattern: string, isGivenTileType: boolean) => pattern.concat(isGivenTileType ? '1' : '0'), '');
     };
 
     /**
      * Checks if a box is at the given coordinates.
-     * @param columnIndex
-     * @param rowIndex
+     * @param position
      */
-    private isBoxAt = (columnIndex: number, rowIndex: number): Box | undefined => {
-        let boxCoordinates: [number, number];
+    private isBoxAt = (position: TilePosition): Box | undefined => {
+        let boxPosition: TilePosition;
         for (let boxIndex = 0; boxIndex < this.boxList.length; boxIndex++) {
-            boxCoordinates = this.boxList[boxIndex].getCoordinates();
-            if (boxCoordinates[0] === columnIndex && boxCoordinates[1] === rowIndex) {
+            boxPosition = this.boxList[boxIndex].getLevelPosition();
+            if (boxPosition.x === position.x && boxPosition.y === position.y) {
                 return this.boxList[boxIndex];
             }
         }
@@ -490,22 +526,21 @@ export default class Level extends Scene {
 
     /**
      * Checks if the given tile type is at the given coordinates.
-     * @param columnIndex
-     * @param rowIndex
+     * @param position
      * @param tileType
      */
-    public isTileTypeAt = (columnIndex: number, rowIndex: number, tileType: TileType): boolean => {
+    public isTileTypeAt = (position: TilePosition, tileType: TileType): boolean => {
         // Check if coordinates are valid
         if (
-            columnIndex < 0 ||
-            columnIndex >= this.tileTypeMap[0].length ||
-            rowIndex < 0 ||
-            rowIndex >= this.tileTypeMap.length
+            position.x < 0 ||
+            position.x >= this.tileTypeMap[0].length ||
+            position.y < 0 ||
+            position.y >= this.tileTypeMap.length
         ) {
             return false;
         }
 
         // Check if cell has the given tile type
-        return this.tileTypeMap[rowIndex][columnIndex] === tileType;
+        return this.tileTypeMap[position.y][position.x] === tileType;
     };
 }

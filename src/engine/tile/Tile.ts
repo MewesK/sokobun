@@ -1,3 +1,5 @@
+import PixelPosition from '../core/PixelPosition';
+import PixelSize from '../core/PixelSize';
 import Resource from '../resource/Resource';
 
 export enum TileType {
@@ -10,37 +12,42 @@ export enum TileType {
 
 export default class Tile {
     public readonly resource: Resource;
-    public readonly x: number;
-    public readonly y: number;
-    public readonly width: number;
-    public readonly height: number;
+    public readonly position: PixelPosition;
+    public readonly size: PixelSize;
 
-    public constructor(resource: Resource, x: number, y: number, width: number, height: number) {
+    public constructor(resource: Resource, position: PixelPosition, size: PixelSize) {
         this.resource = resource;
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+        this.position = position;
+        this.size = size;
     }
 
     /**
      * Draws the sprite with the given context.
-     * @param x
-     * @param y
+     * @param position
      * @param context
      */
-    public draw = (x: number, y: number, context: CanvasRenderingContext2D): void => {
+    public draw = (position: PixelPosition, context: CanvasRenderingContext2D): void => {
+        this.drawStretched(position, this.size, context);
+    };
+
+    /**
+     * Draws the sprite with the given context.
+     * @param position
+     * @param size
+     * @param context
+     */
+    public drawStretched = (position: PixelPosition, size: PixelSize, context: CanvasRenderingContext2D): void => {
         context.imageSmoothingEnabled = false;
         context.drawImage(
             <CanvasImageSource>this.resource.data,
-            this.x,
-            this.y,
-            this.width,
-            this.height,
-            x,
-            y,
-            this.width,
-            this.height
+            this.position.x,
+            this.position.y,
+            this.size.width,
+            this.size.height,
+            position.x,
+            position.y,
+            size.width,
+            size.height
         );
     };
 }

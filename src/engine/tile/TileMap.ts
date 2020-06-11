@@ -1,77 +1,43 @@
+import PixelOffset from '../core/PixelOffset';
+import PixelPosition from '../core/PixelPosition';
+import PixelSize from '../core/PixelSize';
+import TileOffset from '../core/TileOffset';
+import TilePosition from '../core/TilePosition';
+import TileSize from '../core/TileSize';
 import Resource from '../resource/Resource';
+import { OffsetTile } from './OffsetTile';
+import { PatternOffsetTileList } from './PatternOffsetTileList';
+import { RandomTile } from './RandomTile';
 import Tile from './Tile';
-
-export interface Offset {
-    x: number;
-    y: number;
-}
-
-export interface TileOffsetDefinition {
-    tile: Tile;
-    offset: Offset;
-}
-
-export interface TileIndexOffsetDefinition {
-    tileIndex: number;
-    offset: Offset;
-}
-
-export interface WeightedTileDefinition {
-    tileIndex: number;
-    probability: number;
-}
-
-export interface PatternTileDefinition {
-    pattern: RegExp;
-    tileOffsetDefinitionList: Array<TileIndexOffsetDefinition>;
-}
-
-export interface TileMapDefinition {
-    src: string;
-    rows: number;
-    columns: number;
-    offsetRows: number;
-    offsetColumns: number;
-    tileWidth: number;
-    tileHeight: number;
-    grid: number;
-    weightedTileDefinitionList: Array<WeightedTileDefinition> | undefined;
-    patternTileDefinitionList: Array<PatternTileDefinition> | undefined;
-}
 
 export default class TileMap {
     /**
      * Creates a tile table based on the given resource.
      * @param resource
-     * @param rows
-     * @param columns
-     * @param offsetRows
-     * @param offsetColumns
-     * @param tileWidth
-     * @param tileHeight
+     * @param size
+     * @param offset
+     * @param tileSize
      * @param grid
      */
     public static createTileTable(
         resource: Resource,
-        rows: number,
-        columns: number,
-        offsetRows: number,
-        offsetColumns: number,
-        tileWidth: number,
-        tileHeight: number,
+        size: TileSize,
+        offset: TileOffset,
+        tileSize: PixelSize,
         grid: number
     ): Array<Array<Tile>> {
         // Create individual tiles
         const tileTable: Array<Array<Tile>> = [];
-        for (let row = 0; row < rows; row++) {
+        for (let row = 0; row < size.height; row++) {
             tileTable[row] = [];
-            for (let column = 0; column < columns; column++) {
+            for (let column = 0; column < size.width; column++) {
                 tileTable[row][column] = new Tile(
                     resource,
-                    (column + offsetColumns) * (tileWidth + grid),
-                    (row + offsetRows) * (tileHeight + grid),
-                    tileWidth,
-                    tileHeight
+                    new PixelPosition(
+                        (column + offset.x) * (tileSize.width + grid),
+                        (row + offset.y) * (tileSize.height + grid)
+                    ),
+                    tileSize
                 );
             }
         }
@@ -81,19 +47,17 @@ export default class TileMap {
     protected readonly tileTable: Array<Array<Tile>>;
 
     public readonly resource: Resource;
-    public readonly rows: number;
-    public readonly columns: number;
-    public readonly tileWidth: number;
-    public readonly tileHeight: number;
+    public readonly size: TileSize;
+    public readonly tileSize: TileSize;
 
-    private readonly patternTileDefinitionList: Array<PatternTileDefinition> | undefined;
-    private readonly weightedTileDefinitionList: Array<WeightedTileDefinition> | undefined;
+    private readonly randomTileList: Array<RandomTile> | undefined;
+    private readonly patternOffsetTileListList: Array<PatternOffsetTileList> | undefined;
 
     public constructor(
         tileTable: Array<Array<Tile>>,
         resource: Resource,
-        patternTileDefinitionList: Array<PatternTileDefinition> | undefined,
-        weightedTileDefinitionList: Array<WeightedTileDefinition> | undefined
+        randomTileList: Array<RandomTile> | undefined,
+        patternOffsetTileListList: Array<PatternOffsetTileList> | undefined
     ) {
         if (tileTable.length === 0) {
             throw new Error('Invalid tile table (no rows)');
@@ -108,97 +72,104 @@ export default class TileMap {
         this.tileTable = tileTable;
 
         this.resource = resource;
-        this.rows = tileTable.length;
-        this.columns = tileTable[0].length;
-        this.tileWidth = tileTable[0][0].width;
-        this.tileHeight = tileTable[0][0].height;
+        this.size = new TileSize(tileTable[0].length, tileTable.length);
+        this.tileSize = tileTable[0][0].size;
 
-        this.patternTileDefinitionList = patternTileDefinitionList;
-        this.weightedTileDefinitionList = weightedTileDefinitionList;
+        this.randomTileList = randomTileList;
+        this.patternOffsetTileListList = patternOffsetTileListList;
     }
 
     /**
      * Get the tile at the given coordinates.
-     * @param row
-     * @param column
+     * @param position
      */
-    public get = (row: number, column: number): Tile => {
-        if (row < 0 || row >= this.rows) {
-            throw new Error('Invalid row');
-        }
-        if (column < 0 || column >= this.columns) {
+    public get = (position: TilePosition): Tile => {
+        if (position.x < 0 || position.x >= this.size.width) {
             throw new Error('Invalid column');
         }
+        if (position.y < 0 || position.y >= this.size.height) {
+            throw new Error('Invalid row');
+        }
 
-        return this.tileTable[row][column];
+        return this.tileTable[position.y][position.x];
+    };
+
+    /**
+     * Get the tile at the given coordinates.
+     * @param position
+     * @param offset
+     */
+    public getWithOffset = (position: TilePosition, offset: PixelOffset): OffsetTile => {
+        const tile = this.get(position);
+        return new OffsetTile(tile.resource, tile.position, tile.size, offset);
+    };
+
+    /**
+     * Get the tile at the given coordinates.
+     * @param position
+     * @param probability
+     */
+    public getWithProbability = (position: TilePosition, probability: number): RandomTile => {
+        const tile = this.get(position);
+        return new RandomTile(tile.resource, tile.position, tile.size, probability);
     };
 
     /**
      * Returns a list of tiles and their offsets corresponding to the given pattern.
      * @param pattern
      */
-    public getTileListByPattern = (pattern: string): Array<TileOffsetDefinition> => {
-        if (!this.patternTileDefinitionList) {
-            throw new Error('Undefined patternTileDefinitionList');
+    public getOffsetTileListByPattern = (pattern: string): Array<OffsetTile> => {
+        if (!this.patternOffsetTileListList) {
+            throw new Error('Undefined patternOffsetTileSetDefinitionList');
         }
 
         // Find pattern-tile-definitions matching the pattern
-        const patternTileDefinitionList = this.patternTileDefinitionList.filter((value) =>
+        const patternOffsetTileListList = this.patternOffsetTileListList.filter((value) =>
             pattern.match(value.pattern)
         );
-        if (patternTileDefinitionList.length === 0) {
+        if (patternOffsetTileListList.length === 0) {
             throw new Error(`Invalid pattern '${pattern}'`);
         }
 
         // Return tiles and tile offsets for the given pattern-tile-definitions
-        const tileDefinitionList: Array<TileOffsetDefinition> = [];
-        patternTileDefinitionList.forEach((patternTileDefinition) => {
-            patternTileDefinition.tileOffsetDefinitionList.forEach((tileDefinition) => {
-                tileDefinitionList.push({
-                    tile: this.get(
-                        Math.floor(tileDefinition.tileIndex / this.columns),
-                        tileDefinition.tileIndex % this.columns
-                    ),
-                    offset: tileDefinition.offset
-                });
+        const offsetTileList: Array<OffsetTile> = [];
+        patternOffsetTileListList.forEach((patternOffsetTileList) => {
+            patternOffsetTileList.offsetTileList.forEach((offsetTile) => {
+                offsetTileList.push(offsetTile);
             });
         });
-        return tileDefinitionList;
+        return offsetTileList;
     };
 
     /**
      * Return a random tile based according to the defined probabilities.
      */
     public getRandomTile = (): Tile => {
-        if (!this.weightedTileDefinitionList) {
-            throw new Error('Undefined weightedTileDefinitionList');
+        if (!this.randomTileList) {
+            throw new Error('Undefined randomTileDefinitionList');
         }
 
         let sum = 0;
-        let tileIndex = this.weightedTileDefinitionList[0].tileIndex;
+        let weightedTileDefinition = this.randomTileList[0];
 
         // Get random number from 0 to the sum of probabilities
         const random =
             Math.random() *
-            this.weightedTileDefinitionList.reduce(
+            this.randomTileList.reduce(
                 (previousValue, currentValue) => previousValue + currentValue.probability,
-                this.weightedTileDefinitionList[0].probability
+                this.randomTileList[0].probability
             );
 
         // Get tile index
-        for (
-            let weightedTileIndex = 0;
-            weightedTileIndex < this.weightedTileDefinitionList.length;
-            weightedTileIndex++
-        ) {
-            sum += this.weightedTileDefinitionList[weightedTileIndex].probability;
+        for (let weightedTileIndex = 0; weightedTileIndex < this.randomTileList.length; weightedTileIndex++) {
+            sum += this.randomTileList[weightedTileIndex].probability;
             if (random <= sum) {
-                tileIndex = this.weightedTileDefinitionList[weightedTileIndex].tileIndex;
+                weightedTileDefinition = this.randomTileList[weightedTileIndex];
                 break;
             }
         }
 
         // Return tile
-        return this.get(Math.floor(tileIndex / this.columns), tileIndex % this.columns);
+        return weightedTileDefinition;
     };
 }

@@ -1,6 +1,10 @@
 import Resource from '../resource/Resource';
 import ResourceLoader from '../resource/ResourceLoader';
-import TileMap, { TileMapDefinition } from './TileMap';
+import { TileMapDefinition } from './definition/TileMapDefinition';
+import { OffsetTile } from './OffsetTile';
+import { PatternOffsetTileList } from './PatternOffsetTileList';
+import { RandomTile } from './RandomTile';
+import TileMap from './TileMap';
 
 export default class TileMapLoader {
     private readonly resourceLoader: ResourceLoader;
@@ -21,19 +25,32 @@ export default class TileMapLoader {
                 resource = this.resourceLoader.get(input.src);
                 this.cache.push(
                     new TileMap(
-                        TileMap.createTileTable(
-                            resource,
-                            input.rows,
-                            input.columns,
-                            input.offsetRows,
-                            input.offsetColumns,
-                            input.tileWidth,
-                            input.tileHeight,
-                            input.grid
-                        ),
+                        TileMap.createTileTable(resource, input.size, input.offset, input.tileSize, input.grid),
                         resource,
-                        input.patternTileDefinitionList,
-                        input.weightedTileDefinitionList
+                        input.randomTileDefinitionList?.map(
+                            (randomTileDefinition) =>
+                                new RandomTile(
+                                    resource,
+                                    randomTileDefinition.position,
+                                    input.tileSize,
+                                    randomTileDefinition.probability
+                                )
+                        ),
+                        input.patternOffsetTileSetDefinitionList?.map(
+                            (patternOffsetTileSetDefinition) =>
+                                new PatternOffsetTileList(
+                                    patternOffsetTileSetDefinition.pattern,
+                                    patternOffsetTileSetDefinition.offsetTileDefinitionList.map(
+                                        (offsetTileDefinition) =>
+                                            new OffsetTile(
+                                                resource,
+                                                offsetTileDefinition.position,
+                                                input.tileSize,
+                                                offsetTileDefinition.offset
+                                            )
+                                    )
+                                )
+                        )
                     )
                 );
             });

@@ -1,23 +1,24 @@
-import { fontList } from './font/FontList';
+import PixelPosition from './core/PixelPosition';
+import PixelSize from './core/PixelSize';
+import fontList from './font/FontList';
 import FontLoader from './font/FontLoader';
 import Level from './level/Level';
-import { levelList } from './level/LevelList';
+import levelList from './level/LevelList';
 import LevelLoader from './level/LevelLoader';
-import { resourceList } from './resource/ResourceList';
+import resourceList from './resource/ResourceList';
 import ResourceLoader from './resource/ResourceLoader';
 import Scene from './Scene';
-import { tileMapList } from './tile/TileMapList';
+import tileMapList from './tile/TileMapList';
 import TileMapLoader from './tile/TileMapLoader';
 
 export default class Game {
     public static readonly BACKGROUND_COLOR = '#252230';
-    public static readonly MOON_OFFSET = 32;
+    public static readonly MOON_POSITION = new PixelPosition(32, 32);
     public static readonly RENDER_PONDS = true;
     public static readonly RENDER_PILLARS = true;
     public static readonly RENDER_SHADOWS = true;
     public static readonly SMOOTHING = false;
-    public static readonly TILE_WIDTH = 16;
-    public static readonly TILE_HEIGHT = 16;
+    public static readonly TILE_SIZE = new PixelSize(16, 16);
 
     private readonly resourceLoader: ResourceLoader = new ResourceLoader();
     private readonly tileMapLoader: TileMapLoader = new TileMapLoader(this.resourceLoader);
@@ -100,8 +101,7 @@ export default class Game {
             this.resourceLoader,
             this.tileMapLoader,
             this.fontLoader,
-            this.bufferCanvas.width,
-            this.bufferCanvas.height
+            new PixelSize(this.bufferCanvas.width, this.bufferCanvas.height)
         );
 
         this.lastTime = 0;

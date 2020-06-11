@@ -20,7 +20,7 @@ import tilesWaterBorder from '../../images/tiles_water_border.png';
 import tilesWater from '../../images/tiles_water.png';
 import level from '../../levels/Original.txt';
 
-export const resourceList: Array<string> = [
+const list: Array<string> = [
     playerSprites,
     boxSprites,
     destinationSprites,
@@ -43,3 +43,4 @@ export const resourceList: Array<string> = [
     tilesYosterIsland14Dark,
     level
 ];
+export default list;

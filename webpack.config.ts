@@ -56,16 +56,9 @@ const config = (_env: string, args: webpack.CliConfigOptions): webpack.Configura
 
         plugins: [
             new webpack.BannerPlugin(
-                'SokoBun v' +
-                    process.env.npm_package_version +
-                    ' (' +
-                    process.env.npm_package_homepage +
-                    ')\n' +
-                    'Copyright 2020 ' +
-                    process.env.npm_package_author_name +
-                    '\n' +
-                    'Licensed under ' +
-                    process.env.npm_package_license
+                `SokoBun v${process.env.npm_package_version} (${process.env.npm_package_homepage})\n` +
+                    `Copyright 2020 ${process.env.npm_package_author_name}\n` +
+                    `Licensed under ${process.env.npm_package_license}`
             ),
             new CleanWebpackPlugin(),
             new ForkTsCheckerWebpackPlugin(),

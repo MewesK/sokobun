@@ -10,222 +10,207 @@ import tilesVoidBorder from '../../images/tiles_void_border.png';
 import tilesVoid from '../../images/tiles_void.png';
 import tilesWaterBorder from '../../images/tiles_water_border.png';
 import tilesWater from '../../images/tiles_water.png';
-import { PatternTileDefinition, TileMapDefinition } from './TileMap';
+import PixelOffset from '../core/PixelOffset';
+import PixelSize from '../core/PixelSize';
+import TileOffset from '../core/TileOffset';
+import TilePosition from '../core/TilePosition';
+import TileSize from '../core/TileSize';
+import { OffsetTileDefinition } from './definition/OffsetTileDefinition';
+import { PatternOffsetTileSetDefinition } from './definition/PatternOffsetTileSetDefinition';
+import { RandomTileDefinition } from './definition/RandomTileDefinition';
+import { TileMapDefinition } from './definition/TileMapDefinition';
 
-const borderPatternTileDefinition: Array<PatternTileDefinition> = [
-    { pattern: /.1.1..../, tileOffsetDefinitionList: [{ tileIndex: 0, offset: { x: 0, y: 0 } }] },
-    { pattern: /.1.0..../, tileOffsetDefinitionList: [{ tileIndex: 1, offset: { x: 0, y: 0 } }] },
-    { pattern: /.1..0.../, tileOffsetDefinitionList: [{ tileIndex: 2, offset: { x: 8, y: 0 } }] },
-    { pattern: /.1..1.../, tileOffsetDefinitionList: [{ tileIndex: 3, offset: { x: 8, y: 0 } }] },
-    { pattern: /.0.1..../, tileOffsetDefinitionList: [{ tileIndex: 4, offset: { x: 0, y: 0 } }] },
-    { pattern: /....0.01/, tileOffsetDefinitionList: [{ tileIndex: 5, offset: { x: 8, y: 8 } }] },
-    { pattern: /...0.10./, tileOffsetDefinitionList: [{ tileIndex: 6, offset: { x: 0, y: 8 } }] },
-    { pattern: /.0..1.../, tileOffsetDefinitionList: [{ tileIndex: 7, offset: { x: 8, y: 0 } }] },
-    { pattern: /...1..0./, tileOffsetDefinitionList: [{ tileIndex: 8, offset: { x: 0, y: 8 } }] },
-    { pattern: /.01.0.../, tileOffsetDefinitionList: [{ tileIndex: 9, offset: { x: 8, y: 0 } }] },
-    { pattern: /10.0..../, tileOffsetDefinitionList: [{ tileIndex: 10, offset: { x: 0, y: 0 } }] },
-    { pattern: /....1.0./, tileOffsetDefinitionList: [{ tileIndex: 11, offset: { x: 8, y: 8 } }] },
-    { pattern: /...1..1./, tileOffsetDefinitionList: [{ tileIndex: 12, offset: { x: 0, y: 8 } }] },
-    { pattern: /...0..1./, tileOffsetDefinitionList: [{ tileIndex: 13, offset: { x: 0, y: 8 } }] },
-    { pattern: /....0.1./, tileOffsetDefinitionList: [{ tileIndex: 14, offset: { x: 8, y: 8 } }] },
-    { pattern: /....1.1./, tileOffsetDefinitionList: [{ tileIndex: 15, offset: { x: 8, y: 8 } }] }
+const borderPatternDefinitionList = [
+    new PatternOffsetTileSetDefinition(/.1.1..../, [
+        new OffsetTileDefinition(new TilePosition(0, 0), new PixelOffset(0, 0))
+    ]),
+    new PatternOffsetTileSetDefinition(/.1.0..../, [
+        new OffsetTileDefinition(new TilePosition(1, 0), new PixelOffset(0, 0))
+    ]),
+    new PatternOffsetTileSetDefinition(/.1..0.../, [
+        new OffsetTileDefinition(new TilePosition(2, 0), new PixelOffset(8, 0))
+    ]),
+    new PatternOffsetTileSetDefinition(/.1..1.../, [
+        new OffsetTileDefinition(new TilePosition(3, 0), new PixelOffset(8, 0))
+    ]),
+    new PatternOffsetTileSetDefinition(/.0.1..../, [
+        new OffsetTileDefinition(new TilePosition(0, 1), new PixelOffset(0, 0))
+    ]),
+    new PatternOffsetTileSetDefinition(/....0.01/, [
+        new OffsetTileDefinition(new TilePosition(1, 1), new PixelOffset(8, 8))
+    ]),
+    new PatternOffsetTileSetDefinition(/...0.10./, [
+        new OffsetTileDefinition(new TilePosition(2, 1), new PixelOffset(0, 8))
+    ]),
+    new PatternOffsetTileSetDefinition(/.0..1.../, [
+        new OffsetTileDefinition(new TilePosition(3, 1), new PixelOffset(8, 0))
+    ]),
+    new PatternOffsetTileSetDefinition(/...1..0./, [
+        new OffsetTileDefinition(new TilePosition(0, 2), new PixelOffset(0, 8))
+    ]),
+    new PatternOffsetTileSetDefinition(/.01.0.../, [
+        new OffsetTileDefinition(new TilePosition(1, 2), new PixelOffset(8, 0))
+    ]),
+    new PatternOffsetTileSetDefinition(/10.0..../, [
+        new OffsetTileDefinition(new TilePosition(2, 2), new PixelOffset(0, 0))
+    ]),
+    new PatternOffsetTileSetDefinition(/....1.0./, [
+        new OffsetTileDefinition(new TilePosition(3, 2), new PixelOffset(8, 8))
+    ]),
+    new PatternOffsetTileSetDefinition(/...1..1./, [
+        new OffsetTileDefinition(new TilePosition(0, 3), new PixelOffset(0, 8))
+    ]),
+    new PatternOffsetTileSetDefinition(/...0..1./, [
+        new OffsetTileDefinition(new TilePosition(1, 3), new PixelOffset(0, 8))
+    ]),
+    new PatternOffsetTileSetDefinition(/....0.1./, [
+        new OffsetTileDefinition(new TilePosition(2, 3), new PixelOffset(8, 8))
+    ]),
+    new PatternOffsetTileSetDefinition(/....1.1./, [
+        new OffsetTileDefinition(new TilePosition(3, 3), new PixelOffset(8, 8))
+    ])
 ];
 
-export const tileMapList: Array<TileMapDefinition> = [
+const list: Array<TileMapDefinition> = [
     // Sprite tiles
-    {
-        src: playerSprites,
-        rows: 4,
-        columns: 6,
-        offsetRows: 0,
-        offsetColumns: 0,
-        tileWidth: 18,
-        tileHeight: 24,
-        grid: 1,
-        weightedTileDefinitionList: undefined,
-        patternTileDefinitionList: undefined
-    },
-    {
-        src: boxSprites,
-        rows: 1,
-        columns: 1,
-        offsetRows: 0,
-        offsetColumns: 0,
-        tileWidth: 16,
-        tileHeight: 16,
-        grid: 0,
-        weightedTileDefinitionList: undefined,
-        patternTileDefinitionList: undefined
-    },
-    {
-        src: destinationSprites,
-        rows: 1,
-        columns: 1,
-        offsetRows: 0,
-        offsetColumns: 0,
-        tileWidth: 16,
-        tileHeight: 16,
-        grid: 0,
-        weightedTileDefinitionList: undefined,
-        patternTileDefinitionList: undefined
-    },
+    new TileMapDefinition(
+        playerSprites,
+        new TileSize(6, 4),
+        new TileOffset(0, 0),
+        new PixelSize(18, 24),
+        1,
+        undefined,
+        undefined
+    ),
+    new TileMapDefinition(
+        boxSprites,
+        new TileSize(1, 1),
+        new TileOffset(0, 0),
+        new PixelSize(16, 16),
+        0,
+        undefined,
+        undefined
+    ),
+    new TileMapDefinition(
+        destinationSprites,
+        new TileSize(1, 1),
+        new TileOffset(0, 0),
+        new PixelSize(16, 16),
+        0,
+        undefined,
+        undefined
+    ),
     // Level tiles
-    {
-        src: tilesPanel,
-        rows: 3,
-        columns: 3,
-        offsetRows: 0,
-        offsetColumns: 0,
-        tileWidth: 16,
-        tileHeight: 16,
-        grid: 0,
-        weightedTileDefinitionList: undefined,
-        patternTileDefinitionList: undefined
-    },
-    {
-        src: tilesFloor,
-        rows: 2,
-        columns: 2,
-        offsetRows: 0,
-        offsetColumns: 0,
-        tileWidth: 16,
-        tileHeight: 16,
-        grid: 0,
-        weightedTileDefinitionList: [
-            { tileIndex: 0, probability: 2.0 },
-            { tileIndex: 1, probability: 0.4 },
-            { tileIndex: 2, probability: 0.1 },
-            { tileIndex: 3, probability: 0.1 }
+    new TileMapDefinition(
+        tilesPanel,
+        new TileSize(3, 3),
+        new TileOffset(0, 0),
+        new PixelSize(16, 16),
+        0,
+        undefined,
+        undefined
+    ),
+    new TileMapDefinition(
+        tilesFloor,
+        new TileSize(2, 2),
+        new TileOffset(0, 0),
+        new PixelSize(16, 16),
+        0,
+        [
+            new RandomTileDefinition(new TilePosition(0, 0), 2.0),
+            new RandomTileDefinition(new TilePosition(1, 0), 0.4),
+            new RandomTileDefinition(new TilePosition(0, 1), 0.1),
+            new RandomTileDefinition(new TilePosition(1, 1), 0.1)
         ],
-        patternTileDefinitionList: undefined
-    },
-    {
-        src: tilesMoon,
-        rows: 1,
-        columns: 1,
-        offsetRows: 0,
-        offsetColumns: 0,
-        tileWidth: 32,
-        tileHeight: 32,
-        grid: 0,
-        weightedTileDefinitionList: undefined,
-        patternTileDefinitionList: undefined
-    },
-    {
-        src: tilesShadow,
-        rows: 1,
-        columns: 1,
-        offsetRows: 0,
-        offsetColumns: 0,
-        tileWidth: 16,
-        tileHeight: 16,
-        grid: 0,
-        weightedTileDefinitionList: undefined,
-        patternTileDefinitionList: undefined
-    },
-    {
-        src: tilesPillar,
-        rows: 3,
-        columns: 4,
-        offsetRows: 0,
-        offsetColumns: 0,
-        tileWidth: 16,
-        tileHeight: 16,
-        grid: 0,
-        weightedTileDefinitionList: undefined,
-        patternTileDefinitionList: [
-            {
-                pattern: /...00.0./,
-                tileOffsetDefinitionList: [
-                    { tileIndex: 0, offset: { x: 0, y: 16 } },
-                    { tileIndex: 4, offset: { x: 0, y: 32 } },
-                    { tileIndex: 8, offset: { x: 0, y: 48 } }
-                ]
-            },
-            {
-                pattern: /...01.0./,
-                tileOffsetDefinitionList: [
-                    { tileIndex: 1, offset: { x: 0, y: 16 } },
-                    { tileIndex: 5, offset: { x: 0, y: 32 } },
-                    { tileIndex: 9, offset: { x: 0, y: 48 } }
-                ]
-            },
-            {
-                pattern: /...11.0./,
-                tileOffsetDefinitionList: [
-                    { tileIndex: 2, offset: { x: 0, y: 16 } },
-                    { tileIndex: 6, offset: { x: 0, y: 32 } },
-                    { tileIndex: 10, offset: { x: 0, y: 48 } }
-                ]
-            },
-            {
-                pattern: /...10.0./,
-                tileOffsetDefinitionList: [
-                    { tileIndex: 3, offset: { x: 0, y: 16 } },
-                    { tileIndex: 7, offset: { x: 0, y: 32 } },
-                    { tileIndex: 11, offset: { x: 0, y: 48 } }
-                ]
-            }
-        ]
-    },
-    {
-        src: tilesVoid,
-        rows: 3,
-        columns: 2,
-        offsetRows: 0,
-        offsetColumns: 0,
-        tileWidth: 16,
-        tileHeight: 16,
-        grid: 0,
-        weightedTileDefinitionList: [
-            { tileIndex: 0, probability: 2.0 },
-            { tileIndex: 1, probability: 0.1 },
-            { tileIndex: 2, probability: 0.1 },
-            { tileIndex: 3, probability: 0.1 },
-            { tileIndex: 4, probability: 0.1 },
-            { tileIndex: 5, probability: 0.1 }
+        undefined
+    ),
+    new TileMapDefinition(
+        tilesMoon,
+        new TileSize(1, 1),
+        new TileOffset(0, 0),
+        new PixelSize(32, 32),
+        0,
+        undefined,
+        undefined
+    ),
+    new TileMapDefinition(
+        tilesShadow,
+        new TileSize(1, 1),
+        new TileOffset(0, 0),
+        new PixelSize(16, 16),
+        0,
+        undefined,
+        undefined
+    ),
+    new TileMapDefinition(tilesPillar, new TileSize(3, 4), new TileOffset(0, 0), new PixelSize(16, 16), 0, undefined, [
+        new PatternOffsetTileSetDefinition(/...00.0./, [
+            new OffsetTileDefinition(new TilePosition(0, 0), new PixelOffset(0, 16)),
+            new OffsetTileDefinition(new TilePosition(0, 1), new PixelOffset(0, 32)),
+            new OffsetTileDefinition(new TilePosition(0, 2), new PixelOffset(0, 48))
+        ]),
+        new PatternOffsetTileSetDefinition(/...01.0./, [
+            new OffsetTileDefinition(new TilePosition(1, 0), new PixelOffset(0, 16)),
+            new OffsetTileDefinition(new TilePosition(1, 1), new PixelOffset(0, 32)),
+            new OffsetTileDefinition(new TilePosition(1, 2), new PixelOffset(0, 48))
+        ]),
+        new PatternOffsetTileSetDefinition(/...11.0./, [
+            new OffsetTileDefinition(new TilePosition(2, 0), new PixelOffset(0, 16)),
+            new OffsetTileDefinition(new TilePosition(2, 1), new PixelOffset(0, 32)),
+            new OffsetTileDefinition(new TilePosition(2, 2), new PixelOffset(0, 48))
+        ]),
+        new PatternOffsetTileSetDefinition(/...10.0./, [
+            new OffsetTileDefinition(new TilePosition(3, 0), new PixelOffset(0, 16)),
+            new OffsetTileDefinition(new TilePosition(3, 1), new PixelOffset(0, 32)),
+            new OffsetTileDefinition(new TilePosition(3, 2), new PixelOffset(0, 48))
+        ])
+    ]),
+    new TileMapDefinition(
+        tilesVoid,
+        new TileSize(2, 3),
+        new TileOffset(0, 0),
+        new PixelSize(16, 16),
+        0,
+        [
+            new RandomTileDefinition(new TilePosition(0, 0), 2.0),
+            new RandomTileDefinition(new TilePosition(1, 0), 0.1),
+            new RandomTileDefinition(new TilePosition(0, 1), 0.1),
+            new RandomTileDefinition(new TilePosition(1, 1), 0.1),
+            new RandomTileDefinition(new TilePosition(0, 2), 0.1),
+            new RandomTileDefinition(new TilePosition(1, 2), 0.1)
         ],
-        patternTileDefinitionList: undefined
-    },
-    {
-        src: tilesVoidBorder,
-        rows: 4,
-        columns: 4,
-        offsetRows: 0,
-        offsetColumns: 0,
-        tileWidth: 8,
-        tileHeight: 8,
-        grid: 0,
-        weightedTileDefinitionList: undefined,
-        patternTileDefinitionList: borderPatternTileDefinition
-    },
-    {
-        src: tilesWater,
-        rows: 2,
-        columns: 2,
-        offsetRows: 0,
-        offsetColumns: 0,
-        tileWidth: 16,
-        tileHeight: 16,
-        grid: 0,
-        weightedTileDefinitionList: [
-            { tileIndex: 0, probability: 2.0 },
-            { tileIndex: 1, probability: 0.1 },
-            { tileIndex: 2, probability: 0.1 },
-            { tileIndex: 3, probability: 0.1 }
+        undefined
+    ),
+    new TileMapDefinition(
+        tilesVoidBorder,
+        new TileSize(4, 4),
+        new TileOffset(0, 0),
+        new PixelSize(8, 8),
+        0,
+        undefined,
+        borderPatternDefinitionList
+    ),
+    new TileMapDefinition(
+        tilesWater,
+        new TileSize(2, 2),
+        new TileOffset(0, 0),
+        new PixelSize(16, 16),
+        0,
+        [
+            new RandomTileDefinition(new TilePosition(0, 0), 2.0),
+            new RandomTileDefinition(new TilePosition(1, 0), 0.1),
+            new RandomTileDefinition(new TilePosition(0, 1), 0.1),
+            new RandomTileDefinition(new TilePosition(1, 1), 0.1)
         ],
-        patternTileDefinitionList: undefined
-    },
-    {
-        src: tilesWaterBorder,
-        rows: 4,
-        columns: 4,
-        offsetRows: 0,
-        offsetColumns: 0,
-        tileWidth: 8,
-        tileHeight: 8,
-        grid: 0,
-        weightedTileDefinitionList: undefined,
-        patternTileDefinitionList: borderPatternTileDefinition
-    }
+        undefined
+    ),
+    new TileMapDefinition(
+        tilesWaterBorder,
+        new TileSize(4, 4),
+        new TileOffset(0, 0),
+        new PixelSize(8, 8),
+        0,
+        undefined,
+        borderPatternDefinitionList
+    )
 ];
+export default list;
