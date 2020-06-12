@@ -1,4 +1,3 @@
-import PixelOffset from '../core/PixelOffset';
 import PixelPosition from '../core/PixelPosition';
 import PixelSize from '../core/PixelSize';
 import TileOffset from '../core/TileOffset';
@@ -28,14 +27,14 @@ export default class TileMap {
     ): Array<Array<Tile>> {
         // Create individual tiles
         const tileTable: Array<Array<Tile>> = [];
-        for (let row = 0; row < size.height; row++) {
-            tileTable[row] = [];
-            for (let column = 0; column < size.width; column++) {
-                tileTable[row][column] = new Tile(
+        for (let y = 0; y < size.height; y++) {
+            tileTable[y] = [];
+            for (let x = 0; x < size.width; x++) {
+                tileTable[y][x] = new Tile(
                     resource,
                     new PixelPosition(
-                        (column + offset.x) * (tileSize.width + grid),
-                        (row + offset.y) * (tileSize.height + grid)
+                        (x + offset.x) * (tileSize.width + grid),
+                        (y + offset.y) * (tileSize.height + grid)
                     ),
                     tileSize
                 );
@@ -95,37 +94,17 @@ export default class TileMap {
     };
 
     /**
-     * Get the tile at the given coordinates.
-     * @param position
-     * @param offset
-     */
-    public getWithOffset = (position: TilePosition, offset: PixelOffset): OffsetTile => {
-        const tile = this.get(position);
-        return new OffsetTile(tile.resource, tile.position, tile.size, offset);
-    };
-
-    /**
-     * Get the tile at the given coordinates.
-     * @param position
-     * @param probability
-     */
-    public getWithProbability = (position: TilePosition, probability: number): RandomTile => {
-        const tile = this.get(position);
-        return new RandomTile(tile.resource, tile.position, tile.size, probability);
-    };
-
-    /**
      * Returns a list of tiles and their offsets corresponding to the given pattern.
      * @param pattern
      */
     public getOffsetTileListByPattern = (pattern: string): Array<OffsetTile> => {
         if (!this.patternOffsetTileListList) {
-            throw new Error('Undefined patternOffsetTileSetDefinitionList');
+            throw new Error('Undefined patternOffsetTileListList');
         }
 
         // Find pattern-tile-definitions matching the pattern
-        const patternOffsetTileListList = this.patternOffsetTileListList.filter((value) =>
-            pattern.match(value.pattern)
+        const patternOffsetTileListList = this.patternOffsetTileListList.filter((patternOffsetTileList) =>
+            pattern.match(patternOffsetTileList.pattern)
         );
         if (patternOffsetTileListList.length === 0) {
             throw new Error(`Invalid pattern '${pattern}'`);
@@ -134,9 +113,7 @@ export default class TileMap {
         // Return tiles and tile offsets for the given pattern-tile-definitions
         const offsetTileList: Array<OffsetTile> = [];
         patternOffsetTileListList.forEach((patternOffsetTileList) => {
-            patternOffsetTileList.offsetTileList.forEach((offsetTile) => {
-                offsetTileList.push(offsetTile);
-            });
+            offsetTileList.push(...patternOffsetTileList.offsetTileList);
         });
         return offsetTileList;
     };

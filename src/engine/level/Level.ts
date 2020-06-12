@@ -39,8 +39,7 @@ export default class Level extends Scene {
     public readonly boxPositionList: Array<TilePosition>;
     public readonly destinationPositionList: Array<TilePosition>;
 
-    public readonly rows: number;
-    public readonly columns: number;
+    public readonly size: TileSize;
 
     private fontLoader!: FontLoader;
     private tileMapLoader!: TileMapLoader;
@@ -78,8 +77,7 @@ export default class Level extends Scene {
         this.boxPositionList = boxCoordinatesList;
         this.destinationPositionList = destinationCoordinatesList;
 
-        this.rows = tileTypeMap.length;
-        this.columns = tileTypeMap[0].length;
+        this.size = new TileSize(tileTypeMap[0].length, tileTypeMap.length);
     }
 
     /**
@@ -287,8 +285,8 @@ export default class Level extends Scene {
             bufferCanvas.height / Game.TILE_SIZE.height
         );
         const screenOffset = new PixelOffset(
-            ((levelSize.width - this.columns) / 2) * Game.TILE_SIZE.width,
-            ((levelSize.height - this.rows + 2) / 2) * Game.TILE_SIZE.height
+            ((levelSize.width - this.size.width) / 2) * Game.TILE_SIZE.width,
+            ((levelSize.height - this.size.height + 2) / 2) * Game.TILE_SIZE.height
         );
         const spriteList = [...this.destinationList, ...this.boxList, this.player];
 
@@ -423,8 +421,8 @@ export default class Level extends Scene {
 
         let pattern: string;
         let offsetTileList: Array<OffsetTile>;
-        for (let y = 0; y < this.rows; y++) {
-            for (let x = 0; x < this.columns; x++) {
+        for (let y = 0; y < this.size.height; y++) {
+            for (let x = 0; x < this.size.width; x++) {
                 offsetTileList = [];
 
                 switch (this.tileTypeMap[y][x]) {
@@ -472,14 +470,15 @@ export default class Level extends Scene {
                 }
 
                 // Draw tiles
-                offsetTileList.forEach((tileDefinition) => {
-                    if (!tileDefinition.offset) {
-                        tileDefinition.offset = new PixelOffset(0, 0);
+                offsetTileList.forEach((offsetTile) => {
+                    if (!offsetTile.offset) {
+                        offsetTile.offset = new PixelOffset(0, 0);
                     }
-                    tileDefinition.draw(
+                    console.log(offsetTile);
+                    offsetTile.draw(
                         new PixelPosition(
-                            tileDefinition.offset.x + offset.x + x * Game.TILE_SIZE.width,
-                            tileDefinition.offset.y + offset.y + y * Game.TILE_SIZE.height
+                            offsetTile.offset.x + offset.x + x * Game.TILE_SIZE.width,
+                            offsetTile.offset.y + offset.y + y * Game.TILE_SIZE.height
                         ),
                         this.levelContext
                     )}
