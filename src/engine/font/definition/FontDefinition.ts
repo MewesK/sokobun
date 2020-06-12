@@ -1,6 +1,6 @@
-import { CharacterDefinition } from '../Font';
+import CharacterDefinition from './CharacterDefinition';
 
-export interface FontDefinition {
+export default interface FontDefinition {
     family: string;
     size: number;
     height: number;

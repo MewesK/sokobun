@@ -10,8 +10,8 @@ import definitionYosterIsland12 from '../../fonts/yoster_island_12.json';
 import tilesYosterIsland14Bright from '../../fonts/yoster_island_14_bright.png';
 import tilesYosterIsland14Dark from '../../fonts/yoster_island_14_dark.png';
 import definitionYosterIsland14 from '../../fonts/yoster_island_14.json';
-import { FontDefinition } from './definition/FontDefinition';
 import { FontColor } from './Font';
+import FontDefinition from './definition/FontDefinition';
 
 const list: Array<[FontDefinition, FontColor, string]> = [
     [definitionYosterIsland8, FontColor.Bright, tilesYosterIsland8Bright],

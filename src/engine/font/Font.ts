@@ -1,8 +1,8 @@
 import PixelPosition from '../core/PixelPosition';
 import PixelSize from '../core/PixelSize';
 import Resource from '../resource/Resource';
-import { CharacterDefinition } from './definition/CharacterDefinition';
-import { FontDefinition } from './definition/FontDefinition';
+import FontDefinition from './definition/FontDefinition';
+import CharacterDefinition from './definition/CharacterDefinition';
 
 export enum FontColor {
     Bright,

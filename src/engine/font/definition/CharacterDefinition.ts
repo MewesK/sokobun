@@ -1,4 +1,4 @@
-export interface CharacterDefinition {
+export default interface CharacterDefinition {
     width: number;
     x: number;
     y: number;

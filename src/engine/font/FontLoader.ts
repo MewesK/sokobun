@@ -1,5 +1,5 @@
 import ResourceLoader from '../resource/ResourceLoader';
-import { FontDefinition } from './definition/FontDefinition';
+import FontDefinition from './definition/FontDefinition';
 import Font, { FontColor } from './Font';
 
 export default class FontLoader {
