@@ -41,11 +41,11 @@ export default class Level extends Scene {
 
     public readonly size: TileSize;
 
-    private fontLoader!: FontLoader;
-    private tileMapLoader!: TileMapLoader;
+    public fontLoader!: FontLoader;
+    public tileMapLoader!: TileMapLoader;
 
-    private levelCanvas!: HTMLCanvasElement;
-    private levelContext!: CanvasRenderingContext2D;
+    public levelCanvas!: HTMLCanvasElement;
+    public levelContext!: CanvasRenderingContext2D;
 
     private pausePanel!: Panel;
     private winPanel!: Panel;
@@ -96,41 +96,46 @@ export default class Level extends Scene {
         this.fontLoader = fontLoader;
         this.tileMapLoader = tileMapLoader;
 
-        // panels
-        const bigFont = this.fontLoader.get('Yoster Island', 14, FontColor.Dark);
+        // Panels
+        const bigFont = this.fontLoader.get('Yoster Island', 14, FontColor.Bright);
+        const smallFont = this.fontLoader.get('Yoster Island', 10, FontColor.Dark);
         this.pausePanel = new Panel(
+            this,
             new PixelPosition(0, 0),
-            new PixelSize(100, 50),
+            new PixelSize(200, 50),
+            true,
             'Pause',
             bigFont,
-            true,
-            [
-                new Text(
-                    new PixelOffset(0, 0),
-                    new PixelSize(0, 0),
-                    'Press space to unpause',
-                    this.fontLoader.get('Yoster Island', 10, FontColor.Dark),
-                    true
-                )
-            ],
             this.tileMapLoader.get(tilesPanel)
         );
+        this.pausePanel.componentList.push(
+            new Text(
+                this.pausePanel,
+                new PixelPosition(0, 0),
+                new PixelSize(smallFont.measure('Press space to unpause').width, smallFont.height),
+                true,
+                'Press space to unpause',
+                smallFont
+            )
+        );
         this.winPanel = new Panel(
+            this,
             new PixelPosition(0, 0),
-            new PixelSize(200, 100),
+            new PixelSize(200, 50),
+            true,
             'You win!',
             bigFont,
-            true,
-            [
-                new Text(
-                    new PixelOffset(0, 0),
-                    new PixelSize(0, 0),
-                    'Press space for the next level',
-                    this.fontLoader.get('Yoster Island', 10, FontColor.Dark),
-                    true
-                )
-            ],
             this.tileMapLoader.get(tilesPanel)
+        );
+        this.winPanel.componentList.push(
+            new Text(
+                this.winPanel,
+                new PixelPosition(0, 0),
+                new PixelSize(smallFont.measure('Press space for the next level').width, smallFont.height),
+                true,
+                'Press space for the next level',
+                smallFont
+            )
         );
 
         // Level canvas
@@ -329,11 +334,9 @@ export default class Level extends Scene {
 
         if (this.won) {
             // Draw panel
-            this.winPanel.center(new PixelSize(bufferContext.canvas.width, bufferContext.canvas.height));
             this.winPanel.draw(bufferContext);
         } else if (this.paused) {
             // Draw panel
-            this.pausePanel.center(new PixelSize(bufferContext.canvas.width, bufferContext.canvas.height));
             this.pausePanel.draw(bufferContext);
         }
     };
@@ -474,15 +477,14 @@ export default class Level extends Scene {
                     if (!offsetTile.offset) {
                         offsetTile.offset = new PixelOffset(0, 0);
                     }
-                    console.log(offsetTile);
                     offsetTile.draw(
                         new PixelPosition(
                             offsetTile.offset.x + offset.x + x * Game.TILE_SIZE.width,
                             offsetTile.offset.y + offset.y + y * Game.TILE_SIZE.height
                         ),
                         this.levelContext
-                    )}
-                );
+                    );
+                });
             }
         }
     };

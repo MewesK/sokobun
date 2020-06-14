@@ -1,3 +1,4 @@
+import PixelPosition from '../core/PixelPosition';
 import Resource from '../resource/Resource';
 import ResourceLoader from '../resource/ResourceLoader';
 import { TileMapDefinition } from './definition/TileMapDefinition';
@@ -5,7 +6,6 @@ import { OffsetTile } from './OffsetTile';
 import { PatternOffsetTileList } from './PatternOffsetTileList';
 import { RandomTile } from './RandomTile';
 import TileMap from './TileMap';
-import PixelPosition from "../core/PixelPosition";
 
 export default class TileMapLoader {
     private readonly resourceLoader: ResourceLoader;
@@ -49,8 +49,10 @@ export default class TileMapLoader {
                                             new OffsetTile(
                                                 resource,
                                                 new PixelPosition(
-                                                    offsetTileDefinition.position.x * (input.tileSize.width + input.grid),
-                                                    offsetTileDefinition.position.y * (input.tileSize.height + input.grid)
+                                                    offsetTileDefinition.position.x *
+                                                        (input.tileSize.width + input.grid),
+                                                    offsetTileDefinition.position.y *
+                                                        (input.tileSize.height + input.grid)
                                                 ),
                                                 input.tileSize,
                                                 offsetTileDefinition.offset

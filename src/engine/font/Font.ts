@@ -1,8 +1,8 @@
 import PixelPosition from '../core/PixelPosition';
 import PixelSize from '../core/PixelSize';
 import Resource from '../resource/Resource';
-import FontDefinition from './definition/FontDefinition';
 import CharacterDefinition from './definition/CharacterDefinition';
+import FontDefinition from './definition/FontDefinition';
 
 export enum FontColor {
     Bright,
@@ -64,31 +64,6 @@ export default class Font implements FontDefinition {
             }
         });
 
-        return this;
-    };
-
-    /**
-     * Draws the given text.
-     * @param text
-     * @param position
-     * @param parentSize
-     * @param context
-     */
-    public drawCentered = (
-        text: string,
-        position: PixelPosition,
-        parentSize: PixelSize,
-        context: CanvasRenderingContext2D
-    ): Font => {
-        const textSize = this.measure(text);
-        this.draw(
-            text,
-            new PixelPosition(
-                position.x + (parentSize.width - textSize.width) / 2,
-                position.y + (parentSize.height - textSize.height) / 2
-            ),
-            context
-        );
         return this;
     };
 

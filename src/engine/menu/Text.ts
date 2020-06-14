@@ -1,25 +1,27 @@
 import PixelPosition from '../core/PixelPosition';
 import PixelSize from '../core/PixelSize';
 import Font from '../font/Font';
+import Level from '../level/Level';
 import Component from './Component';
 
 export default class Text extends Component {
     public text: string;
     public font: Font;
-    public centered = false;
 
-    constructor(position: PixelPosition, size: PixelSize, text: string, font: Font, centered: boolean) {
-        super(position, size);
+    constructor(
+        parent: Component | Level,
+        position: PixelPosition,
+        size: PixelSize,
+        centered: boolean,
+        text: string,
+        font: Font
+    ) {
+        super(parent, position, size, centered);
         this.text = text;
         this.font = font;
-        this.centered = centered;
     }
 
     public draw = (context: CanvasRenderingContext2D): void => {
-        if (this.centered) {
-            this.font.drawCentered(this.text, this.position, this.size, context);
-        } else {
-            this.font.draw(this.text, this.position, context);
-        }
+        this.font.draw(this.text, this.calculatePosition(), context);
     };
 }
