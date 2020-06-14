@@ -110,16 +110,23 @@ export default class Level extends Scene {
         this.levelContext = levelContext;
 
         // Panels
+        const panelTiles = this.tileMapLoader.get(tilesPanel);
         const bigFont = this.fontLoader.get('Yoster Island', 14, FontColor.Bright);
         const smallFont = this.fontLoader.get('Yoster Island', 10, FontColor.Dark);
-        this.pausePanel = new Panel(this.tileMapLoader.get(tilesPanel), this.levelCanvas, 140, 'Pause', bigFont);
+        this.pausePanel = new Panel(panelTiles, this.levelCanvas, 140, 'Pause', bigFont);
         this.pausePanel.componentList.push(
+            new Button(this.pausePanel, 0, 'Options', smallFont, false),
             new Button(this.pausePanel, 0, 'Reload level', smallFont, false),
             new Button(this.pausePanel, 0, 'Select level', smallFont, false),
             new Button(this.pausePanel, 6, 'Back to game', smallFont, true)
         );
-        this.winPanel = new Panel(this.tileMapLoader.get(tilesPanel), this.levelCanvas, 200, 'You win!', bigFont);
-        this.winPanel.componentList.push(new Text(this.winPanel, 0, 'Press space for the next level', smallFont));
+        this.winPanel = new Panel(panelTiles, this.levelCanvas, 140, 'You win!', bigFont);
+        this.winPanel.componentList.push(
+            new Text(this.pausePanel, 0, 'Moves: ' + this.moves, smallFont),
+            new Text(this.pausePanel, 0, 'Pushes: ' + this.pushes, smallFont),
+            new Text(this.pausePanel, 0, 'Time: ' + this.time, smallFont),
+            new Button(this.pausePanel, 6, 'Next level', smallFont, true)
+        );
 
         // Create sprites and set initial position
         this.player = new Player(this.tileMapLoader.get(playerSprites));

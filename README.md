@@ -20,12 +20,11 @@ Bitmap font based on:
 
 ## Next steps
 
- - merge Tile and OffsetTile
  - add menu (level select, character select, options, credits)
  - add intro
  - add sounds/music
- - add retry/prev/next//mute buttons
+ - add retry buttons
  - add win animation
  - add level teleport animation
  - add clouds
- - add love particles
+ - add particles
