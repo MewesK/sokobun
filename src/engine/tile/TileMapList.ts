@@ -16,57 +16,57 @@ import TileOffset from '../core/TileOffset';
 import TilePosition from '../core/TilePosition';
 import TileSize from '../core/TileSize';
 import { OffsetTileDefinition } from './definition/OffsetTileDefinition';
-import { PatternOffsetTileSetDefinition } from './definition/PatternOffsetTileSetDefinition';
+import { PatternOffsetTileListDefinition } from './definition/PatternOffsetTileListDefinition';
 import { RandomTileDefinition } from './definition/RandomTileDefinition';
 import { TileMapDefinition } from './definition/TileMapDefinition';
 
 const borderPatternDefinitionList = [
-    new PatternOffsetTileSetDefinition(/.1.1..../, [
+    new PatternOffsetTileListDefinition(/.1.1..../, [
         new OffsetTileDefinition(new TilePosition(0, 0), new PixelOffset(0, 0))
     ]),
-    new PatternOffsetTileSetDefinition(/.1.0..../, [
+    new PatternOffsetTileListDefinition(/.1.0..../, [
         new OffsetTileDefinition(new TilePosition(1, 0), new PixelOffset(0, 0))
     ]),
-    new PatternOffsetTileSetDefinition(/.1..0.../, [
+    new PatternOffsetTileListDefinition(/.1..0.../, [
         new OffsetTileDefinition(new TilePosition(2, 0), new PixelOffset(8, 0))
     ]),
-    new PatternOffsetTileSetDefinition(/.1..1.../, [
+    new PatternOffsetTileListDefinition(/.1..1.../, [
         new OffsetTileDefinition(new TilePosition(3, 0), new PixelOffset(8, 0))
     ]),
-    new PatternOffsetTileSetDefinition(/.0.1..../, [
+    new PatternOffsetTileListDefinition(/.0.1..../, [
         new OffsetTileDefinition(new TilePosition(0, 1), new PixelOffset(0, 0))
     ]),
-    new PatternOffsetTileSetDefinition(/....0.01/, [
+    new PatternOffsetTileListDefinition(/....0.01/, [
         new OffsetTileDefinition(new TilePosition(1, 1), new PixelOffset(8, 8))
     ]),
-    new PatternOffsetTileSetDefinition(/...0.10./, [
+    new PatternOffsetTileListDefinition(/...0.10./, [
         new OffsetTileDefinition(new TilePosition(2, 1), new PixelOffset(0, 8))
     ]),
-    new PatternOffsetTileSetDefinition(/.0..1.../, [
+    new PatternOffsetTileListDefinition(/.0..1.../, [
         new OffsetTileDefinition(new TilePosition(3, 1), new PixelOffset(8, 0))
     ]),
-    new PatternOffsetTileSetDefinition(/...1..0./, [
+    new PatternOffsetTileListDefinition(/...1..0./, [
         new OffsetTileDefinition(new TilePosition(0, 2), new PixelOffset(0, 8))
     ]),
-    new PatternOffsetTileSetDefinition(/.01.0.../, [
+    new PatternOffsetTileListDefinition(/.01.0.../, [
         new OffsetTileDefinition(new TilePosition(1, 2), new PixelOffset(8, 0))
     ]),
-    new PatternOffsetTileSetDefinition(/10.0..../, [
+    new PatternOffsetTileListDefinition(/10.0..../, [
         new OffsetTileDefinition(new TilePosition(2, 2), new PixelOffset(0, 0))
     ]),
-    new PatternOffsetTileSetDefinition(/....1.0./, [
+    new PatternOffsetTileListDefinition(/....1.0./, [
         new OffsetTileDefinition(new TilePosition(3, 2), new PixelOffset(8, 8))
     ]),
-    new PatternOffsetTileSetDefinition(/...1..1./, [
+    new PatternOffsetTileListDefinition(/...1..1./, [
         new OffsetTileDefinition(new TilePosition(0, 3), new PixelOffset(0, 8))
     ]),
-    new PatternOffsetTileSetDefinition(/...0..1./, [
+    new PatternOffsetTileListDefinition(/...0..1./, [
         new OffsetTileDefinition(new TilePosition(1, 3), new PixelOffset(0, 8))
     ]),
-    new PatternOffsetTileSetDefinition(/....0.1./, [
+    new PatternOffsetTileListDefinition(/....0.1./, [
         new OffsetTileDefinition(new TilePosition(2, 3), new PixelOffset(8, 8))
     ]),
-    new PatternOffsetTileSetDefinition(/....1.1./, [
+    new PatternOffsetTileListDefinition(/....1.1./, [
         new OffsetTileDefinition(new TilePosition(3, 3), new PixelOffset(8, 8))
     ])
 ];
@@ -143,22 +143,22 @@ const list: Array<TileMapDefinition> = [
         undefined
     ),
     new TileMapDefinition(tilesPillar, new TileSize(3, 4), new TileOffset(0, 0), new PixelSize(16, 16), 0, undefined, [
-        new PatternOffsetTileSetDefinition(/...00.0./, [
+        new PatternOffsetTileListDefinition(/...00.0./, [
             new OffsetTileDefinition(new TilePosition(0, 0), new PixelOffset(0, 16)),
             new OffsetTileDefinition(new TilePosition(0, 1), new PixelOffset(0, 32)),
             new OffsetTileDefinition(new TilePosition(0, 2), new PixelOffset(0, 48))
         ]),
-        new PatternOffsetTileSetDefinition(/...01.0./, [
+        new PatternOffsetTileListDefinition(/...01.0./, [
             new OffsetTileDefinition(new TilePosition(1, 0), new PixelOffset(0, 16)),
             new OffsetTileDefinition(new TilePosition(1, 1), new PixelOffset(0, 32)),
             new OffsetTileDefinition(new TilePosition(1, 2), new PixelOffset(0, 48))
         ]),
-        new PatternOffsetTileSetDefinition(/...11.0./, [
+        new PatternOffsetTileListDefinition(/...11.0./, [
             new OffsetTileDefinition(new TilePosition(2, 0), new PixelOffset(0, 16)),
             new OffsetTileDefinition(new TilePosition(2, 1), new PixelOffset(0, 32)),
             new OffsetTileDefinition(new TilePosition(2, 2), new PixelOffset(0, 48))
         ]),
-        new PatternOffsetTileSetDefinition(/...10.0./, [
+        new PatternOffsetTileListDefinition(/...10.0./, [
             new OffsetTileDefinition(new TilePosition(3, 0), new PixelOffset(0, 16)),
             new OffsetTileDefinition(new TilePosition(3, 1), new PixelOffset(0, 32)),
             new OffsetTileDefinition(new TilePosition(3, 2), new PixelOffset(0, 48))

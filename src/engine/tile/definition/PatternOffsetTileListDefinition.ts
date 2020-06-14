@@ -1,6 +1,6 @@
 import { OffsetTileDefinition } from './OffsetTileDefinition';
 
-export class PatternOffsetTileSetDefinition {
+export class PatternOffsetTileListDefinition {
     public pattern: RegExp;
     public offsetTileDefinitionList: Array<OffsetTileDefinition>;
 
