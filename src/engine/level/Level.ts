@@ -19,6 +19,7 @@ import TileSize from '../core/TileSize';
 import { FontColor } from '../font/Font';
 import FontLoader from '../font/FontLoader';
 import Game from '../Game';
+import Button from '../menu/Button';
 import Panel from '../menu/Panel';
 import Text from '../menu/Text';
 import ResourceLoader from '../resource/ResourceLoader';
@@ -96,48 +97,6 @@ export default class Level extends Scene {
         this.fontLoader = fontLoader;
         this.tileMapLoader = tileMapLoader;
 
-        // Panels
-        const bigFont = this.fontLoader.get('Yoster Island', 14, FontColor.Bright);
-        const smallFont = this.fontLoader.get('Yoster Island', 10, FontColor.Dark);
-        this.pausePanel = new Panel(
-            this,
-            new PixelPosition(0, 0),
-            new PixelSize(200, 50),
-            true,
-            'Pause',
-            bigFont,
-            this.tileMapLoader.get(tilesPanel)
-        );
-        this.pausePanel.componentList.push(
-            new Text(
-                this.pausePanel,
-                new PixelPosition(0, 0),
-                new PixelSize(smallFont.measure('Press space to unpause').width, smallFont.height),
-                true,
-                'Press space to unpause',
-                smallFont
-            )
-        );
-        this.winPanel = new Panel(
-            this,
-            new PixelPosition(0, 0),
-            new PixelSize(200, 50),
-            true,
-            'You win!',
-            bigFont,
-            this.tileMapLoader.get(tilesPanel)
-        );
-        this.winPanel.componentList.push(
-            new Text(
-                this.winPanel,
-                new PixelPosition(0, 0),
-                new PixelSize(smallFont.measure('Press space for the next level').width, smallFont.height),
-                true,
-                'Press space for the next level',
-                smallFont
-            )
-        );
-
         // Level canvas
         this.levelCanvas = document.createElement('canvas');
         this.levelCanvas.width = size.width;
@@ -149,6 +108,18 @@ export default class Level extends Scene {
             throw new Error('2D context not supported');
         }
         this.levelContext = levelContext;
+
+        // Panels
+        const bigFont = this.fontLoader.get('Yoster Island', 14, FontColor.Bright);
+        const smallFont = this.fontLoader.get('Yoster Island', 10, FontColor.Dark);
+        this.pausePanel = new Panel(this.tileMapLoader.get(tilesPanel), this.levelCanvas, 140, 'Pause', bigFont);
+        this.pausePanel.componentList.push(
+            new Button(this.pausePanel, 0, 'Reload level', smallFont, false),
+            new Button(this.pausePanel, 0, 'Select level', smallFont, false),
+            new Button(this.pausePanel, 6, 'Back to game', smallFont, true)
+        );
+        this.winPanel = new Panel(this.tileMapLoader.get(tilesPanel), this.levelCanvas, 200, 'You win!', bigFont);
+        this.winPanel.componentList.push(new Text(this.winPanel, 0, 'Press space for the next level', smallFont));
 
         // Create sprites and set initial position
         this.player = new Player(this.tileMapLoader.get(playerSprites));

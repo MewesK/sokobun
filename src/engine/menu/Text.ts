@@ -1,27 +1,26 @@
 import PixelPosition from '../core/PixelPosition';
 import PixelSize from '../core/PixelSize';
 import Font from '../font/Font';
-import Level from '../level/Level';
 import Component from './Component';
+import Panel from './Panel';
 
 export default class Text extends Component {
     public text: string;
     public font: Font;
 
-    constructor(
-        parent: Component | Level,
-        position: PixelPosition,
-        size: PixelSize,
-        centered: boolean,
-        text: string,
-        font: Font
-    ) {
-        super(parent, position, size, centered);
+    constructor(parent: Panel, marginTop: number, text: string, font: Font) {
+        super(parent, marginTop);
         this.text = text;
         this.font = font;
     }
 
-    public draw = (context: CanvasRenderingContext2D): void => {
-        this.font.draw(this.text, this.calculatePosition(), context);
+    public draw = (position: PixelPosition, context: CanvasRenderingContext2D): void => {
+        const fontWidth = this.font.measure(this.text).width;
+        const parentWidth = this.parent.width;
+        this.font.draw(this.text, new PixelPosition((parentWidth - fontWidth) / 2 + position.x, position.y), context);
+    };
+
+    public measure = (): PixelSize => {
+        return new PixelSize(this.parent.width, this.font.measure(this.text).height);
     };
 }
