@@ -1,8 +1,12 @@
 import CharacterDefinition from './CharacterDefinition';
+import KerningDefinition from './KerningDefinition';
 
 export default interface FontDefinition {
     family: string;
     size: number;
     height: number;
-    characterDefinitionList: Record<string, CharacterDefinition>;
+    ascender: number;
+    descender: number;
+    characterDefinitionList: Array<CharacterDefinition>;
+    kerningDefinitionList: Array<KerningDefinition>;
 }

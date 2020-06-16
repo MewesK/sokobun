@@ -24,7 +24,10 @@ export default class FontLoader {
                         input[0].family,
                         input[0].size,
                         input[0].height,
-                        input[0].characterDefinitionList
+                        input[0].ascender,
+                        input[0].descender,
+                        input[0].characterDefinitionList,
+                        input[0].kerningDefinitionList
                     )
                 );
             });

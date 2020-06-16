@@ -101,7 +101,7 @@ export default class Panel {
         const fontSize = this.font.measure(this.text);
         this.font.draw(
             this.text,
-            new PixelPosition((size.width - fontSize.width) / 2 + position.x, position.y - fontSize.height),
+            new PixelPosition((size.width - fontSize.width) / 2 + position.x, position.y - fontSize.height - Panel.PADDING),
             context
         );
 
@@ -125,10 +125,10 @@ export default class Panel {
      * Calculates the actual size based on the child components.
      */
     private calculateSize = (): PixelSize => {
-        let height = 0;
+        let height = Panel.PADDING;
         this.componentList.forEach((component) => {
             height += component.measure().height + component.marginTop + Panel.PADDING;
         });
-        return new PixelSize(this.width + 2 * Panel.PADDING, height + Panel.PADDING);
+        return new PixelSize(this.width + 2 * Panel.PADDING, height + (this.componentList.length == 0 ? Panel.PADDING : 0));
     };
 }

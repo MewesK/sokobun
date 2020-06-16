@@ -17,7 +17,7 @@ export default class Text extends Component {
     public draw = (position: PixelPosition, context: CanvasRenderingContext2D): void => {
         const fontWidth = this.font.measure(this.text).width;
         const parentWidth = this.parent.width;
-        this.font.draw(this.text, new PixelPosition((parentWidth - fontWidth) / 2 + position.x, position.y), context);
+        this.font.draw(this.text, new PixelPosition(Math.round((parentWidth - fontWidth) / 2) + position.x, position.y), context);
     };
 
     public measure = (): PixelSize => {

@@ -1,4 +1,5 @@
 export default interface CharacterDefinition {
+    char: string;
     width: number;
     x: number;
     y: number;

@@ -111,8 +111,8 @@ export default class Level extends Scene {
 
         // Panels
         const panelTiles = this.tileMapLoader.get(tilesPanel);
-        const bigFont = this.fontLoader.get('Yoster Island', 14, FontColor.Bright);
-        const smallFont = this.fontLoader.get('Yoster Island', 10, FontColor.Dark);
+        const bigFont = this.fontLoader.get('Qarmic', 14, FontColor.Bright);
+        const smallFont = this.fontLoader.get('Qarmic', 10, FontColor.Dark);
         this.pausePanel = new Panel(panelTiles, this.levelCanvas, 140, 'Pause', bigFont);
         this.pausePanel.componentList.push(
             new Button(this.pausePanel, 0, 'Options', smallFont, false),
@@ -302,13 +302,10 @@ export default class Level extends Scene {
 
         // Draw status
         this.fontLoader
-            .get('Yoster Island', 10, FontColor.Bright)
-            .draw('Moves', new PixelPosition(10, 256), bufferContext)
-            .draw(String(this.moves), new PixelPosition(64, 256), bufferContext)
-            .draw('Pushes', new PixelPosition(10, 270), bufferContext)
-            .draw(String(this.pushes), new PixelPosition(64, 270), bufferContext)
-            .draw('Time', new PixelPosition(10, 284), bufferContext)
-            .draw(String(Math.floor(this.time)), new PixelPosition(64, 284), bufferContext);
+            .get('Qarmic', 10, FontColor.Bright)
+            .draw(`Moves: ${this.moves}`, new PixelPosition(10, 278), bufferContext)
+            .draw(`Pushes: ${this.pushes}`, new PixelPosition(137, 278), bufferContext)
+            .draw(`Time: ${Math.floor(this.time)}`, new PixelPosition(264, 278), bufferContext)
 
         if (this.won) {
             // Draw panel

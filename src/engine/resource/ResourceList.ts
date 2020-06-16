@@ -1,11 +1,7 @@
-import tilesYosterIsland8Bright from '../../fonts/yoster_island_8_bright.png';
-import tilesYosterIsland8Dark from '../../fonts/yoster_island_8_dark.png';
-import tilesYosterIsland10Bright from '../../fonts/yoster_island_10_bright.png';
-import tilesYosterIsland10Dark from '../../fonts/yoster_island_10_dark.png';
-import tilesYosterIsland12Bright from '../../fonts/yoster_island_12_bright.png';
-import tilesYosterIsland12Dark from '../../fonts/yoster_island_12_dark.png';
-import tilesYosterIsland14Bright from '../../fonts/yoster_island_14_bright.png';
-import tilesYosterIsland14Dark from '../../fonts/yoster_island_14_dark.png';
+import tilesQarmic10Bright from '../../fonts/qarmic_10_bright.png';
+import tilesQarmic10Dark from '../../fonts/qarmic_10_dark.png';
+import tilesQarmic14Bright from '../../fonts/qarmic_14_bright.png';
+import tilesQarmic14Dark from '../../fonts/qarmic_14_dark.png';
 import boxSprites from '../../images/bun.png';
 import tilesMoon from '../../images/moon.png';
 import destinationSprites from '../../images/pillow.png';
@@ -33,14 +29,10 @@ const list: Array<string> = [
     tilesVoidBorder,
     tilesWater,
     tilesWaterBorder,
-    tilesYosterIsland8Bright,
-    tilesYosterIsland10Bright,
-    tilesYosterIsland12Bright,
-    tilesYosterIsland14Bright,
-    tilesYosterIsland8Dark,
-    tilesYosterIsland10Dark,
-    tilesYosterIsland12Dark,
-    tilesYosterIsland14Dark,
+    tilesQarmic10Bright,
+    tilesQarmic10Dark,
+    tilesQarmic14Bright,
+    tilesQarmic14Dark,
     level
 ];
 export default list;

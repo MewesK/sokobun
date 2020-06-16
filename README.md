@@ -16,7 +16,7 @@ Inspired by the following works:
 
 Bitmap font based on:
 
- - "Yoster Island Font" by [codeman38](https://www.1001fonts.com/yoster-island-font.html)
+ - "Qarmic Sans" by [Joanne Taylor](https://www.fontsquirrel.com/fonts/Qikki-Reg)
 
 ## Next steps
 
