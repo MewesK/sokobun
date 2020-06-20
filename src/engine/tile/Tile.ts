@@ -40,12 +40,12 @@ export default class Tile {
         context.imageSmoothingEnabled = false;
         context.drawImage(
             <CanvasImageSource>this.resource.data,
-            this.position.x,
-            this.position.y,
+            Math.floor(this.position.x),
+            Math.floor(this.position.y),
             this.size.width,
             this.size.height,
-            position.x,
-            position.y,
+            Math.floor(position.x),
+            Math.floor(position.y),
             size.width,
             size.height
         );

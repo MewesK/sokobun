@@ -60,17 +60,19 @@ export default class Font implements FontDefinition {
             );
             if (characterDefinition !== undefined) {
                 context.imageSmoothingEnabled = false;
-                context.drawImage(
-                    <CanvasImageSource>this.resource.data,
-                    characterDefinition.x,
-                    characterDefinition.y,
-                    characterDefinition.w,
-                    characterDefinition.h,
-                    charX,
-                    charY + (this.ascender - characterDefinition.oy),
-                    characterDefinition.w,
-                    characterDefinition.h
-                );
+                if (characterDefinition.w > 0 && characterDefinition.h > 0) {
+                    context.drawImage(
+                        <CanvasImageSource>this.resource.data,
+                        characterDefinition.x,
+                        characterDefinition.y,
+                        characterDefinition.w,
+                        characterDefinition.h,
+                        charX,
+                        charY + (this.ascender - characterDefinition.oy),
+                        characterDefinition.w,
+                        characterDefinition.h
+                    );
+                }
 
                 charX += characterDefinition.width - characterDefinition.ox;
             }
