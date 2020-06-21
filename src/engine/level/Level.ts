@@ -301,11 +301,16 @@ export default class Level extends Scene {
         });
 
         // Draw status
-        this.fontLoader
-            .get('Qarmic', 10, FontColor.Bright)
-            .draw(`Moves: ${this.moves}`, new PixelPosition(10, 278), bufferContext)
-            .draw(`Pushes: ${this.pushes}`, new PixelPosition(137, 278), bufferContext)
-            .draw(`Time: ${Math.floor(this.time)}`, new PixelPosition(264, 278), bufferContext)
+        const statusFont = this.fontLoader.get('Qarmic', 10, FontColor.Bright);
+        const movesWidth = statusFont.measure(`${this.moves}`).width;
+        statusFont
+            .draw(`Moves:`, new PixelPosition(290, 8), bufferContext)
+            .draw(`${this.moves}`, new PixelPosition(386 - movesWidth, 8), bufferContext);
+
+        const pushesWidth = statusFont.measure(`${this.pushes}`).width;
+        statusFont
+            .draw(`Pushes:`, new PixelPosition(290, 28), bufferContext)
+            .draw(`${this.pushes}`, new PixelPosition(386 - pushesWidth, 28), bufferContext);
 
         if (this.won) {
             // Draw panel
