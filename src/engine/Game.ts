@@ -13,10 +13,12 @@ import TileMapLoader from './tile/TileMapLoader';
 
 export default class Game {
     public static readonly BACKGROUND_COLOR = '#252230';
+    public static readonly CONTINUES_ACTIONS = true;
     public static readonly MOON_POSITION = new PixelPosition(32, 32);
     public static readonly RENDER_PONDS = true;
     public static readonly RENDER_PILLARS = true;
     public static readonly RENDER_SHADOWS = true;
+    public static readonly PLAYER_SPEED = 1.0;
     public static readonly SMOOTHING = false;
     public static readonly TILE_SIZE = new PixelSize(16, 16);
 
@@ -146,7 +148,8 @@ export default class Game {
         let pressedKeyData: { pressed: boolean; startTime: number };
         Object.keys(this.pressedKeyList).forEach((pressedKey) => {
             pressedKeyData = this.pressedKeyList[pressedKey];
-            if (pressedKeyData.pressed) {
+            if (pressedKeyData.pressed && (Game.CONTINUES_ACTIONS || pressedKeyData.startTime == 0)) {
+
                 this.scene.control(pressedKey, currentTime - pressedKeyData.startTime);
                 this.pressedKeyList[pressedKey].startTime = currentTime;
             }

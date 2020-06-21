@@ -28,7 +28,7 @@ export default class Box extends Sprite {
                         [DirectionType.Left]: new Animation([new Frame(tileMap.get(new TilePosition(0, 0)), 0.0)]),
                         [DirectionType.Right]: new Animation([new Frame(tileMap.get(new TilePosition(0, 0)), 0.0)])
                     },
-                    0.5
+                    0.4
                 )
             },
             new CollisionBox(0, 16, 4, 16)
